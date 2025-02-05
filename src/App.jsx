@@ -3,46 +3,81 @@ import "./App.css";
 import Signup from "./components/Signup";
 import AuthProvider from "./contexts/AuthContext";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Dashboard from "./components/Dashboard";
+import Dashboard, { DashboardIndex } from "./components/Dashboard";
 import Login from "./components/Login";
 import PrivateRoute from "./components/PrivateRoute";
+import DashboardLayout from "./layouts/DashboardLayout";
+import UpdateProfile from "./components/UpdateProfile";
 
 function App() {
+
   return (
-    <>
-      {/* {}
-    <Signup/> */}
-      <Router>
-        <AuthProvider>
-          <Routes>
-            {/* <Route exact path = "/" Component={Dashboard}/> */}
-            {/* <Route path="/" element={<Dashboard />} /> */}
-            {/* <Route
-              path="/"
-              element={<PrivateRoute element={<Dashboard />} />}
-            /> */}
-            <Route path="/" element={<PrivateRoute element={<Dashboard />} />} />
-            <Route path="/login" Component={Login} />
-            <Route path="/signup" Component={Signup} />
-          </Routes>
-        </AuthProvider>
-      </Router>
+    <Router>
+      <AuthProvider>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
 
-      {/* <div className="parent-div flex flex-col h-screen w-screen">
-      <div className="flex h-screen ">
-        <Sidebar
-          userName="Alfen Nishanth S"
-          selectedItem={selectedItem}
-          setSelectedItem={setSelectedItem}
-        />
-      </div>
+          <Route
+            path="/dashboard/*"
+            element={
+              <PrivateRoute>
+                <DashboardLayout />
+              </PrivateRoute>
+            }
+          >
+            {/* Default dashboard view */}
+            <Route index element={<DashboardIndex/>} />
+            {/* Nested routes */}
+            <Route path="update-profile" element={<UpdateProfile />}/>
+            {/* <Route path="add-new-item" element={<AddNewItem />} /> */}
+          </Route>
 
-
-
-      {/* <ToastContainer /> 
-    </div> */}
-    </>
+          {/* Optionally, redirect root to dashboard */}
+          <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+        </Routes>
+      </AuthProvider>
+    </Router>
   );
+
 }
+
+
+//   return (
+//     <>
+//       {/* {}
+//     <Signup/> */}
+//       <Router>
+//         <AuthProvider>
+//           <Routes>
+//             {/* <Route exact path = "/" Component={Dashboard}/> */}
+//             {/* <Route path="/" element={<Dashboard />} /> */}
+//             {/* <Route
+//               path="/"
+//               element={<PrivateRoute element={<Dashboard />} />}
+//             /> */}
+//             <Route path="/" element={<PrivateRoute element={<Dashboard />} />} />
+//             <Route path="/login" Component={Login} />
+//             <Route path="/signup" Component={Signup} />
+//           </Routes>
+//         </AuthProvider>
+//       </Router>
+
+//       {/* <div className="parent-div flex flex-col h-screen w-screen">
+//       <div className="flex h-screen ">
+//         <Sidebar
+//           userName="Alfen Nishanth S"
+//           selectedItem={selectedItem}
+//           setSelectedItem={setSelectedItem}
+//         />
+//       </div>
+
+
+
+//       {/* <ToastContainer /> 
+//     </div> */}
+//     </>
+//   );
+// }
 
 export default App;

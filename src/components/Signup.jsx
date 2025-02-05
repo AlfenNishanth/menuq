@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { db } from "../fireabse/firebase";
 import { doc, getDoc, setDoc, updateDoc, collection } from "firebase/firestore";
 import { Loader2 } from "lucide-react";
+import { updateProfile } from "firebase/auth";
 
 const Signup = () => {
   const emailRef = useRef();
@@ -45,9 +46,13 @@ const Signup = () => {
         emailRef.current.value,
         passwordRef.current.value
       );
+
       //   console.log(JSON.stringify(currentUser));
       const user = userCredential.user; // Newly signed-up user
       if (user) {
+
+        await updateProfile(user, { displayName: ResNameRef.current.value});
+        console.log("updated user displayName: " + user);
         await registerRestaurant(
           user,
           phoneRef.current.value,
@@ -56,7 +61,7 @@ const Signup = () => {
           NoSeatsRef.current.value
         );
         setLoading(false);
-        navigate("/");
+        navigate("/dashboard");
       }
     } catch (err) {
       setError(
@@ -97,6 +102,7 @@ const Signup = () => {
       restaurantName: ResName,
       restaurantAddress: ResAdrs,
       noOfSeats: NoSeats,
+      createdAt: Date.now().toString()
     });
 
     await setDoc(metadataRef, { lastRestaurantId: newRestaurantId });
@@ -157,7 +163,7 @@ const Signup = () => {
             required
           />
           <input
-            type="text"
+            type="number"
             ref={NoSeatsRef}
             placeholder="No. of seats"
             className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"

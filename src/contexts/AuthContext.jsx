@@ -36,10 +36,10 @@ function AuthProvider({ children }) {
       setLoading(false);
       // console.log(JSON.stringify(currentUser) + 'in second ' + loading)
       console.log(
-        user ? `User logged in: ${JSON.stringify(user)}` : "No user logged in"
+        user ? `1 User logged in: ${JSON.stringify(user)}` : "1 No user logged in"
       );
     });
-    console.log(JSON.stringify(currentUser) + "third " + loading);
+    console.log(JSON.stringify(currentUser) + " 2 " + loading);
     return unsubscribe;
   }, []);
 

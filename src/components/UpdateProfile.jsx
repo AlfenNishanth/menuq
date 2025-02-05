@@ -36,7 +36,7 @@ const UpdateProfile = () => {
         // email: emailRef.current.value,
       });
       setLoading(false);
-      navigate("/"); // Navigate back to the dashboard or another page after updating.
+      navigate("/"); 
     } catch (err) {
       setError("Failed to update profile: " + err.message);
       setLoading(false);

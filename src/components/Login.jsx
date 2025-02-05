@@ -19,7 +19,7 @@ const Login = () => {
       setLoading(true);
       await login(emailRef.current.value, passwordRef.current.value);
       console.log(currentUser)
-      navigate('/')
+      navigate('/dashboard')
     } catch(err) {
       setError("Failed to Sign In " + err.message.replace("Firebase",""));
     }
