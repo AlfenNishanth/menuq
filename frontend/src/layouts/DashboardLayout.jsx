@@ -25,7 +25,7 @@ const DashboardLayout = () => {
       <Sidebar onLogoutClick={() => setShowLogoutModal(true)} />
         
         {/* The Outlet renders the nested route component */}
-        <div className="flex-1">
+        <div className="flex-1 overflow-y-scroll">
           <Outlet />
         </div>
       </div>

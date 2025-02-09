@@ -8,6 +8,8 @@ import Login from "./components/Login";
 import PrivateRoute from "./components/PrivateRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
 import UpdateProfile from "./components/UpdateProfile";
+import AddNewMenuItem from "./components/AddNewMenuItem";
+import MenuLayout from "./components/menuitems/MenuLayout";
 
 function App() {
 
@@ -30,11 +32,15 @@ function App() {
             <Route index element={<DashboardIndex/>} />
             {/* Nested routes */}
             <Route path="update-profile" element={<UpdateProfile />}/>
+            <Route path="add-new-menu-item" element={<AddNewMenuItem/>}/>
+
             {/* <Route path="add-new-item" element={<AddNewItem />} /> */}
           </Route>
 
           {/* Optionally, redirect root to dashboard */}
           <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+          <Route path="/res/:id" element={<MenuLayout/>}/>
+
         </Routes>
       </AuthProvider>
     </Router>

@@ -1,7 +1,7 @@
-import {  MoreVertical,MenuIcon, ChevronLeftIcon,HomeIcon,  ChartArea,ChevronDown, Edit,LogOut,
+import {  MoreVertical,MenuIcon, ChevronLeftIcon,HomeIcon,  ChartArea,ChevronDown, Edit,LogOut, PlusSquare,
 } from "lucide-react";
 import { createContext, useContext, useState } from "react";
-import { auth } from "../fireabse/firebase";
+import { useAuth } from "../contexts/AuthContext";
 import { NavLink } from "react-router-dom";
 import MarqueeText from "../animation/MarqueeText";
 
@@ -9,10 +9,10 @@ const SidebarContext = createContext();
 
 export default function Sidebar({onLogoutClick }) {
 
-  console.log('mounted sidebar');
+  // console.log('mounted sidebar');
 
   const [expanded, setExpanded] = useState(false);
-  const user = auth.currentUser;
+  const {currentUser: user} = useAuth();
   // console.log(user);
   
   const iconApi = `https://ui-avatars.com/api/?name=${String(user.displayName).replace(
@@ -52,23 +52,15 @@ export default function Sidebar({onLogoutClick }) {
               to="/dashboard/"
             />
             <SidebarItem
-              icon={<ChartArea size={20} />}
-              text="Dashboard"
-              to="/dashboard/dashboard"
-            >
-              <SidebarSubItem
-                text="place-holder"
-                icon={<MoreVertical size={20} />}
-              />
-              <SidebarSubItem
-                text="place-holder"
-                icon={<MoreVertical size={20} />}
-              />
-              <SidebarSubItem
-                text="place-holder"
-                icon={<MoreVertical size={20} />}
-              />
-            </SidebarItem>
+              icon={<PlusSquare size={20} />}
+              text="Add New Menu Item"
+              to="/dashboard/add-new-menu-item"
+            />
+            {/* <SidebarItem
+              icon={<Edit size={20} />}
+              text="Edit profile"
+              to="/dashboard/update-profile2"
+            /> */}
             <SidebarItem
               icon={<Edit size={20} />}
               text="Edit profile"
@@ -96,7 +88,7 @@ export default function Sidebar({onLogoutClick }) {
             <div className="leading-4">
               {/* <h4 className="font-semibold" >{user?.displayName}</h4> */}
               {/* <MarqueeText text={user?.displayName} /> */}
-              <MarqueeText text="abc" />              
+              <MarqueeText text={user.displayName} />              
               <span className="text-xs text-gray-600">{user?.email}</span>
             </div>
             <MoreVertical />
