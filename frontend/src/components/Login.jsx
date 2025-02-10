@@ -9,19 +9,19 @@ const Login = () => {
   const { login, currentUser } = useAuth();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-    const navigate = useNavigate()
+  const navigate = useNavigate();
 
   async function handleSubmit(e) {
     e.preventDefault();
-    console.log(currentUser)
+    console.log(currentUser);
     try {
       setError("");
       setLoading(true);
       await login(emailRef.current.value, passwordRef.current.value);
-      console.log(currentUser)
-      navigate('/dashboard')
-    } catch(err) {
-      setError("Failed to Sign In " + err.message.replace("Firebase",""));
+      console.log(currentUser);
+      navigate("/dashboard/");
+    } catch (err) {
+      setError("Failed to Sign In " + err.message.replace("Firebase", ""));
     }
     setLoading(false);
   }
@@ -52,10 +52,14 @@ const Login = () => {
             className="w-full bg-teal-400 text-white p-2 rounded-lg hover:bg-teal-700 transition"
             disabled={loading}
           >
-Log In          </button>
+            Log In{" "}
+          </button>
         </form>
         <div className="flex justify-center">
-          New User?  {""} <Link to="/signup" className="text-blue-800 underline ml-2">Sign Up</Link>
+          New User? {""}{" "}
+          <Link to="/signup" className="text-blue-800 underline ml-2">
+            Sign Up
+          </Link>
         </div>
       </div>
     </div>

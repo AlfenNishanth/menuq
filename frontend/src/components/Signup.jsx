@@ -61,7 +61,7 @@ const Signup = () => {
           NoSeatsRef.current.value
         );
         setLoading(false);
-        navigate("/dashboard");
+        navigate("/dashboard/");
       }
     } catch (err) {
       setError(

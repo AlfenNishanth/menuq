@@ -1,0 +1,23 @@
+GET http://localhost:3000/menuq/67a8f4fadf30e4b6a6e64757
+
+###
+GET http://localhost:3000/menuq/RX00002
+
+###
+
+GET http://localhost:3000/menuq/
+
+###
+POST http://localhost:3000/menuq
+Content-Type: application/json
+
+{
+  "firebaseUid": "user_123456789",
+  "email": "test122@example.com",
+  "phone": "9876543210",
+  "restaurantName": "Tasty Bites",
+  "restaurantAddress": "123 Main Street, City",
+  "noOfSeats": 0
+//  "restaurantCategory": "Cafe",
+//  "cuisineType": ["Italian", "Indian"],
+}
