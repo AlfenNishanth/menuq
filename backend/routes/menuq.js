@@ -4,7 +4,7 @@ const router = express.Router();
 const Restaurant = require("../models/restaurants");
 const MenuItem = require("../models/menuItem");
 const multer = require("multer");
-const { v4: uuidv4 } = require("uuid");
+const { v4 } = require("uuid");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 
 const storage = multer.memoryStorage();
@@ -120,7 +120,7 @@ async function getRestaurantById(req, res, next) {
 }
 
 //Menu
-router.post("/menu", async (req, res) => {
+router.post("/menu", upload.single("image"), async (req, res) => {
   try {
     const {
       restaurantID,
@@ -130,10 +130,15 @@ router.post("/menu", async (req, res) => {
       price,
       variants,
       addOns,
-      imageUrl,
       available,
       tags,
     } = req.body;
+
+    let imageUrl = "";
+    if (req.file) {
+      console.log("calling upload func");
+      imageUrl = await uploadFileToS3(req.file);
+    }
 
     const newMenuItem = new MenuItem({
       restaurantID,
@@ -147,51 +152,31 @@ router.post("/menu", async (req, res) => {
       available,
       tags,
     });
-
+    console.log("trying to save to mongo");
     const savedMenuItem = await newMenuItem.save();
     res.status(201).json(savedMenuItem); // Respond with the saved menu item
   } catch (err) {
+    console.log(`Error while tyring to create menu: ${err}`);
     res.status(400).json({ message: err.message });
   }
 });
 
-//post image
+//upload file
+async function uploadFileToS3(file) {
+  console.log("trying to upload file");
+  const fileName = `${file.originalname}_${v4()}`;
+  const params = {
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: fileName,
+    Body: file.buffer,
+    ContentType: file.mimetype,
+    // ACL: "public-read",
+  };
 
-router.post("/upload", upload.single("file"), async (req, res) => {
-  try {
-    const file = req.file;
-    if (!file) {
-      return res.status(400).json({ error: "No file provided" });
-    }
-
-    const fileName = `${file.originalname}_${uuidv4()}`;
-
-    const params = {
-      Bucket: process.env.AWS_BUCKET_NAME,
-      Key: fileName,
-      Body: file.buffer,
-      ContentType: file.mimetype,
-      ACL: "public-read", // Makes the file publicly accessible; adjust if needed
-    };
-
-    const command = new PutObjectCommand(params);
-
-    await s3Client.send(command);
-    // , (err, data) => {
-    //   if (err) {
-    //     console.error("Error uploading file to S3:", err);
-    //     return res.status(500).json({ error: "Error uploading file" + err });
-    //   }
-    //   // data.Location contains the public URL of the uploaded file
-    //   return res.status(200).json({ imageUrl: data.Location });
-    // });
-
-    const imageUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
-    return res.status(200).json({ imageUrl });
-  } catch (error) {
-    console.error("Server error:", error);
-    res.status(500).json({ error: "Server error" + error});
-  }
-});
+  const command = new PutObjectCommand(params);
+  await s3Client.send(command);
+  // Manually construct the URL (this assumes your bucket’s public URL format)
+  return `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+}
 
 module.exports = router;

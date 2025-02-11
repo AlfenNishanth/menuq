@@ -60,64 +60,45 @@ export default function AddNewMenuItem() {
     const file = e.target.files[0];
     if (file) {
       setImageFile(file);
-      setImageUrl(URL.createObjectURL(file));
+      setImageUrl(URL.createObjectURL(file)); // for previewing the image
     }
-  };
-
-  const handleImageUpload = async () => {
-    if (!imageFile) return alert("Please select an image to upload");
-    setUploading(true);
-    const storageRef = ref(storage, `menuImages/${v4()}_${imageFile.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, imageFile);
-    uploadTask.on(
-      "state_changed",
-      null,
-      (error) => {
-        console.error("Upload error:", error);
-        setUploading(false);
-      },
-      async () => {
-        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-        setImageUrl(downloadURL);
-        setUploading(false);
-      }
-    );
   };
 
   const onSubmit = async (data) => {
     if (!currentUser) return alert("You must be logged in to add menu items!");
-    // if (!data.name.trim()) {
-    //     setError("name", { type: "manual", message: "Name is required" });
-    //     return;
-    //   }
 
     setLoading(true);
 
     const restaurantID = userData.restaurantId; // Assuming RestaurantID is user's UID
-
     const finalType = data.type === "Custom" ? data.customType : data.type;
 
-    const menuItem = {
-      restaurantID,
-      name: data.name,
-      description: data.description,
-      type: finalType,
-      price: parseFloat(data.price),
-      variants,
-      addOns,
-      imageUrl: imageUrl,
-      available: data.available === "true",
-      tags,
-    };
+    const formData = new FormData();
+    formData.append("restaurantID", restaurantID);
+    formData.append("name", data.name);
+    formData.append("description", data.description);
+    formData.append("type", finalType);
+    formData.append("price", parseFloat(data.price));
+    formData.append("variants", JSON.stringify(variants));
+    formData.append("available", true);
+    formData.append("addOns", JSON.stringify(addOns));
+    formData.append("tags", JSON.stringify(tags));
+
+    if (imageFile) {
+      formData.append("image", imageFile);
+    }
+
+    console.log(formData);
 
     try {
-      const response = await addMenuItem(menuItem);
+      const response = await addMenuItem(formData);
       //   alert("Menu item added successfully!");
       toast.success("Menu item added successfully!", { autoClose: 2000 });
       reset();
       setVariants([]);
       setAddOns([]);
       setTags([]);
+      setImageFile(null);
+      setImageUrl("");
       //      setCustomType("");
     } catch (error) {
       console.error("Error adding menu item:", error);
