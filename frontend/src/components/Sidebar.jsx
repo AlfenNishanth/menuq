@@ -13,7 +13,10 @@ export default function Sidebar({onLogoutClick }) {
 
   const [expanded, setExpanded] = useState(false);
   const {currentUser: user} = useAuth();
-  // console.log(user);
+
+  const {userData} = useAuth();
+  console.log("from sidebar")
+  console.log(userData);
   
   const iconApi = `https://ui-avatars.com/api/?name=${String(user.displayName).replace(
     / /g,

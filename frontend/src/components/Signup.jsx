@@ -6,6 +6,7 @@ import { db } from "../fireabse/firebase";
 import { doc, getDoc, setDoc, updateDoc, collection } from "firebase/firestore";
 import { Loader2 } from "lucide-react";
 import { updateProfile } from "firebase/auth";
+import { registerRestaurant } from "../api/restaurant";
 
 const Signup = () => {
   const emailRef = useRef();
@@ -15,6 +16,11 @@ const Signup = () => {
   const ResAdrsRef = useRef();
   const NoSeatsRef = useRef();
   const phoneRef = useRef();
+  const [ResLoc, setResLoc] = useState({ type: "Point", coordinates: [0, 0] });
+  const [ResCategory, setResCategory] = useState("Other");
+  const [CuisineType, setCuisineType] = useState([]);
+  const [OperatingHours, setOperatingHours] = useState([]);
+  const [SocialMedia, setSocialMedia] = useState({});
 
   const { signUp, currentUser } = useAuth();
   const [error, setError] = useState("");
@@ -50,16 +56,23 @@ const Signup = () => {
       //   console.log(JSON.stringify(currentUser));
       const user = userCredential.user; // Newly signed-up user
       if (user) {
-
-        await updateProfile(user, { displayName: ResNameRef.current.value});
+        await updateProfile(user, { displayName: ResNameRef.current.value });
         console.log("updated user displayName: " + user);
-        await registerRestaurant(
-          user,
-          phoneRef.current.value,
-          ResNameRef.current.value,
-          ResAdrsRef.current.value,
-          NoSeatsRef.current.value
-        );
+        const data = {
+          firebaseUid: user.uid,
+          email: emailRef.current.value,
+          phone: phoneRef.current.value,
+          restaurantName: ResNameRef.current.value,
+          restaurantAddress: ResAdrsRef.current.value,
+          restaurantLocation: ResLoc, // This should be an object like: { type: "Point", coordinates: [lng, lat] }
+          noOfSeats: NoSeatsRef.current.value,
+          restaurantCategory: ResCategory,
+          cuisineType: CuisineType,
+          operatingHours: OperatingHours,
+          socialMedia: SocialMedia,
+        };
+        
+        await registerRestaurant(data);
         setLoading(false);
         navigate("/dashboard/");
       }
@@ -71,43 +84,6 @@ const Signup = () => {
     }
 
     setLoading(false);
-  }
-
-  async function registerRestaurant(
-    currentUser,
-    phone,
-    ResName,
-    ResAdrs,
-    NoSeats
-  ) {
-    console.log("inside register func");
-    const metadataRef = doc(db, "metadata", "restaurantCounter");
-
-    const metadataSnap = await getDoc(metadataRef);
-    let lastId = "R0000";
-    console.log(metadataSnap);
-
-    if (metadataSnap.exists()) {
-      lastId = metadataSnap.data().lastRestaurantId;
-    }
-
-    const newRestaurantId = `R${String(
-      parseInt(lastId.substring(1)) + 1
-    ).padStart(4, "0")}`;
-
-    await setDoc(doc(db, "Users", currentUser.uid), {
-      email: currentUser.email,
-      phone: phone,
-      restaurantId: newRestaurantId,
-      restaurantName: ResName,
-      restaurantAddress: ResAdrs,
-      noOfSeats: NoSeats,
-      createdAt: Date.now().toString()
-    });
-
-    await setDoc(metadataRef, { lastRestaurantId: newRestaurantId });
-
-    return newRestaurantId;
   }
 
   return (

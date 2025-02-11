@@ -8,6 +8,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Upload, XCircleIcon, XIcon } from "lucide-react";
 import { v4 } from "uuid";
+import { addMenuItem } from "../api/menuItem";
 
 export default function AddNewMenuItem() {
   const {
@@ -97,6 +98,7 @@ export default function AddNewMenuItem() {
     const finalType = data.type === "Custom" ? data.customType : data.type;
 
     const menuItem = {
+      restaurantID,
       name: data.name,
       description: data.description,
       type: finalType,
@@ -106,15 +108,12 @@ export default function AddNewMenuItem() {
       imageUrl: imageUrl,
       available: data.available === "true",
       tags,
-      restaurantID,
-      createdAt: new Date(), // Created timestamp
-      updatedAt: new Date(), // Updated timestamp (same on creation)
     };
 
     try {
-      await addDoc(collection(db, "Menu"), menuItem);
+      const response = await addMenuItem(menuItem);
       //   alert("Menu item added successfully!");
-      toast.success("Menu item added successfully!", {autoClose: 2000});
+      toast.success("Menu item added successfully!", { autoClose: 2000 });
       reset();
       setVariants([]);
       setAddOns([]);
@@ -122,8 +121,7 @@ export default function AddNewMenuItem() {
       //      setCustomType("");
     } catch (error) {
       console.error("Error adding menu item:", error);
-      toast.error("Error adding menu item: ", error);
-      //   setLoading(false);
+      toast.error("Error adding menu item: " + error, { autoClose: 2000 });
     }
     setLoading(false);
   };
@@ -211,11 +209,14 @@ export default function AddNewMenuItem() {
         {/* Price */}
         <input
           type="number"
-          {...register("price")}
+          {...register("price", { required: "Price is required" })}
           placeholder="Base Price"
           className="w-full p-2 border rounded"
           disabled={loading}
         />
+        {errors.price && (
+          <p className="text-red-500 text-sm">{errors.price.message}</p>
+        )}
 
         {/* Variants */}
         <div className="space-y-2">
@@ -297,9 +298,7 @@ export default function AddNewMenuItem() {
               />
               <button
                 type="button"
-                onClick={() =>
-                  setAddOns(addOns.filter((_, i) => i !== index))
-                }
+                onClick={() => setAddOns(addOns.filter((_, i) => i !== index))}
                 className="bg-red-500 text-white px-2 rounded cursor-pointer"
                 disabled={loading}
               >

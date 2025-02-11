@@ -6,9 +6,12 @@ const restaurantSchema = new mongoose.Schema({
   restaurantId: { type: String, unique: true },
   firebaseUid: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
-  phone: { type: String, required: true },
+  phone: { type: String },
   restaurantName: { type: String, required: true },
-  restaurantAddress: { type: String, required: true },
+  restaurantAddress: { type: String },
+  restaurantCity: { type: String },
+  restaurantState: { type: String },
+  restaurantPincode: { type: String },
 
   // Geolocation (For maps & nearby search)
   restaurantLocation: {
@@ -16,7 +19,7 @@ const restaurantSchema = new mongoose.Schema({
     coordinates: { type: [Number] }, // [longitude, latitude]
   },
 
-  noOfSeats: { type: Number, required: true },
+  noOfSeats: { type: Number },
 
   // Restaurant category (Predefined & Custom)
   restaurantCategory: {
@@ -28,7 +31,7 @@ const restaurantSchema = new mongoose.Schema({
   //   customCategory: { type: String }, // Only used if "Other" is selected
 
   // Cuisine type (e.g., Indian, Italian, etc.)
-  cuisineType: { type: [String], required: true }, // Array of cuisines
+  cuisineType: { type: [String] }, // Array of cuisines
 
   // Operating hours (Array of time slots)
   operatingHours: [
@@ -45,7 +48,7 @@ const restaurantSchema = new mongoose.Schema({
           "Sunday",
         ],
       },
-      hours: { type: String, required: true }, // Example: "7AM - 11AM, 12PM - 3PM"
+      hours: { type: String }, // Example: "7AM - 11AM, 12PM - 3PM"
     },
   ],
 

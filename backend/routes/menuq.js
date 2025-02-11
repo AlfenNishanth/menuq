@@ -1,6 +1,22 @@
+require("dotenv").config();
 const express = require("express");
 const router = express.Router();
 const Restaurant = require("../models/restaurants");
+const MenuItem = require("../models/menuItem");
+const multer = require("multer");
+const { v4: uuidv4 } = require("uuid");
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+const s3Client = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+});
 
 //Get all
 router.get("/", async (req, res) => {
@@ -17,6 +33,11 @@ router.get("/:id", getRestaurant, (req, res) => {
   res.json(res.restaurant);
 });
 
+//Get by restaurantId
+router.get("/byId/:id", getRestaurantById, (req, res) => {
+  res.json(res.restaurant);
+});
+
 //Create one
 router.post("/", async (req, res) => {
   try {
@@ -26,6 +47,9 @@ router.post("/", async (req, res) => {
       phone,
       restaurantName,
       restaurantAddress,
+      restaurantCity,
+      restaurantState,
+      restaurantPincode,
       restaurantLocation,
       noOfSeats,
       restaurantCategory,
@@ -39,6 +63,9 @@ router.post("/", async (req, res) => {
       phone,
       restaurantName,
       restaurantAddress,
+      restaurantCity,
+      restaurantState,
+      restaurantPincode,
       restaurantLocation,
       noOfSeats,
       restaurantCategory,
@@ -63,13 +90,8 @@ router.delete("/:id", (req, res) => {});
 async function getRestaurant(req, res, next) {
   let restaurant;
   try {
-    // restaurant = await Restaurant.findById(req.params.id);
-    if (/^[0-9a-fA-F]{24}$/.test(req.params.id)) {
-      restaurant = await Restaurant.findById(req.params.id);
-    } else {
-      // If not a MongoDB ID, search by restaurantId (RX00001, RX00002...)
-      restaurant = await Restaurant.findOne({ restaurantId: req.params.id });
-    }
+    restaurant = await Restaurant.findOne({ firebaseUid: req.params.id });
+    // restaurant = await Restaurant.findOne({ restaurantId: req.params.id });
 
     if (restaurant == null) {
       return res.status(404).json({ message: "Cannot find restaurant" });
@@ -80,5 +102,96 @@ async function getRestaurant(req, res, next) {
   res.restaurant = restaurant;
   next();
 }
+
+async function getRestaurantById(req, res, next) {
+  let restaurant;
+  try {
+    const restaurant = await Restaurant.findOne({
+      restaurantId: req.params.id,
+    });
+    if (restaurant == null) {
+      return res.status(404).json({ message: "Cannot find restaurant" });
+    }
+    res.json(restaurant);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+  next();
+}
+
+//Menu
+router.post("/menu", async (req, res) => {
+  try {
+    const {
+      restaurantID,
+      name,
+      description,
+      type,
+      price,
+      variants,
+      addOns,
+      imageUrl,
+      available,
+      tags,
+    } = req.body;
+
+    const newMenuItem = new MenuItem({
+      restaurantID,
+      name,
+      description,
+      type,
+      price,
+      variants,
+      addOns,
+      imageUrl,
+      available,
+      tags,
+    });
+
+    const savedMenuItem = await newMenuItem.save();
+    res.status(201).json(savedMenuItem); // Respond with the saved menu item
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+//post image
+
+router.post("/upload", upload.single("file"), async (req, res) => {
+  try {
+    const file = req.file;
+    if (!file) {
+      return res.status(400).json({ error: "No file provided" });
+    }
+
+    const fileName = `${file.originalname}_${uuidv4()}`;
+
+    const params = {
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: fileName,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+      ACL: "public-read", // Makes the file publicly accessible; adjust if needed
+    };
+
+    const command = new PutObjectCommand(params);
+
+    await s3Client.send(command);
+    // , (err, data) => {
+    //   if (err) {
+    //     console.error("Error uploading file to S3:", err);
+    //     return res.status(500).json({ error: "Error uploading file" + err });
+    //   }
+    //   // data.Location contains the public URL of the uploaded file
+    //   return res.status(200).json({ imageUrl: data.Location });
+    // });
+
+    const imageUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+    return res.status(200).json({ imageUrl });
+  } catch (error) {
+    console.error("Server error:", error);
+    res.status(500).json({ error: "Server error" + error});
+  }
+});
 
 module.exports = router;

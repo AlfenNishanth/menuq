@@ -7,6 +7,9 @@ import {
   onAuthStateChanged,
 } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
+import axios from "axios";
+import config from "../../config";
+import { fetchRestaurantByUID } from "../api/restaurant";
 
 const AuthContext = React.createContext();
 
@@ -49,7 +52,7 @@ function AuthProvider({ children }) {
   //         console.log("Error fetching user data" + error)
   //         setUserData(null);
   //       })}
-  //     setLoading(false);    
+  //     setLoading(false);
   //   });
 
   //   // console.log(JSON.stringify(currentUser) + " 2 " + loading);
@@ -61,33 +64,36 @@ function AuthProvider({ children }) {
       setCurrentUser(user);
       // console.log(JSON.stringify(currentUser) + 'in second ' + loading)
       // console.log(user ? `1 User logged in: ${JSON.stringify(user)}` : "1 No user logged in");
-      const fetchUserData = async () => {
-        if(user){
-          const userRef = doc(db, "Users", user.uid);
-          try{const userSnap = await getDoc(userRef);
-          if(userSnap.exists()){
-            setUserData(userSnap.data());
-          } else setUserData(null);}
-          catch(error){
+      const getUserData = async () => {
+        if (user) {
+          try {
+            const data = await fetchRestaurantByUID(user.uid);
+            if (data) {
+              setUserData(data);
+              console.log("setted user data: " + JSON.stringify(data));
+            } else {
+              setUserData(null);
+              //todo: check and direct to update profile
+            }
+          } catch (error) {
             console.log("Error while fetching user data: " + error);
             setUserData(null);
           }
-        }else setUserData(null);
-        setLoading(false);    
-      }
-      fetchUserData();
+        } else setUserData(null);
+        setLoading(false);
+      };
+      getUserData();
     });
     // console.log(JSON.stringify(currentUser) + " 2 " + loading);
     return unsubscribe;
   }, []);
 
-    // const unsubscribe = onAuthStateChanged(auth, user=> {
-    //     console.log(JSON.stringify(currentUser) + 'first ' + loading)
-    //     setCurrentUser(user);
-    //     setLoading(false)
-    //     console.log(JSON.stringify(currentUser) + 'in second ' + loading)
-    // })
-
+  // const unsubscribe = onAuthStateChanged(auth, user=> {
+  //     console.log(JSON.stringify(currentUser) + 'first ' + loading)
+  //     setCurrentUser(user);
+  //     setLoading(false)
+  //     console.log(JSON.stringify(currentUser) + 'in second ' + loading)
+  // })
 
   // useEffect(() => {
   //     console.log("Updated userDAta in the context: ", userData);

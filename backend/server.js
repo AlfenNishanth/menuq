@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const app = express();
+const cors = require("cors");
 const mongoose = require("mongoose");
 
 mongoose.connect(process.env.DATABASE_URL);
@@ -14,6 +15,7 @@ db.once("open", () => {
   console.log("Database connection established");
 });
 
+app.use(cors());
 app.use(express.json());
 
 const menuRouter = require("./routes/menuq");
