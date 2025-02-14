@@ -91,7 +91,7 @@ export default function AddNewMenuItem() {
 
     try {
       const response = await addMenuItem(formData);
-      //   alert("Menu item added successfully!");
+    //   alert("Menu item added successfully!");
       toast.success("Menu item added successfully!", { autoClose: 2000 });
       reset();
       setVariants([]);
