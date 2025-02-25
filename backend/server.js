@@ -18,7 +18,10 @@ db.once("open", () => {
 app.use(cors());
 app.use(express.json());
 
-const menuRouter = require("./routes/menuq");
-app.use("/menuq", menuRouter);
+const resRouter = require("./routes/menuq");
+app.use("/menuq", resRouter);
+
+const menuRouter = require("./routes/menu");
+app.use("/menu", menuRouter);
 
 app.listen(3000, () => console.log("Server running on port 3000"));

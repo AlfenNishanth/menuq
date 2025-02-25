@@ -23,3 +23,6 @@ Content-Type: application/json
 //  "restaurantCategory": "Cafe",
 //  "cuisineType": ["Italian", "Indian"],
 }
+
+###
+GET http://localhost:3000/menu/RX00001

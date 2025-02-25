@@ -15,3 +15,14 @@ export async function addMenuItem(menuItem) {
     throw error;
   }
 }
+
+export async function getRestaurantMenu(id) {
+
+  try {
+    const response = await axios.get(`${config.MENU}/${id}`);
+  console.log(`${config.MENUQ}/${id}`)
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}

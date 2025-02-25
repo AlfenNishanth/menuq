@@ -78,10 +78,14 @@ export default function AddNewMenuItem() {
     formData.append("description", data.description);
     formData.append("type", finalType);
     formData.append("price", parseFloat(data.price));
-    formData.append("variants", JSON.stringify(variants));
+    // if(variants.length !== 0) formData.append("variants", JSON.stringify(variants));
+    if(variants.length !== 0) formData.append("variants", variants);
     formData.append("available", true);
-    formData.append("addOns", JSON.stringify(addOns));
-    formData.append("tags", JSON.stringify(tags));
+    // if(addOns.length !== 0) formData.append("addOns", JSON.stringify(addOns));
+    // if(tags.length !== 0) formData.append("tags", tags)
+    if(addOns.length !== 0) formData.append("addOns", addOns);
+    if(tags.length !== 0) formData.append("tags", tags)
+
 
     if (imageFile) {
       formData.append("image", imageFile);
