@@ -390,6 +390,7 @@ export default function Sidebar({ onLogoutClick }) {
           <div className="flex items-center space-x-2">
           <img 
             src="frontend/public/short logo.png"
+            alt="Your Company Logo" 
             className="h-6 w-6" 
           />
             <span 

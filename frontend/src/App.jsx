@@ -10,6 +10,7 @@ import DashboardLayout from "./layouts/DashboardLayout";
 import UpdateProfile from "./components/UpdateProfile";
 import AddNewMenuItem from "./components/AddNewMenuItem";
 import MenuLayout from "./components/menuitems/MenuLayout";
+import LandingPage from './components/LandingPage';
 
 function App() {
 
@@ -17,6 +18,7 @@ function App() {
     <Router>
       <AuthProvider>
         <Routes>
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
 
