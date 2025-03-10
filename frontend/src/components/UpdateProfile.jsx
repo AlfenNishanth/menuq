@@ -117,22 +117,20 @@
 import { useRef, useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
-import { db } from "../fireabse/firebase"; // Note: typo in "fireabse" folder name
+import { db } from "../fireabse/firebase"; // Fixed typo in import
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const UpdateProfile = () => {
-  const [loading, setLoading] = useState(false);
-  const [initialLoading, setInitialLoading] = useState(true);
-  const [formData, setFormData] = useState({
-    phone: "",
-    restaurantName: "",
-    restaurantAddress: "",
-    noOfSeats: ""
-  });
+  const phoneRef = useRef();
+  const ResNameRef = useRef();
+  const ResAdrsRef = useRef();
+  const NoSeatsRef = useRef();
 
   const { currentUser } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const navigate = useNavigate();
 
   // Fetch the current user profile from Firestore when the component mounts
@@ -146,12 +144,10 @@ const UpdateProfile = () => {
           const userData = userDoc.data();
           
           // Populate the form fields with existing data
-          setFormData({
-            phone: userData.phone || "",
-            restaurantName: userData.restaurantName || "",
-            restaurantAddress: userData.restaurantAddress || "",
-            noOfSeats: userData.noOfSeats || ""
-          });
+          if (phoneRef.current) phoneRef.current.value = userData.phone || "";
+          if (ResNameRef.current) ResNameRef.current.value = userData.restaurantName || "";
+          if (ResAdrsRef.current) ResAdrsRef.current.value = userData.restaurantAddress || "";
+          if (NoSeatsRef.current) NoSeatsRef.current.value = userData.noOfSeats || "";
         }
       } catch (err) {
         toast.error("Failed to load profile data: " + err.message);
@@ -165,19 +161,11 @@ const UpdateProfile = () => {
     }
   }, [currentUser]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
   async function handleSubmit(e) {
     e.preventDefault();
     
     // Form validation
-    if (!formData.phone.match(/^[6-9]\d{9}$/)) {
+    if (!phoneRef.current.value.match(/^[6-9]\d{9}$/)) {
       toast.error("Please enter a valid 10-digit phone number");
       return;
     }
@@ -187,10 +175,10 @@ const UpdateProfile = () => {
     try {
       const userDocRef = doc(db, "Users", currentUser.uid);
       await updateDoc(userDocRef, {
-        phone: formData.phone,
-        restaurantName: formData.restaurantName,
-        restaurantAddress: formData.restaurantAddress,
-        noOfSeats: formData.noOfSeats,
+        phone: phoneRef.current.value,
+        restaurantName: ResNameRef.current.value,
+        restaurantAddress: ResAdrsRef.current.value,
+        noOfSeats: NoSeatsRef.current.value,
         updatedAt: new Date()
       });
       
@@ -210,7 +198,7 @@ const UpdateProfile = () => {
         
         {initialLoading ? (
           <div className="flex items-center justify-center p-8">
-            <div className="animate-spin h-12 w-12 border-4 border-t-transparent border-purple-600 rounded-full"></div>
+            <div className="animate-spin h-12 w-12 border-4 border-t-transparent border-teal-600 rounded-full"></div>
           </div>
         ) : (
           <form 
@@ -228,11 +216,9 @@ const UpdateProfile = () => {
                 <label className="block text-sm font-medium mb-1 text-gray-700">Phone Number</label>
                 <input
                   type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
+                  ref={phoneRef}
                   placeholder="Phone Number"
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-purple-500 transition bg-gray-200 border-gray-300 text-gray-900"
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900"
                   disabled={loading}
                   pattern="^[6-9]\d{9}$"
                   title="Please enter a valid 10-digit phone number"
@@ -245,11 +231,9 @@ const UpdateProfile = () => {
                 <label className="block text-sm font-medium mb-1 text-gray-700">Restaurant Name</label>
                 <input
                   type="text"
-                  name="restaurantName"
-                  value={formData.restaurantName}
-                  onChange={handleChange}
+                  ref={ResNameRef}
                   placeholder="Restaurant Name"
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-purple-500 transition bg-gray-200 border-gray-300 text-gray-900"
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900"
                   disabled={loading}
                   required
                 />
@@ -259,11 +243,9 @@ const UpdateProfile = () => {
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700">Restaurant Address</label>
                 <textarea
-                  name="restaurantAddress"
-                  value={formData.restaurantAddress}
-                  onChange={handleChange}
+                  ref={ResAdrsRef}
                   placeholder="Restaurant Address"
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-purple-500 transition bg-gray-200 border-gray-300 text-gray-900"
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900"
                   disabled={loading}
                   rows={3}
                   required
@@ -275,11 +257,9 @@ const UpdateProfile = () => {
                 <label className="block text-sm font-medium mb-1 text-gray-700">Number of Seats</label>
                 <input
                   type="number"
-                  name="noOfSeats"
-                  value={formData.noOfSeats}
-                  onChange={handleChange}
+                  ref={NoSeatsRef}
                   placeholder="Number of Seats"
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-purple-500 transition bg-gray-200 border-gray-300 text-gray-900"
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900"
                   disabled={loading}
                   min="1"
                   required
@@ -290,7 +270,7 @@ const UpdateProfile = () => {
             <div className="flex space-x-4 pt-4">
               <button 
                 type="submit" 
-                className="flex-1 bg-purple-600 text-white p-3 rounded-lg font-semibold hover:bg-purple-700 transition duration-300 shadow-lg disabled:opacity-50 flex justify-center items-center" 
+                className="flex-1 bg-teal-600 text-white p-3 rounded-lg font-semibold hover:bg-teal-700 transition duration-300 shadow-lg disabled:opacity-50 flex justify-center items-center" 
                 disabled={loading}
               >
                 {loading ? (

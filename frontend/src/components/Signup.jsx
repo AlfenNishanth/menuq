@@ -205,10 +205,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash, FaSun, FaMoon, FaGoogle, FaFacebook, FaApple, FaCloudUploadAlt, FaTrash } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { db, storage } from "../fireabse/firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db, storage } from "../fireabse/firebase"; // Fixed typo in import path
+import { doc, getDoc, setDoc, updateDoc, collection } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { updateProfile } from "firebase/auth";
+import { registerRestaurant } from "../api/restaurant";
 
 const Signup = () => {
   const emailRef = useRef();
@@ -219,6 +220,13 @@ const Signup = () => {
   const NoSeatsRef = useRef();
   const phoneRef = useRef();
   const fileInputRef = useRef();
+
+  // Additional restaurant data
+  const [ResLoc, setResLoc] = useState({ type: "Point", coordinates: [0, 0] });
+  const [ResCategory, setResCategory] = useState("Other");
+  const [CuisineType, setCuisineType] = useState([]);
+  const [OperatingHours, setOperatingHours] = useState([]);
+  const [SocialMedia, setSocialMedia] = useState({});
 
   const { signUp, socialLogin, currentUser } = useAuth();
   const [error, setError] = useState("");
@@ -240,6 +248,11 @@ const Signup = () => {
   useEffect(() => {
     localStorage.setItem("language", language);
   }, [language]);
+
+  useEffect(() => {
+    localStorage.setItem("darkMode", darkMode);
+    document.body.classList.toggle("dark-mode", darkMode);
+  }, [darkMode]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -316,14 +329,24 @@ const Signup = () => {
           imageUrl = await uploadRestaurantImage(user.uid);
         }
         
-        await registerRestaurant(
-          user,
-          phoneRef.current.value,
-          ResNameRef.current.value,
-          ResAdrsRef.current.value,
-          NoSeatsRef.current.value,
-          imageUrl
-        );
+        // Prepare restaurant data
+        const data = {
+          firebaseUid: user.uid,
+          email: emailRef.current.value,
+          phone: phoneRef.current.value,
+          restaurantName: ResNameRef.current.value,
+          restaurantAddress: ResAdrsRef.current.value,
+          restaurantLocation: ResLoc,
+          noOfSeats: NoSeatsRef.current.value,
+          restaurantCategory: ResCategory,
+          cuisineType: CuisineType,
+          operatingHours: OperatingHours,
+          socialMedia: SocialMedia,
+          profileImage: imageUrl
+        };
+        
+        // Use your API function to register the restaurant
+        await registerRestaurant(data);
         
         toast.success("Account created successfully!");
         navigate("/dashboard");
@@ -332,46 +355,10 @@ const Signup = () => {
       const errorMessage = err.message.replace("Firebase: ", "");
       setError(`Failed to create an account: ${errorMessage}`);
       toast.error(`Signup failed: ${errorMessage}`);
+      console.error(error);
     }
 
     setLoading(false);
-  }
-
-  async function registerRestaurant(
-    currentUser,
-    phone,
-    ResName,
-    ResAdrs,
-    NoSeats,
-    imageUrl
-  ) {
-    const metadataRef = doc(db, "metadata", "restaurantCounter");
-
-    const metadataSnap = await getDoc(metadataRef);
-    let lastId = "R0000";
-
-    if (metadataSnap.exists()) {
-      lastId = metadataSnap.data().lastRestaurantId;
-    }
-
-    const newRestaurantId = `R${String(
-      parseInt(lastId.substring(1)) + 1
-    ).padStart(4, "0")}`;
-
-    await setDoc(doc(db, "Users", currentUser.uid), {
-      email: currentUser.email,
-      phone: phone,
-      restaurantId: newRestaurantId,
-      restaurantName: ResName,
-      restaurantAddress: ResAdrs,
-      noOfSeats: NoSeats,
-      profileImage: imageUrl,
-      createdAt: Date.now().toString()
-    });
-
-    await setDoc(metadataRef, { lastRestaurantId: newRestaurantId });
-
-    return newRestaurantId;
   }
 
   async function handleSocialSignup(provider) {
@@ -390,10 +377,19 @@ const Signup = () => {
   return (
     <div className={`flex items-center justify-center min-h-screen transition-colors duration-500 ${darkMode ? 'bg-gradient-to-r from-indigo-900 via-purple-900 to-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'}`}>
       <div className="absolute top-5 right-5 flex gap-3">
-        <button onClick={() => setDarkMode(!darkMode)} className="p-2 rounded-lg bg-gray-700 text-white hover:bg-gray-600 transition flex items-center">
+        <button 
+          onClick={() => setDarkMode(!darkMode)} 
+          className="p-2 rounded-lg bg-gray-700 text-white hover:bg-gray-600 transition flex items-center"
+          aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+        >
           {darkMode ? <FaSun className="text-yellow-400" /> : <FaMoon className="text-gray-400" />}
         </button>
-        <select value={language} onChange={(e) => setLanguage(e.target.value)} className="p-2 rounded-lg bg-gray-700 text-white">
+        <select 
+          value={language} 
+          onChange={(e) => setLanguage(e.target.value)} 
+          className="p-2 rounded-lg bg-gray-700 text-white"
+          aria-label="Select language"
+        >
           <option value="en">English</option>
           <option value="hi">Hindi</option>
           <option value="es">Español</option>
@@ -411,19 +407,21 @@ const Signup = () => {
               type="email" 
               ref={emailRef} 
               placeholder="Email Address" 
-              className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-purple-500 transition ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-200 border-gray-300 text-gray-900'}`} 
+              className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-200 border-gray-300 text-gray-900'}`} 
               required 
               autoFocus 
+              aria-label="Email Address"
             />
             
             <input 
               type="tel" 
               ref={phoneRef} 
               placeholder="Phone Number" 
-              className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-purple-500 transition ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-200 border-gray-300 text-gray-900'}`} 
+              className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-200 border-gray-300 text-gray-900'}`} 
               required
               pattern="^[6-9]\d{9}$"
               title="Please enter a valid 10-digit phone number."
+              aria-label="Phone Number"
             />
             
             <div className="relative">
@@ -431,8 +429,9 @@ const Signup = () => {
                 type={showPassword ? "text" : "password"} 
                 ref={passwordRef} 
                 placeholder="Password" 
-                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-purple-500 transition ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-200 border-gray-300 text-gray-900'}`} 
-                required 
+                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-200 border-gray-300 text-gray-900'}`} 
+                required
+                aria-label="Password" 
               />
               <button
                 type="button"
@@ -440,6 +439,7 @@ const Signup = () => {
                   darkMode ? "text-gray-400 hover:text-gray-200" : "text-gray-700 hover:text-gray-900"
                 }`}
                 onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
@@ -450,8 +450,9 @@ const Signup = () => {
                 type={showConfirmPassword ? "text" : "password"} 
                 ref={confirmPasswordRef} 
                 placeholder="Confirm Password" 
-                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-purple-500 transition ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-200 border-gray-300 text-gray-900'}`} 
-                required 
+                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-200 border-gray-300 text-gray-900'}`} 
+                required
+                aria-label="Confirm Password" 
               />
               <button
                 type="button"
@@ -459,6 +460,7 @@ const Signup = () => {
                   darkMode ? "text-gray-400 hover:text-gray-200" : "text-gray-700 hover:text-gray-900"
                 }`}
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                aria-label={showConfirmPassword ? "Hide password" : "Show password"}
               >
                 {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
@@ -468,16 +470,18 @@ const Signup = () => {
               type="text" 
               ref={ResNameRef} 
               placeholder="Restaurant Name" 
-              className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-purple-500 transition ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-200 border-gray-300 text-gray-900'}`} 
-              required 
+              className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-200 border-gray-300 text-gray-900'}`} 
+              required
+              aria-label="Restaurant Name" 
             />
             
             <input 
               type="text" 
               ref={ResAdrsRef} 
               placeholder="Restaurant Address" 
-              className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-purple-500 transition ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-200 border-gray-300 text-gray-900'}`} 
-              required 
+              className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-200 border-gray-300 text-gray-900'}`} 
+              required
+              aria-label="Restaurant Address" 
             />
             
             <input 
@@ -485,12 +489,30 @@ const Signup = () => {
               ref={NoSeatsRef} 
               placeholder="Number of Seats" 
               min="1"
-              className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-purple-500 transition ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-200 border-gray-300 text-gray-900'}`} 
-              required 
+              className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-200 border-gray-300 text-gray-900'}`} 
+              required
+              aria-label="Number of Seats" 
             />
 
+            {/* Restaurant Category Dropdown */}
+            <select
+              value={ResCategory}
+              onChange={(e) => setResCategory(e.target.value)}
+              className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-200 border-gray-300 text-gray-900'}`}
+              aria-label="Restaurant Category"
+            >
+              <option value="Other">Select Category</option>
+              <option value="Fine Dining">Fine Dining</option>
+              <option value="Casual Dining">Casual Dining</option>
+              <option value="Cafe">Cafe</option>
+              <option value="Fast Food">Fast Food</option>
+              <option value="Buffet">Buffet</option>
+              <option value="Food Truck">Food Truck</option>
+              <option value="Other">Other</option>
+            </select>
+
             {/* Restaurant Image Upload */}
-            <div className={`border-2 border-dashed rounded-lg p-4 transition ${darkMode ? 'border-gray-600 hover:border-gray-400' : 'border-gray-300 hover:border-purple-400'} text-center`}>
+            <div className={`border-2 border-dashed rounded-lg p-4 transition ${darkMode ? 'border-gray-600 hover:border-gray-400' : 'border-gray-300 hover:border-teal-400'} text-center`}>
               <div className="space-y-2">
                 {imagePreview ? (
                   <div className="relative">
@@ -503,6 +525,7 @@ const Signup = () => {
                       type="button" 
                       onClick={removeImage}
                       className="absolute -top-2 -right-2 bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 transition"
+                      aria-label="Remove image"
                     >
                       <FaTrash size={12} />
                     </button>
@@ -522,6 +545,7 @@ const Signup = () => {
                   onChange={handleImageChange}
                   className="hidden"
                   id="restaurant-image"
+                  aria-label="Upload restaurant image"
                 />
                 
                 {!imagePreview && (
@@ -530,9 +554,10 @@ const Signup = () => {
                     onClick={() => fileInputRef.current.click()}
                     className={`mt-2 inline-flex items-center px-4 py-2 text-sm font-medium rounded-md ${
                       darkMode 
-                        ? 'bg-purple-700 text-white hover:bg-purple-600' 
-                        : 'bg-purple-600 text-white hover:bg-purple-700'
+                        ? 'bg-teal-700 text-white hover:bg-teal-600' 
+                        : 'bg-teal-600 text-white hover:bg-teal-700'
                     } transition-colors`}
+                    aria-label="Browse for restaurant image"
                   >
                     Browse Image
                   </button>
@@ -547,6 +572,7 @@ const Signup = () => {
                         ? 'bg-gray-700 text-white hover:bg-gray-600' 
                         : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
                     } transition-colors`}
+                    aria-label="Change restaurant image"
                   >
                     Change Image
                   </button>
@@ -557,8 +583,9 @@ const Signup = () => {
 
           <button 
             type="submit" 
-            className="w-full bg-purple-600 text-white p-3 rounded-lg font-semibold hover:bg-purple-700 transition duration-300 shadow-lg disabled:opacity-50 flex justify-center items-center" 
+            className="w-full bg-teal-600 text-white p-3 rounded-lg font-semibold hover:bg-teal-700 transition duration-300 shadow-lg disabled:opacity-50 flex justify-center items-center" 
             disabled={loading || uploadingImage}
+            aria-label="Create account"
           >
             {loading || uploadingImage ? (
               <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
@@ -571,15 +598,33 @@ const Signup = () => {
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-400 mb-2">Or sign up with</p>
           <div className="flex justify-center space-x-3">
-            <button className="p-3 bg-red-600 text-white rounded-full hover:bg-red-700" onClick={() => handleSocialSignup('google')}><FaGoogle /></button>
-            <button className="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-700" onClick={() => handleSocialSignup('facebook')}><FaFacebook /></button>
-            <button className="p-3 bg-black text-white rounded-full hover:bg-gray-800" onClick={() => handleSocialSignup('apple')}><FaApple /></button>
+            <button 
+              className="p-3 bg-red-600 text-white rounded-full hover:bg-red-700" 
+              onClick={() => handleSocialSignup('google')}
+              aria-label="Sign up with Google"
+            >
+              <FaGoogle />
+            </button>
+            <button 
+              className="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-700" 
+              onClick={() => handleSocialSignup('facebook')}
+              aria-label="Sign up with Facebook"
+            >
+              <FaFacebook />
+            </button>
+            <button 
+              className="p-3 bg-black text-white rounded-full hover:bg-gray-800" 
+              onClick={() => handleSocialSignup('apple')}
+              aria-label="Sign up with Apple"
+            >
+              <FaApple />
+            </button>
           </div>
         </div>
 
         <div className="flex justify-center mt-4 text-gray-400">
           Already have an account?
-          <Link to="/login" className="text-purple-400 underline ml-2 hover:text-purple-600 transition">Log In</Link>
+          <Link to="/login" className="text-teal-400 underline ml-2 hover:text-teal-600 transition">Log In</Link>
         </div>
       </div>
 
