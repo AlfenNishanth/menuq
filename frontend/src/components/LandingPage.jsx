@@ -99,52 +99,92 @@ function LandingPage() {
       </header>
       
       {/* Hero Section */}
-<section className="relative pt-32 pb-20 bg-gradient-to-b from-blue-50 to-white">
+<section className="relative pt-36 pb-24 bg-gradient-to-br from-indigo-50 via-slate-50 to-stone-50">
   <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-    <div className="flex flex-col lg:flex-row items-center">
+    {/* Decorative Elements */}
+    <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-10 pointer-events-none">
+      <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-indigo-300 mix-blend-multiply"></div>
+      <div className="absolute top-1/3 right-1/4 w-64 h-64 rounded-full bg-amber-200 mix-blend-multiply"></div>
+      <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full bg-rose-200 mix-blend-multiply"></div>
+    </div>
+    
+    <div className="flex flex-col lg:flex-row items-center relative z-10">
       {/* Left Side - Text Content */}
-      <div className="lg:w-1/2 mb-10 lg:mb-0 text-center lg:text-left">
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight text-gray-900 mb-6 font-serif tracking-wide drop-shadow-md">
-          <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Revolutionizing Dining  
-          </span>  
-          <br /> One Scan, Endless Possibilities.
+      <div className="lg:w-1/2 mb-16 lg:mb-0 text-center lg:text-left">
+        <span className="inline-block px-4 py-1 rounded-full bg-white/80 backdrop-blur-sm shadow-sm mb-8 text-indigo-800 font-medium">
+          The Future of Dining Experience
+        </span>
+        <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold leading-none text-gray-900 mb-8">
+          <span className="block mb-3 text-indigo-800">Curated Dining</span>
+          <span className="italic text-3xl md:text-4xl lg:text-5xl text-stone-700">at your fingertips</span>
+          <p><span className="italic text-2xl md:text-2xl lg:text-3xl text-stone-500">One Scan, Endless Possibilities.</span></p>
         </h1>
+        <p className="text-xl text-stone-600 mb-10 max-w-lg mx-auto lg:mx-0 font-light">
+          Where culinary tradition meets digital innovation, creating moments that transcend the ordinary.
+        </p>
         {/* CTA Button */}
-        <div>
-          <Link to="/signup" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-center px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-2xl hover:scale-105 hover:ring-4 hover:ring-blue-300 transition-all">
-            Get Started for Free
+        <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+          <Link to="/signup" className="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-indigo-800 rounded-md overflow-hidden shadow-md hover:shadow-xl transition-all duration-300">
+            <span className="absolute inset-0 w-full h-full transition-all duration-300 ease-out transform translate-x-full bg-amber-700 group-hover:translate-x-0"></span>
+            <span className="relative flex items-center">
+              Begin Your Journey
+              <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+              </svg>
+            </span>
           </Link>
+          <a href="#features" className="inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-indigo-800 bg-transparent border border-indigo-800 rounded-md hover:bg-indigo-50 transition-colors duration-300">
+            Discover More
+          </a>
         </div>
       </div>
+      
       {/* Right Side - Image and Description */}
       <div className="lg:w-1/2 flex flex-col items-center lg:items-end relative">
         <div className="relative">
-          {/* Floating Glow Effect */}
-          <div className="absolute inset-0 w-72 h-72 bg-blue-100 rounded-full blur-3xl opacity-50 -z-10"></div>
+          {/* Ambient Glow */}
+          <div className="absolute inset-0 w-full h-full bg-gradient-to-tr from-amber-100 to-indigo-100 rounded-2xl blur-2xl opacity-60 -z-10 transform rotate-6"></div>
+          
           {/* Main Image */}
-          <img 
-            src="/api/placeholder/300/600" 
-            alt="QR code menu demonstration" 
-            className="relative z-10 rounded-xl shadow-2xl transform hover:scale-105 transition-transform"
-          />
-          {/* Floating QR Code Card */}
-          <div className="absolute -right-6 -bottom-6 bg-white/80 backdrop-blur-md p-4 rounded-lg shadow-xl z-20 flex items-center space-x-3">
-            <img src="/api/placeholder/80/80" alt="QR code" className="w-12 h-12" />
-            <div className="text-sm font-medium text-gray-800">Scan to see demo</div>
+          <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/50">
+            <img 
+              src="/api/placeholder/300/600" 
+              alt="Sophisticated dining experience" 
+              className="relative z-10 transition-all duration-700 hover:scale-105 transform-gpu"
+            />
+            
+            {/* Overlay Gradient */}
+            <div className="absolute inset-0 bg-gradient-to-t from-indigo-900/30 to-transparent"></div>
+          </div>
+          
+          {/* Floating QR Code Element */}
+          <div className="absolute -right-12 -bottom-8 bg-white shadow-xl rounded-xl p-5 z-20 transform hover:scale-105 transition-transform duration-300">
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <div className="absolute inset-0 bg-amber-100 rounded-md rotate-45 transform -translate-x-1 translate-y-1"></div>
+                <img src="/api/placeholder/80/80" alt="QR code" className="w-16 h-16 relative z-10" />
+              </div>
+              <div className="text-sm font-medium">
+                <span className="block text-indigo-800 font-serif text-base">Experience MenuQ</span>
+                <span className="text-stone-600">Scan to preview</span>
+              </div>
+            </div>
           </div>
         </div>
-        {/* Description Positioned Lower with "Know More" */}
-        <div className="mt-16 text-center lg:text-right max-w-md">
-          <h2 className="text-2xl font-serif font-bold text-gray-900">Menu Q</h2>
-          <p className="text-lg text-gray-700 mt-2 leading-relaxed tracking-wide">
-          "Elevate the way you serve and savor. With a simple scan, MenuQ transforms dining into a seamless, interactive experience - bridging tradition with innovation. 
-          Enhance customer engagement, streamline operations, and redefine convenience, all while preserving the warmth of a great meal."
+        
+        {/* Description Card */}
+        <div className="mt-20 p-8 bg-white/80 backdrop-blur-md rounded-xl shadow-lg border border-indigo-50 max-w-md transform hover:-translate-y-2 transition-all duration-300">
+          <h2 className="text-2xl font-serif font-bold text-indigo-900 mb-3">MenuQ</h2>
+          <p className="text-stone-700 leading-relaxed">
+            "Where artistry meets technology. MenuQ crafts a dining narrative that honors the chef's vision while empowering guests to explore culinary landscapes at their own pace. Not merely a tool, but a canvas for gastronomic expression."
           </p>
-          {/* Know More Button */}
-          <div className="mt-6">
-            <a href="#features" className="text-blue-600 font-semibold text-lg hover:underline hover:text-blue-800 transition-all">
-              Know More →
+          <div className="mt-6 border-t border-indigo-100 pt-4 flex justify-between items-center">
+            <span className="text-amber-700 font-medium">Redefining Hospitality</span>
+            <a href="#philosophy" className="group text-indigo-800 font-medium flex items-center gap-2 hover:gap-3 transition-all duration-300">
+              Our Philosophy
+              <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+              </svg>
             </a>
           </div>
         </div>

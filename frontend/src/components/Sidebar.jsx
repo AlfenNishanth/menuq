@@ -388,21 +388,21 @@ export default function Sidebar({ onLogoutClick }) {
         {/* Logo & Toggle Button */}
         <div className="p-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
-          <img 
-            src="frontend/public/short logo.png"
-            alt="Your Company Logo" 
-            className="h-6 w-6" 
-          />
+            <img 
+              src="frontend/public/short logo.png"
+              alt="Your Company Logo" 
+              className="h-6 w-6" 
+            />
             <span 
               className={`font-bold text-lg transition-all duration-300 ${
-                expanded ? "opacity-100" : "opacity-0 w-0"
+                expanded ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
               }`}
             >
               Menu Q
             </span>
           </div>
           <button
-            className="p-2 rounded-lg hover:bg-indigo-50 bg-indigo-50 transition-all duration-200 min-w-[32px] min-h-[32px] flex items-center justify-center z-10"
+            className="p-2 rounded-lg hover:bg-indigo-50 bg-indigo-50 transition-all duration-200 flex items-center justify-center z-10 h-8 w-8"
             onClick={() => setExpanded((curr) => !curr)}
           >
             {expanded ? <ChevronLeft size={18} /> : <Menu size={18} />}
@@ -414,7 +414,7 @@ export default function Sidebar({ onLogoutClick }) {
 
         {/* Menu Items */}
         <SidebarContext.Provider value={{ expanded }}>
-          <ul className="flex-1 px-3 py-4 space-y-1">
+          <ul className="flex-1 px-3 py-4 space-y-2">
             <SidebarItem
               icon={<Home size={18} />}
               text="Dashboard"
@@ -444,28 +444,31 @@ export default function Sidebar({ onLogoutClick }) {
               text="Settings"
               to="/dashboard/settings"
             />
-            {/* Logout */}
-            <li className="mt-auto">
-              <div
-                onClick={onLogoutClick}
-                className="flex items-center py-2 px-3 cursor-pointer rounded-md transition-colors hover:bg-red-50 text-red-500"
-              >
-                <LogOut size={18} />
-                <span
-                  className={`ml-3 transition-all duration-300 ${
-                    expanded ? "opacity-100" : "opacity-0 w-0"
-                  }`}
-                >
-                  Logout
-                </span>
-              </div>
-            </li>
           </ul>
+          
+          {/* Logout (separated from main menu) */}
+          <div className="mt-auto px-3 pb-4">
+            <div
+              onClick={onLogoutClick}
+              className="flex items-center py-2.5 px-3 cursor-pointer rounded-md transition-colors hover:bg-red-50 text-red-500"
+            >
+              <div className="flex items-center justify-center w-5">
+                <LogOut size={18} />
+              </div>
+              <span
+                className={`ml-3 transition-all duration-300 ${
+                  expanded ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
+                }`}
+              >
+                Logout
+              </span>
+            </div>
+          </div>
         </SidebarContext.Provider>
 
         {/* User Profile Section */}
-        <div className="border-t p-3 flex items-center gap-3 border-gray-200">
-          <div className="relative">
+        <div className="border-t p-3 flex items-center border-gray-200">
+          <div className="relative flex-shrink-0">
             <img
               src={iconApi}
               alt="User Avatar"
@@ -474,7 +477,7 @@ export default function Sidebar({ onLogoutClick }) {
             <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 border-2 border-white" />
           </div>
           <div
-            className={`flex-1 overflow-hidden transition-all duration-300 ${
+            className={`flex-1 ml-3 overflow-hidden transition-all duration-300 ${
               expanded ? "opacity-100" : "opacity-0 w-0"
             }`}
           >
@@ -521,17 +524,19 @@ function SidebarItem({ icon, text, to, badge, onClick, children }) {
               : "hover:bg-indigo-50 text-gray-700"
           }`}
         >
-          <div className="flex items-center gap-3">
-            {icon}
+          <div className="flex items-center">
+            <div className="flex items-center justify-center w-5">
+              {icon}
+            </div>
             <span
-              className={`transition-all duration-300 ${
-                expanded ? "opacity-100" : "opacity-0 w-0"
+              className={`ml-3 transition-all duration-300 ${
+                expanded ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
               }`}
             >
               {text}
             </span>
             {badge && expanded && (
-              <span className="text-xs font-semibold px-1.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800">
+              <span className="ml-2 text-xs font-semibold px-1.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800">
                 {badge}
               </span>
             )}
@@ -584,10 +589,12 @@ function SidebarItem({ icon, text, to, badge, onClick, children }) {
         <div
           className="relative flex items-center py-2.5 px-3 my-1 font-medium rounded-md transition-colors group hover:bg-indigo-50 text-gray-700"
         >
-          {icon}
+          <div className="flex items-center justify-center w-5">
+            {icon}
+          </div>
           <span
             className={`ml-3 transition-all duration-300 ${
-              expanded ? "opacity-100" : "opacity-0 w-0"
+              expanded ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
             }`}
           >
             {text}
