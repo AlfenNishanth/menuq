@@ -245,14 +245,14 @@ const Signup = () => {
     emailRef.current?.focus();
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem("language", language);
-  }, [language]);
+  // useEffect(() => {
+  //   localStorage.setItem("language", language);
+  // }, [language]);
 
-  useEffect(() => {
-    localStorage.setItem("darkMode", darkMode);
-    document.body.classList.toggle("dark-mode", darkMode);
-  }, [darkMode]);
+  // useEffect(() => {
+  //   localStorage.setItem("darkMode", darkMode);
+  //   document.body.classList.toggle("dark-mode", darkMode);
+  // }, [darkMode]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -376,7 +376,7 @@ const Signup = () => {
 
   return (
     <div className={`flex items-center justify-center min-h-screen transition-colors duration-500 ${darkMode ? 'bg-gradient-to-r from-indigo-900 via-purple-900 to-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'}`}>
-      <div className="absolute top-5 right-5 flex gap-3">
+      {/* <div className="absolute top-5 right-5 flex gap-3">
         <button 
           onClick={() => setDarkMode(!darkMode)} 
           className="p-2 rounded-lg bg-gray-700 text-white hover:bg-gray-600 transition flex items-center"
@@ -395,9 +395,9 @@ const Signup = () => {
           <option value="es">Español</option>
           <option value="fr">Français</option>
         </select>
-      </div>
+      </div> */}
 
-      <div className={`p-8 rounded-2xl shadow-xl w-full max-w-md transform hover:scale-105 transition-transform duration-300 backdrop-blur-lg ${darkMode ? 'bg-gray-800 bg-opacity-30' : 'bg-white'}`}>
+      <div className={`p-8 rounded-2xl shadow-xl w-full max-w-md transform transition-transform duration-300 backdrop-blur-lg ${darkMode ? 'bg-gray-800 bg-opacity-30' : 'bg-white'}`}>
         <h2 className="text-3xl font-extrabold mb-6 text-center">Create Your MenuQ Account</h2>
         {error && <div className="text-red-500 text-center mb-4 animate-shake">{error}</div>}
         

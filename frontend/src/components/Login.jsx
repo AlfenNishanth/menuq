@@ -154,7 +154,7 @@ const Login = () => {
         </select>
       </div>
 
-      <div className={`p-8 rounded-2xl shadow-xl w-96 transform hover:scale-105 transition-transform duration-300 backdrop-blur-lg ${darkMode ? 'bg-gray-800 bg-opacity-30' : 'bg-white'}`}>
+      <div className={`p-8 rounded-2xl shadow-xl w-96 transform transition-transform duration-300 backdrop-blur-lg ${darkMode ? 'bg-gray-800 bg-opacity-30' : 'bg-white'}`}>
         <h2 className="text-3xl font-extrabold mb-6 text-center">Log In</h2>
         {error && <div className="text-red-500 text-center mb-4 animate-shake">{error}</div>}
         

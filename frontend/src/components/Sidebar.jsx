@@ -389,8 +389,7 @@ export default function Sidebar({ onLogoutClick }) {
         <div className="p-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <img 
-              src="frontend/public/short logo.png"
-              alt="Your Company Logo" 
+              // src="frontend/public/short logo.png"
               className="h-6 w-6" 
             />
             <span 
