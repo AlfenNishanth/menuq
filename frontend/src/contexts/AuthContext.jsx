@@ -68,7 +68,7 @@ function AuthProvider({ children }) {
     });
     // console.log(JSON.stringify(currentUser) + " 2 " + loading);
     return unsubscribe;
-  }, []);
+  }, [currentUser]);
 
   const updateUserData = async () => {
     if (currentUser) {
@@ -76,9 +76,10 @@ function AuthProvider({ children }) {
         const data = await fetchRestaurantByUID(currentUser.uid);
         if (data) {
           setUserData(data);
-          console.log("setted user data: " + JSON.stringify(data));
+          console.log("sett user data: " + JSON.stringify(data));
         } else {
           setUserData(null);
+          console.log('No user data');
           //todo: check and direct to update profile
         }
       } catch (error) {

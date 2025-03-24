@@ -19,6 +19,9 @@ const UpdateProfile = () => {
   const [noOfSeats, setNoOfSeats] = useState("");
 
   useEffect(() => {
+    
+    console.log("in component - userData:", userData);
+
     if (userData) {
       setPhone(userData.phone || "");
       setRestaurantName(userData.restaurantName || "");
