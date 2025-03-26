@@ -43,107 +43,109 @@ function MenuCard({ item, onAddToOrder }) {
 
   return (
     <div 
-      className={`relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 bg-white border-0 flex max-w-4xl mx-auto ${!available ? 'opacity-60' : ''}`}
+      className={`relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 bg-white border-0 flex flex-col max-w-4xl mx-auto ${!available ? 'opacity-60' : ''}`}
     >
-      <div className="w-44 flex-shrink-0 relative group">
-        <img 
-          className="w-full h-44 object-cover transition-transform duration-300 group-hover:scale-105"
-          src={imageUrl}
-          alt={name} 
-          loading="lazy"
-        />
-        <div className="absolute bottom-2 left-2">
-          <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full flex items-center">
-            <FireIcon />
-            <span className="ml-1">{spiceLevel}</span>
-          </span>
-        </div>
-      </div>
-
-      <div className="flex-grow flex flex-col">
-        <div className="p-6 pb-0">
-          <div className="flex justify-between items-start mb-4">
-            <div className="flex-grow pr-4">
-              <h2 className="text-xl font-serif tracking-wide">{name}</h2>
-              <div className="flex items-center mt-1">
-                <Star className="w-4 h-4 text-amber-500 mr-1" />
-                <span className="text-sm text-gray-600">
-                  {rating} ({ratingCount} reviews)
-                </span>
-              </div>
-            </div>
-            <div className="text-right">
-              <span className="text-lg font-medium text-amber-700 block">₹{price}</span>
-            </div>
-          </div>
-          
-          <p className="text-gray-600 mb-4 line-clamp-2">{truncateText(description)}</p>
-          
-          {tags && tags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {tags.map((tag, index) => (
-                <span 
-                  key={index}
-                  className="px-3 py-1 text-xs bg-amber-50 text-amber-800 rounded-full font-medium"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-
-          <div className={`mt-2 text-sm font-medium ${available ? 'text-green-600' : 'text-red-600'}`}>
-            {available ? 'Available' : 'Currently Unavailable'}
+      <div className="flex">
+        <div className="w-44 flex-shrink-0 relative group">
+          <img 
+            className="w-full h-44 object-cover transition-transform duration-300 group-hover:scale-105"
+            src={imageUrl}
+            alt={name} 
+            loading="lazy"
+          />
+          <div className="absolute bottom-2 left-2">
+            <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full flex items-center">
+              <FireIcon />
+              <span className="ml-1">{spiceLevel}</span>
+            </span>
           </div>
         </div>
 
-        <button 
-          onClick={toggleExpand}
-          className="mt-4 flex items-center justify-center w-full py-2 text-amber-700 hover:text-amber-900 transition-colors duration-200 font-medium"
-        >
-          {expanded ? (
-            <>Show Less <ChevronUp className="ml-1 w-4 h-4" /></>
-          ) : (
-            <>View Details <ChevronDown className="ml-1 w-4 h-4" /></>
-          )}
-        </button>
-        
-        {expanded && (
-          <div className="p-6 pt-0">
-            <div className="border-t border-gray-100 pt-4 space-y-4">
-              <div>
-                <h3 className="text-sm font-medium text-gray-700 mb-2">About the Dish</h3>
-                <p className="text-gray-600">{description}</p>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <Clock className="w-5 h-5 text-amber-600 mr-2" />
-                  <span className="text-xs text-gray-500">Prep Time</span>
+        <div className="flex-grow flex flex-col">
+          <div className="p-6 pb-0">
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex-grow pr-4">
+                <h2 className="text-xl font-serif tracking-wide">{name}</h2>
+                <div className="flex items-center mt-1">
+                  <Star className="w-4 h-4 text-amber-500 mr-1" />
+                  <span className="text-sm text-gray-600">
+                    {rating} ({ratingCount} reviews)
+                  </span>
                 </div>
-                <span className="text-sm font-medium">{prepTime}</span>
               </div>
-              
-              <div className="mt-4">
-                {available ? (
-                  <div className="flex space-x-2">
-                    <button 
-                      onClick={() => onAddToOrder && onAddToOrder(item)}
-                      className="flex-grow bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 rounded-md transition-colors duration-200"
-                    >
-                      Add to Order
-                    </button>
-                  </div>
-                ) : (
-                  <div className="bg-red-100 text-red-600 py-2 text-center text-sm rounded-md">
-                    Sorry, this item is currently unavailable
-                  </div>
-                )}
+              <div className="text-right">
+                <span className="text-lg font-medium text-amber-700 block">₹{price}</span>
               </div>
             </div>
+            
+            <p className="text-gray-600 mb-4 line-clamp-2">{truncateText(description)}</p>
+            
+            {tags && tags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {tags.map((tag, index) => (
+                  <span 
+                    key={index}
+                    className="px-3 py-1 text-xs bg-amber-50 text-amber-800 rounded-full font-medium"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            <div className={`mt-2 text-sm font-medium ${available ? 'text-green-600' : 'text-red-600'}`}>
+              {available ? 'Available' : 'Currently Unavailable'}
+            </div>
           </div>
-        )}
+
+          <button 
+            onClick={toggleExpand}
+            className="mt-4 flex items-center justify-center w-full py-2 text-amber-700 hover:text-amber-900 transition-colors duration-200 font-medium"
+          >
+            {expanded ? (
+              <>Show Less <ChevronUp className="ml-1 w-4 h-4" /></>
+            ) : (
+              <>View Details <ChevronDown className="ml-1 w-4 h-4" /></>
+            )}
+          </button>
+        </div>
       </div>
+      
+      {expanded && (
+        <div className="w-full p-6 pt-0">
+          <div className="border-t border-gray-100 pt-4 space-y-4">
+            <div>
+              <h3 className="text-sm font-medium text-gray-700 mb-2">About the Dish</h3>
+              <p className="text-gray-600">{description}</p>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <Clock className="w-5 h-5 text-amber-600 mr-2" />
+                <span className="text-xs text-gray-500">Prep Time</span>
+              </div>
+              <span className="text-sm font-medium">{prepTime}</span>
+            </div>
+            
+            <div className="mt-4">
+              {available ? (
+                <div className="flex space-x-2">
+                  <button 
+                    onClick={() => onAddToOrder && onAddToOrder(item)}
+                    className="flex-grow bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 rounded-md transition-colors duration-200"
+                  >
+                    Add to Order
+                  </button>
+                </div>
+              ) : (
+                <div className="bg-red-100 text-red-600 py-2 text-center text-sm rounded-md">
+                  Sorry, this item is currently unavailable
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
