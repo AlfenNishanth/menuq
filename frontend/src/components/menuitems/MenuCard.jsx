@@ -18,6 +18,7 @@ function MenuCard({ item }) {
     name,
     price,
     description,
+    longDescription,
     imageUrl,
     tags,
     prepTime,
