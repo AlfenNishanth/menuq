@@ -3,22 +3,29 @@ import {
   ChevronDown, 
   ChevronUp, 
   Clock, 
-  Star, 
-  ListPlus 
+  Star
 } from 'lucide-react';
 
-function MenuCard({ item }) {
+function MenuCard({ item, onAddToOrder }) {
   const [expanded, setExpanded] = useState(false);
 
   const toggleExpand = () => {
     setExpanded(!expanded);
   };
 
+  // Function to truncate text to 200 words
+  const truncateText = (text, maxWords = 200) => {
+    const words = text.split(' ');
+    if (words.length > maxWords) {
+      return words.slice(0, maxWords).join(' ') + '...';
+    }
+    return text;
+  };
+
   const {
     name,
     price,
     description,
-    longDescription,
     imageUrl,
     tags,
     prepTime,
@@ -70,7 +77,7 @@ function MenuCard({ item }) {
             </div>
           </div>
           
-          <p className="text-gray-600 mb-4 line-clamp-2">{description}</p>
+          <p className="text-gray-600 mb-4 line-clamp-2">{truncateText(description)}</p>
           
           {tags && tags.length > 0 && (
             <div className="flex flex-wrap gap-2">
@@ -106,22 +113,24 @@ function MenuCard({ item }) {
             <div className="border-t border-gray-100 pt-4 space-y-4">
               <div>
                 <h3 className="text-sm font-medium text-gray-700 mb-2">About the Dish</h3>
-                <p className="text-gray-600">{longDescription}</p>
+                <p className="text-gray-600">{description}</p>
               </div>
 
-              <div className="flex items-center">
-                <Clock className="w-5 h-5 text-amber-600 mr-2" />
-                <div>
-                  <span className="text-xs text-gray-500 block">Prep Time</span>
-                  <span className="text-sm font-medium">{prepTime}</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <Clock className="w-5 h-5 text-amber-600 mr-2" />
+                  <span className="text-xs text-gray-500">Prep Time</span>
                 </div>
+                <span className="text-sm font-medium">{prepTime}</span>
               </div>
               
               <div className="mt-4">
                 {available ? (
                   <div className="flex space-x-2">
-                    <button className="flex-grow bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 rounded-md transition-colors duration-200 flex items-center justify-center">
-                      <ListPlus className="w-5 h-5 mr-2" />
+                    <button 
+                      onClick={() => onAddToOrder && onAddToOrder(item)}
+                      className="flex-grow bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 rounded-md transition-colors duration-200"
+                    >
                       Add to Order
                     </button>
                   </div>
