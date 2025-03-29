@@ -66,3 +66,15 @@ export async function registerRestaurant(data) {
     }
   }
 
+  export async function updateRestaurant(id, data) {
+    try {
+      console.log("Trying to update restaurant");
+      console.log(id, data);
+      const response = await axios.patch(`${config.MENUQ}/${id}`, data);
+      return response.data;
+    } catch (error) {
+      console.error("Error updating restaurant:", error);
+      throw error;
+    }
+  }
+  

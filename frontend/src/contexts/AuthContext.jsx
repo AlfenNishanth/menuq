@@ -64,29 +64,32 @@ function AuthProvider({ children }) {
       setCurrentUser(user);
       // console.log(JSON.stringify(currentUser) + 'in second ' + loading)
       // console.log(user ? `1 User logged in: ${JSON.stringify(user)}` : "1 No user logged in");
-      const getUserData = async () => {
-        if (user) {
-          try {
-            const data = await fetchRestaurantByUID(user.uid);
-            if (data) {
-              setUserData(data);
-              console.log("setted user data: " + JSON.stringify(data));
-            } else {
-              setUserData(null);
-              //todo: check and direct to update profile
-            }
-          } catch (error) {
-            console.log("Error while fetching user data: " + error);
-            setUserData(null);
-          }
-        } else setUserData(null);
-        setLoading(false);
-      };
-      getUserData();
+      updateUserData();
     });
     // console.log(JSON.stringify(currentUser) + " 2 " + loading);
     return unsubscribe;
-  }, []);
+  }, [currentUser]);
+
+  const updateUserData = async () => {
+    if (currentUser) {
+      try {
+        const data = await fetchRestaurantByUID(currentUser.uid);
+        if (data) {
+          setUserData(data);
+          console.log("sett user data: " + JSON.stringify(data));
+        } else {
+          setUserData(null);
+          console.log('No user data');
+          //todo: check and direct to update profile
+        }
+      } catch (error) {
+        console.log("Error while fetching user data: " + error);
+        setUserData(null);
+      }
+    } else setUserData(null);
+    setLoading(false);
+  };
+
 
   // const unsubscribe = onAuthStateChanged(auth, user=> {
   //     console.log(JSON.stringify(currentUser) + 'first ' + loading)
@@ -105,6 +108,7 @@ function AuthProvider({ children }) {
     signUp,
     login,
     logout,
+    updateUserData
   };
 
   return (

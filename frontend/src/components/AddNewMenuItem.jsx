@@ -537,15 +537,12 @@
 
 import { useState, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { db, storage } from "../fireabse/firebase";
 import { useAuth } from "../contexts/AuthContext";
-import { collection, addDoc } from "firebase/firestore";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FaCloudUploadAlt, FaTrash } from "react-icons/fa";
-import { XIcon } from "lucide-react";
+import { Upload, XCircleIcon, XIcon } from "lucide-react";
 import { v4 } from "uuid";
+import { addMenuItem } from "../api/menuItem";
 
 export default function AddNewMenuItem() {
   const {
@@ -620,49 +617,27 @@ export default function AddNewMenuItem() {
 
     setLoading(true);
 
+    const restaurantID = userData.restaurantId;
     const finalType = data.type === "Custom" ? data.customType : data.type;
-    let imageUrl = null;
+
+    const formData = new FormData();
+    formData.append("restaurantID", restaurantID);
+    formData.append("name", data.name);
+    formData.append("description", data.description);
+    formData.append("type", finalType);
+    formData.append("price", parseFloat(data.price));
+    formData.append("available", data.available === "true");
+    
+    if (variants.length !== 0) formData.append("variants", variants);
+    if (addOns.length !== 0) formData.append("addOns", addOns);
+    if (tags.length !== 0) formData.append("tags", tags);
+
+    if (imageFile) {
+      formData.append("image", imageFile);
+    }
 
     try {
-      // Upload image if exists
-      if (imageFile) {
-        const storageRef = ref(storage, `menuImages/${v4()}_${imageFile.name}`);
-        const uploadTask = uploadBytesResumable(storageRef, imageFile);
-        
-        // Wait for upload to complete
-        await new Promise((resolve, reject) => {
-          uploadTask.on(
-            "state_changed",
-            null,
-            (error) => {
-              console.error("Upload error:", error);
-              reject(error);
-            },
-            async () => {
-              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-              imageUrl = downloadURL;
-              resolve();
-            }
-          );
-        });
-      }
-
-      const menuItem = {
-        name: data.name,
-        description: data.description,
-        type: finalType,
-        price: parseFloat(data.price),
-        variants,
-        addOns,
-        imageUrl: imageUrl,
-        available: data.available === "true",
-        tags,
-        restaurantID: userData.restaurantId,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
-      await addDoc(collection(db, "Menu"), menuItem);
+      await addMenuItem(formData);
       toast.success("Menu item added successfully!");
       reset();
       setVariants([]);
@@ -697,7 +672,7 @@ export default function AddNewMenuItem() {
             <input
               {...register("name", { required: "Name is required" })}
               placeholder="Item Name"
-              className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-purple-500 transition bg-gray-200 border-gray-300 text-gray-900 ${
+              className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900 ${
                 errors.name ? "border-red-500 ring-1 ring-red-500" : ""
               }`}
               disabled={loading}
@@ -710,7 +685,7 @@ export default function AddNewMenuItem() {
             <textarea
               {...register("description")}
               placeholder="Description"
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-purple-500 transition bg-gray-200 border-gray-300 text-gray-900"
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900"
               disabled={loading}
               rows={3}
             />
@@ -718,7 +693,7 @@ export default function AddNewMenuItem() {
             {/* Type Dropdown */}
             <select
               {...register("type")}
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-purple-500 transition bg-gray-200 border-gray-300 text-gray-900"
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900"
               onChange={(e) => {
                 setValue("type", e.target.value);
                 if (e.target.value !== "Custom") {
@@ -741,7 +716,7 @@ export default function AddNewMenuItem() {
                 {...register("customType", { required: "Custom type is required" })}
                 type="text"
                 placeholder="Enter custom category"
-                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-purple-500 transition bg-gray-200 border-gray-300 text-gray-900 ${
+                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900 ${
                   errors.customType ? "border-red-500 ring-1 ring-red-500" : ""
                 }`}
                 disabled={loading}
@@ -757,7 +732,7 @@ export default function AddNewMenuItem() {
               step="0.01"
               {...register("price", { required: "Price is required" })}
               placeholder="Base Price"
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-purple-500 transition bg-gray-200 border-gray-300 text-gray-900"
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900"
               disabled={loading}
             />
             {errors.price && (
@@ -772,7 +747,7 @@ export default function AddNewMenuItem() {
               render={({ field }) => (
                 <select 
                   {...field} 
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-purple-500 transition bg-gray-200 border-gray-300 text-gray-900"
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900"
                   disabled={loading}
                 >
                   <option value="true">Available</option>
@@ -781,8 +756,8 @@ export default function AddNewMenuItem() {
               )}
             />
 
-            {/* Restaurant Image Upload */}
-            <div className="border-2 border-dashed rounded-lg p-4 transition border-gray-300 hover:border-purple-400 text-center">
+            {/* Image Upload */}
+            <div className="border-2 border-dashed rounded-lg p-4 transition border-gray-300 hover:border-teal-400 text-center">
               <div className="space-y-2">
                 {imagePreview ? (
                   <div className="relative">
@@ -796,12 +771,12 @@ export default function AddNewMenuItem() {
                       onClick={removeImage}
                       className="absolute -top-2 -right-2 bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 transition"
                     >
-                      <FaTrash size={12} />
+                      <XIcon size={12} />
                     </button>
                   </div>
                 ) : (
                   <div className="text-center py-4 text-gray-500">
-                    <FaCloudUploadAlt className="mx-auto text-4xl mb-2" />
+                    <Upload className="mx-auto text-4xl mb-2" />
                     <p className="text-sm font-medium">Upload Menu Item Image</p>
                     <p className="text-xs mt-1">JPG, PNG or GIF (Max. 5MB)</p>
                   </div>
@@ -820,7 +795,7 @@ export default function AddNewMenuItem() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current.click()}
-                    className="mt-2 inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-purple-600 text-white hover:bg-purple-700 transition-colors"
+                    className="mt-2 inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-teal-600 text-white hover:bg-teal-700 transition-colors"
                   >
                     Browse Image
                   </button>
@@ -884,7 +859,7 @@ export default function AddNewMenuItem() {
                 type="button"
                 onClick={() => setVariants([...variants, { name: "", price: 0 }])}
                 disabled={loading}
-                className="mt-2 w-full px-4 py-2 text-sm font-medium rounded-md transition-colors bg-purple-600 text-white hover:bg-purple-700"
+                className="mt-2 w-full px-4 py-2 text-sm font-medium rounded-md transition-colors bg-teal-600 text-white hover:bg-teal-700"
               >
                 Add Variant
               </button>
@@ -936,7 +911,7 @@ export default function AddNewMenuItem() {
                 type="button"
                 onClick={() => setAddOns([...addOns, { name: "", price: 0 }])}
                 disabled={loading}
-                className="mt-2 w-full px-4 py-2 text-sm font-medium rounded-md transition-colors bg-purple-600 text-white hover:bg-purple-700"
+                className="mt-2 w-full px-4 py-2 text-sm font-medium rounded-md transition-colors bg-teal-600 text-white hover:bg-teal-700"
               >
                 Add New
               </button>
@@ -950,13 +925,13 @@ export default function AddNewMenuItem() {
               {tags.map((tag, index) => (
                 <span
                   key={index}
-                  className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800"
+                  className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-teal-100 text-teal-800"
                 >
                   {tag}
                   <button
                     type="button"
                     onClick={() => setTags(tags.filter((_, i) => i !== index))}
-                    className="ml-2 -mr-1 h-4 w-4 rounded-full inline-flex items-center justify-center transition bg-purple-200 text-purple-600 hover:bg-purple-300"
+                    className="ml-2 -mr-1 h-4 w-4 rounded-full inline-flex items-center justify-center transition bg-teal-200 text-teal-600 hover:bg-teal-300"
                     disabled={loading}
                   >
                     <span className="text-xs">×</span>
@@ -982,7 +957,7 @@ export default function AddNewMenuItem() {
               <button
                 type="button"
                 onClick={addTag}
-                className="px-4 py-2 font-medium rounded-lg transition-colors bg-purple-600 text-white hover:bg-purple-700"
+                className="px-4 py-2 font-medium rounded-lg transition-colors bg-teal-600 text-white hover:bg-teal-700"
                 disabled={loading}
               >
                 Add
@@ -995,7 +970,7 @@ export default function AddNewMenuItem() {
 
           <button 
             type="submit" 
-            className="w-full bg-purple-600 text-white p-3 rounded-lg font-semibold hover:bg-purple-700 transition duration-300 shadow-lg disabled:opacity-50 flex justify-center items-center" 
+            className="w-full bg-teal-600 text-white p-3 rounded-lg font-semibold hover:bg-teal-700 transition duration-300 shadow-lg disabled:opacity-50 flex justify-center items-center" 
             disabled={loading}
           >
             {loading ? (

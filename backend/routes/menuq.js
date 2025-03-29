@@ -81,8 +81,33 @@ router.post("/", async (req, res) => {
   }
 });
 
-//Update one
-router.patch("/:id", (req, res) => {});
+// Update one
+router.patch("/:id", async (req, res) => {
+  try {
+    const firebaseUid  = req.params.id;
+    const updates = req.body;
+
+    console.log("firebaseUid: ", firebaseUid);
+    const updatedRestaurant = await Restaurant.findOneAndUpdate(
+      { firebaseUid }, // Search condition
+      updates,
+      {
+        new: true, // Return the updated document
+        runValidators: true, // Ensure validation rules apply
+      }
+    );
+
+    // If no restaurant found, return a 404 error
+    if (!updatedRestaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
+    }
+
+    res.status(200).json(updatedRestaurant);
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ message: err.message });
+  }
+});
 
 //Delete one
 router.delete("/:id", (req, res) => {});
