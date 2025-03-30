@@ -563,6 +563,7 @@ export default function AddNewMenuItem() {
   const [loading, setLoading] = useState(false);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [vegetarian, setVegetarian] = useState(null);
   
   const fileInputRef = useRef();
   const { currentUser, userData } = useAuth();
@@ -627,6 +628,7 @@ export default function AddNewMenuItem() {
     formData.append("type", finalType);
     formData.append("price", parseFloat(data.price));
     formData.append("available", "true");
+    formData.append("vegetarian", data.vegetarian);
     
     if (variants.length !== 0) formData.append("variants", variants);
     if (addOns.length !== 0) formData.append("addOns", addOns);
@@ -725,6 +727,34 @@ export default function AddNewMenuItem() {
             {errors.customType && (
               <p className="text-red-500 text-sm -mt-3">{errors.customType.message}</p>
             )}
+
+            {/* Vegetarian Toggle */}
+            <div className="flex items-center justify-between p-3 rounded-lg bg-gray-200">
+              <span className="font-medium">
+                {watch("vegetarian") ? "Vegetarian" : "Non-vegetarian"}
+              </span>
+              <Controller
+                name="vegetarian"
+                control={control}
+                defaultValue={false}
+                render={({ field: { onChange, value } }) => (
+                  <button 
+                    type="button"
+                    onClick={() => onChange(!value)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      value ? 'bg-teal-600' : 'bg-gray-400'
+                    }`}
+                    disabled={loading}
+                  >
+                    <span 
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        value ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                )}
+              />
+            </div>
 
             {/* Price */}
             <input

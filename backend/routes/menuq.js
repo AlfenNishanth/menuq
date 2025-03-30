@@ -157,6 +157,7 @@ router.post("/menu", upload.single("image"), async (req, res) => {
       addOns,
       available,
       tags,
+      vegetarian
     } = req.body;
 
     let imageUrl = "";
