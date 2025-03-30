@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import MenuCard from "./MenuCard";
 import { getRestaurantMenu } from "../../api/menuItem";
 import {capitalizeWords} from "../../utils/format";
+
 // Comprehensive list of menu categories in logical serving order
 const categoryOrder = [
   // Meal-specific menus
