@@ -6,13 +6,16 @@ const menuItemSchema = new mongoose.Schema({
   description: { type: String },
   type: { type: String, required: true },
   price: { type: Number, required: true },
-  variants: { type: Array, default: [] }, // You can customize the schema if variants have a specific structure
-  addOns: { type: Array, default: [] }, // Similarly, define a sub-schema if needed
+  variants: { type: Array, default: [] }, 
+  addOns: { type: Array, default: [] }, 
   imageUrl: { type: String },
   available: { type: Boolean, default: true },
   tags: { type: [String], default: [] },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
+  vegetarian: { type: Boolean },
+  rating: { type: Number, min: 1, max: 5},
+  numRatings: { type: Number, default: 0 },
 });
 
 module.exports = mongoose.model("MenuItem", menuItemSchema);

@@ -618,15 +618,15 @@ export default function AddNewMenuItem() {
     setLoading(true);
 
     const restaurantID = userData.restaurantId;
-    const finalType = data.type === "Custom" ? data.customType : data.type;
+    const finalType = data.type === "Custom" ? data.customType.toLowerCase() : data.type;
 
     const formData = new FormData();
     formData.append("restaurantID", restaurantID);
-    formData.append("name", data.name);
-    formData.append("description", data.description);
+    formData.append("name", data.name.toLowerCase());
+    formData.append("description", data.description.toLowerCase());
     formData.append("type", finalType);
     formData.append("price", parseFloat(data.price));
-    formData.append("available", data.available === "true");
+    formData.append("available", "true");
     
     if (variants.length !== 0) formData.append("variants", variants);
     if (addOns.length !== 0) formData.append("addOns", addOns);
@@ -740,7 +740,7 @@ export default function AddNewMenuItem() {
             )}
 
             {/* Availability Toggle */}
-            <Controller
+         {/*   <Controller
               name="available"
               control={control}
               defaultValue="true"
@@ -755,7 +755,7 @@ export default function AddNewMenuItem() {
                 </select>
               )}
             />
-
+*/}
             {/* Image Upload */}
             <div className="border-2 border-dashed rounded-lg p-4 transition border-gray-300 hover:border-teal-400 text-center">
               <div className="space-y-2">
