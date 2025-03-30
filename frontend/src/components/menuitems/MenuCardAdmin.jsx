@@ -1,17 +1,36 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   ChevronDown, 
   ChevronUp, 
   Clock, 
-  Star
+  Star,
+  Edit
 } from 'lucide-react';
 import { capitalizeWords } from '../../utils/format';
 
 function MenuCard({ item, onAddToOrder }) {
   const [expanded, setExpanded] = useState(false);
+  const [isAvailable, setIsAvailable] = useState(item.available);
+  const navigate = useNavigate();
 
   const toggleExpand = () => {
     setExpanded(!expanded);
+  };
+
+  const handleToggleAvailability = () => {
+    const newAvailability = !isAvailable;
+    setIsAvailable(newAvailability);
+    
+    // Call the parent component's function with updated item
+    if (onAddToOrder) {
+      onAddToOrder({ ...item, available: newAvailability });
+    }
+  };
+
+  const handleEditItem = () => {
+    // Navigate to the EditMenuItem page with the item ID as a parameter
+    navigate(`/edit-menu-item/${item.id}`);
   };
 
   // Function to truncate text to 200 words
@@ -23,8 +42,6 @@ function MenuCard({ item, onAddToOrder }) {
     return text;
   };
 
-  
-
   const {
     name,
     price,
@@ -34,7 +51,6 @@ function MenuCard({ item, onAddToOrder }) {
     prepTime,
     rating,
     ratingCount,
-    available,
     spiceLevel
   } = item;
 
@@ -46,12 +62,12 @@ function MenuCard({ item, onAddToOrder }) {
 
   return (
     <div 
-      className={`relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 bg-white border-0 flex flex-col max-w-4xl mx-auto ${!available ? 'opacity-60' : ''}`}
+      className={`relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 bg-white border-0 flex flex-col max-w-4xl mx-auto ${!isAvailable ? 'opacity-60' : ''}`}
     >
       <div className="flex">
         <div className="w-44 flex-shrink-0 relative group">
           <img 
-            className="w-full h-44 object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-54 object-cover transition-transform duration-300 group-hover:scale-105"
             src={imageUrl}
             alt={name} 
             loading="lazy"
@@ -65,7 +81,7 @@ function MenuCard({ item, onAddToOrder }) {
         </div>
 
         <div className="flex-grow flex flex-col">
-          <div className="p-6 pb-0">
+          <div className="p-6 pb-2">
             <div className="flex justify-between items-start mb-4">
               <div className="flex-grow pr-4">
                 <h2 className="text-xl font-serif tracking-wide">{capitalizeWords(name)}</h2>
@@ -76,8 +92,15 @@ function MenuCard({ item, onAddToOrder }) {
                   </span>
                 </div>
               </div>
-              <div className="text-right">
+              <div className="text-right flex flex-col items-end">
                 <span className="text-lg font-medium text-amber-700 block">₹{price}</span>
+                <button 
+                  onClick={handleEditItem}
+                  className="mt-2 flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+                >
+                  <Edit className="w-4 h-4 mr-1" />
+                  <span className="text-sm">Edit</span>
+                </button>
               </div>
             </div>
             
@@ -96,14 +119,30 @@ function MenuCard({ item, onAddToOrder }) {
               </div>
             )}
 
-            <div className={`mt-2 text-sm font-medium ${available ? 'text-green-600' : 'text-red-600'}`}>
-              {available ? 'Available' : 'Currently Unavailable'}
+            {/* Improved Availability Toggle Switch */}
+            <div className="mt-4 flex items-center justify-between">
+              <span className="text-sm font-medium text-gray-700">Dish Availability:</span>
+              <button
+                onClick={handleToggleAvailability}
+                className="relative inline-flex h-6 w-11 items-center rounded-full focus:outline-none"
+                aria-pressed={isAvailable}
+                type="button"
+              >
+                <span className={`absolute h-5 w-10 rounded-full transition ${isAvailable ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+                <span 
+                  className={`absolute inset-y-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-md transition-all ${isAvailable ? 'translate-x-5' : 'translate-x-0'}`}
+                ></span>
+              </button>
+            </div>
+            
+            <div className={`mt-2 text-sm font-medium ${isAvailable ? 'text-green-600' : 'text-red-600'}`}>
+              {isAvailable ? 'Available' : 'Currently Unavailable'}
             </div>
           </div>
 
           <button 
             onClick={toggleExpand}
-            className="mt-4 flex items-center justify-center w-full py-2 text-amber-700 hover:text-amber-900 transition-colors duration-200 font-medium"
+            className="mt-2 flex items-center justify-center w-full py-2 text-amber-700 hover:text-amber-900 transition-colors duration-200 font-medium"
           >
             {expanded ? (
               <>Show Less <ChevronUp className="ml-1 w-4 h-4" /></>
@@ -111,15 +150,6 @@ function MenuCard({ item, onAddToOrder }) {
               <>View Details <ChevronDown className="ml-1 w-4 h-4" /></>
             )}
           </button>
-        <button
-            onClick={() => onAddToOrder && onAddToOrder({ ...item, available: !available })}
-            className="mt-2 flex items-center justify-center w-full py-2 text-amber-700 hover:text-amber-900 transition-colors duration-200 font-medium"
-        >
-            <span className="mr-2">Toggle Availability</span>
-            <div className={`w-10 h-6 rounded-full ${available ? 'bg-green-500' : 'bg-gray-300'} relative transition-colors duration-200`}>
-                <div className={`absolute top-1 ${available ? 'right-1' : 'left-1'} w-4 h-4 bg-white rounded-full transition-all duration-200`} />
-            </div>
-        </button>
         </div>
       </div>
       
@@ -140,7 +170,7 @@ function MenuCard({ item, onAddToOrder }) {
             </div>
             
             <div className="mt-4">
-              {available ? (
+              {isAvailable ? (
                 <div className="flex space-x-2">
                   <button 
                     onClick={() => onAddToOrder && onAddToOrder(item)}
