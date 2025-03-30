@@ -12,7 +12,7 @@ import AddNewMenuItem from "./components/AddNewMenuItem";
 import MenuLayout from "./components/menuitems/MenuLayout";
 import LandingPage from './components/LandingPage';
 import ManageMenu from "./components/menuitems/ManageMenu";
-import EditMenuItem from "./components/menuitems/EditMenuItem";
+
 
 function App() {
 
@@ -38,7 +38,6 @@ function App() {
             <Route path="update-profile" element={<UpdateProfile />}/>
             <Route path="add-new-menu-item" element={<AddNewMenuItem/>}/>
             <Route path="manage-menu" element={<ManageMenu/>}/>
-            <Route path="edit-menu-item" element={<EditMenuItem/>}/>
 
             {/* <Route path="add-new-item" element={<AddNewItem />} /> */}
           </Route>

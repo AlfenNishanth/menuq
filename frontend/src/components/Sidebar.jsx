@@ -426,11 +426,6 @@ export default function Sidebar({ onLogoutClick }) {
               to="/dashboard/manage-menu/"
             />
             <SidebarItem
-              icon={<Settings2 size={18} />}
-              text="Edit Menu"
-              to="/dashboard/edit-menu-item"
-            />
-            <SidebarItem
               icon={<PlusSquare size={18} />}
               text="Add Menu Item"
               to="/dashboard/add-new-menu-item"
