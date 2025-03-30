@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import MenuCard from "./MenuCard";
 import { getRestaurantMenu } from "../../api/menuItem";
 import {capitalizeWords} from "../../utils/format";
+import { useAuth } from "../../contexts/AuthContext";
 // Comprehensive list of menu categories in logical serving order
 const categoryOrder = [
   // Meal-specific menus
@@ -54,8 +55,16 @@ const categoryOrder = [
   "Desserts"
 ];
 
-const RestaurantMenu = () => {
-  const { id } = useParams();
+const ManageMenu = () => {
+
+    const { userData} = useAuth();
+//   const id  = userData.restaurantId;
+
+    console.log("menuLayout userData:", userData); // Logs the entire object
+    console.log(`menuLayout restaurantId - ${userData?.restaurantId}`); // Logs specific property
+
+
+  const id = 'RX00001'
   const [menuItems, setMenuItems] = useState({});
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("");
@@ -294,16 +303,34 @@ const RestaurantMenu = () => {
                   )}
                   <div className="flex items-center">
                     <div className="w-2 h-2 bg-amber-500 rounded-full mr-3"></div>
-                    <h2 className="text-2xl font-serif text-gray-800">{capitalizeWords(category)}</h2>
+                    <h2 className="text-2xl font-serif text-gray-800">{category}</h2>
                     <div className="flex-grow h-px bg-gradient-to-r from-amber-300 to-transparent ml-4"></div>
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {menuItems[category].map((item) => (
+                {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"> */}
+                {/* <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                {menuItems[category].map((item) => (
                     <div 
                       key={item._id}
                       className="transform transition-all duration-500 hover:-translate-y-1"
+                    >
+                      <MenuCard item={item} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div> */}
+
+
+<div className="flex flex-wrap gap-8">
+                {menuItems[category].map((item) => (
+                    <div 
+                      key={item._id}
+                      className="flex basis-[calc(100%-2rem)] md:basis-[calc(50%-1rem)] lg:basis-[calc(33.333%-1.5rem)] 
+                       transform transition-all duration-500 hover:-translate-y-1"
                     >
                       <MenuCard item={item} />
                     </div>
@@ -339,4 +366,4 @@ const RestaurantMenu = () => {
 // .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
 // .animate-spin-slow { animation: spin 3s linear infinite; }
 
-export default RestaurantMenu;
+export default ManageMenu;

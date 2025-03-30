@@ -176,6 +176,7 @@ router.post("/menu", upload.single("image"), async (req, res) => {
       imageUrl,
       available,
       tags,
+      vegetarian
     });
     console.log("trying to save to mongo");
     const savedMenuItem = await newMenuItem.save();

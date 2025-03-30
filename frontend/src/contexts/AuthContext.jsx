@@ -68,7 +68,35 @@ function AuthProvider({ children }) {
     });
     // console.log(JSON.stringify(currentUser) + " 2 " + loading);
     return unsubscribe;
-  }, [currentUser]);
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setCurrentUser(user);
+      
+      if (user) {
+        try {
+          const data = await fetchRestaurantByUID(user.uid);
+          if (data) {
+            setUserData(data);
+            console.log("set user data: " + JSON.stringify(data));
+          } else {
+            setUserData(null);
+            console.log('No user data');
+          }
+        } catch (error) {
+          console.log("Error while fetching user data: " + error);
+          setUserData(null);
+        }
+      } else {
+        setUserData(null);
+      }
+      
+      setLoading(false);
+    });
+    
+    return unsubscribe;
+  }, []); // Remove currentUser from dependency array
 
   const updateUserData = async () => {
     if (currentUser) {
@@ -108,7 +136,8 @@ function AuthProvider({ children }) {
     signUp,
     login,
     logout,
-    updateUserData
+    updateUserData, 
+    loading
   };
 
   return (

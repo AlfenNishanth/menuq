@@ -336,7 +336,7 @@ import {
   PlusSquare,
   User,
   Settings,
-  Coffee
+  Settings2, 
 } from "lucide-react";
 import { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
@@ -419,6 +419,11 @@ export default function Sidebar({ onLogoutClick }) {
               text="Dashboard"
               to="/dashboard/"
               badge="New"
+            />
+            <SidebarItem
+              icon={<Settings2 size={18} />}
+              text="Manage Menu"
+              to="/dashboard/manage-menu/"
             />
             <SidebarItem
               icon={<PlusSquare size={18} />}

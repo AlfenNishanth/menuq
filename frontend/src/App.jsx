@@ -11,6 +11,7 @@ import UpdateProfile from "./components/UpdateProfile";
 import AddNewMenuItem from "./components/AddNewMenuItem";
 import MenuLayout from "./components/menuitems/MenuLayout";
 import LandingPage from './components/LandingPage';
+import ManageMenu from "./components/menuitems/ManageMenu";
 
 function App() {
 
@@ -35,6 +36,7 @@ function App() {
             {/* Nested routes */}
             <Route path="update-profile" element={<UpdateProfile />}/>
             <Route path="add-new-menu-item" element={<AddNewMenuItem/>}/>
+            <Route path="manage-menu" element={<ManageMenu/>}/>
 
             {/* <Route path="add-new-item" element={<AddNewItem />} /> */}
           </Route>

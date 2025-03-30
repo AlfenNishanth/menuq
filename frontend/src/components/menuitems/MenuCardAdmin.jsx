@@ -52,10 +52,7 @@ function MenuCard({ item, onAddToOrder }) {
         <div className="w-44 flex-shrink-0 relative group">
           <img 
             className="w-full h-44 object-cover transition-transform duration-300 group-hover:scale-105"
-            // src={imageUrl}
-            src={item.imageUrl !== "" ? item.imageUrl : 
-              "https://t3.ftcdn.net/jpg/02/68/55/60/360_F_268556012_c1WBaKFN5rjRxR2eyV33znK4qnYeKZjm.jpg"}
-            //"https://archive.org/download/placeholder-image/placeholder-image.jpg"}
+            src={imageUrl}
             alt={name} 
             loading="lazy"
           />
@@ -114,6 +111,15 @@ function MenuCard({ item, onAddToOrder }) {
               <>View Details <ChevronDown className="ml-1 w-4 h-4" /></>
             )}
           </button>
+        <button
+            onClick={() => onAddToOrder && onAddToOrder({ ...item, available: !available })}
+            className="mt-2 flex items-center justify-center w-full py-2 text-amber-700 hover:text-amber-900 transition-colors duration-200 font-medium"
+        >
+            <span className="mr-2">Toggle Availability</span>
+            <div className={`w-10 h-6 rounded-full ${available ? 'bg-green-500' : 'bg-gray-300'} relative transition-colors duration-200`}>
+                <div className={`absolute top-1 ${available ? 'right-1' : 'left-1'} w-4 h-4 bg-white rounded-full transition-all duration-200`} />
+            </div>
+        </button>
         </div>
       </div>
       
