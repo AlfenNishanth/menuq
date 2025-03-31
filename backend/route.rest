@@ -1,14 +1,27 @@
 GET http://localhost:3000/menuq/ds6Xpv0xPmQceDOuCzeqiMT7CSk2
 
 ###
-GET http://localhost:3000/menuq/byId/RX00003
+GET http://localhost:3000/menuq/byId/RX00001
 
 ###
-GET http://localhost:3000/menuq/RX00002
+GET http://localhost:3000/menu/RX00001
+
+###
+GET http://localhost:3000/menu/RX00001
+
+###
+GET http://localhost:3000/menu/item/67aadaa454641ff4345fb9d6
 
 ###
 GET http://localhost:3000/menuq/
 
+###
+PATCH http://localhost:3000/menu/availability/67aadaa454641ff4345fb9d6
+Content-Type: application/json
+
+{
+  "available": false
+}
 ###
 POST http://localhost:3000/menuq
 Content-Type: application/json

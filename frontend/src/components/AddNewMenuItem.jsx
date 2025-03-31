@@ -632,7 +632,9 @@ export default function AddNewMenuItem() {
     
     if (variants.length !== 0) formData.append("variants", variants);
     if (addOns.length !== 0) formData.append("addOns", addOns);
-    if (tags.length !== 0) formData.append("tags", tags);
+    // if (tags.length !== 0) formData.append("tags", tags);
+
+    if (tags.length !== 0)  formData.append("tags", JSON.stringify(tags));
 
     if (imageFile) {
       formData.append("image", imageFile);

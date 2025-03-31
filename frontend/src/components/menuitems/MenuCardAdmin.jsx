@@ -7,9 +7,11 @@ import {
   Star,
   Edit
 } from 'lucide-react';
+import { ToastContainer, toast } from 'react-toastify';
 import { capitalizeWords } from '../../utils/format';
+import { updateAvailability } from '../../api/menuItem';
 
-function MenuCard({ item, onAddToOrder }) {
+ function MenuCardAdmin({ item, onAddToOrder }) {
   const [expanded, setExpanded] = useState(false);
   const [isAvailable, setIsAvailable] = useState(item.available);
   const navigate = useNavigate();
@@ -18,9 +20,19 @@ function MenuCard({ item, onAddToOrder }) {
     setExpanded(!expanded);
   };
 
-  const handleToggleAvailability = () => {
+  const handleToggleAvailability = async () => {
     const newAvailability = !isAvailable;
+    try{
     setIsAvailable(newAvailability);
+    console.log(item._id);
+
+    await updateAvailability(item._id, newAvailability)
+    
+}catch(error){
+  console.error("Error updating availability:", error.response?.data || error.message); 
+  toast.error("Error updating availability. Please try again later.");
+  setIsAvailable(!newAvailability); // Revert the state change
+}
     
     // Call the parent component's function with updated item
     if (onAddToOrder) {
@@ -98,7 +110,7 @@ function MenuCard({ item, onAddToOrder }) {
                   onClick={handleEditItem}
                   className="mt-2 flex items-center text-blue-600 hover:text-blue-800 transition-colors"
                 >
-                  <Edit className="w-4 h-4 mr-1" />
+                  <Edit className="w-4 h-4 mr-1 cursor-pointer" />
                   <span className="text-sm">Edit</span>
                 </button>
               </div>
@@ -121,10 +133,13 @@ function MenuCard({ item, onAddToOrder }) {
 
             {/* Improved Availability Toggle Switch */}
             <div className="mt-4 flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-700">Dish Availability:</span>
+              {/* <span className="text-sm font-medium text-gray-700">{isAvailable? "Available" : "Unavailable"}:</span> */}
+              <div className={`mt-2 text-sm font-medium align-top ${isAvailable ? 'text-green-600' : 'text-red-600'}`}>
+              {isAvailable ? 'Available' : 'Currently Unavailable'}
+            </div>
               <button
                 onClick={handleToggleAvailability}
-                className="relative inline-flex h-6 w-11 items-center rounded-full focus:outline-none"
+                className="relative inline-flex h-6 w-11 items-center rounded-full focus:outline-none cursor-pointer"
                 aria-pressed={isAvailable}
                 type="button"
               >
@@ -135,9 +150,7 @@ function MenuCard({ item, onAddToOrder }) {
               </button>
             </div>
             
-            <div className={`mt-2 text-sm font-medium ${isAvailable ? 'text-green-600' : 'text-red-600'}`}>
-              {isAvailable ? 'Available' : 'Currently Unavailable'}
-            </div>
+
           </div>
 
           <button 
@@ -188,8 +201,9 @@ function MenuCard({ item, onAddToOrder }) {
           </div>
         </div>
       )}
+      <ToastContainer/>
     </div>
   );
 }
 
-export default MenuCard;
+export default MenuCardAdmin;
