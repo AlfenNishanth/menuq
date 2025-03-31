@@ -1,12 +1,11 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useAuth } from "../contexts/AuthContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Upload, XCircleIcon, XIcon } from "lucide-react";
-import { v4 } from "uuid";
-import { updateMenuItem } from "../api/menuItem";
-import { useParams } from "react-router-dom";
+import { updateMenuItem, getMenuItem } from "../api/menuItem";
+import { useParams, useNavigate } from "react-router-dom";
 
 export default function UpdateMenuItem() {
   const {
@@ -19,7 +18,8 @@ export default function UpdateMenuItem() {
     formState: { errors },
   } = useForm();
 
-  const {id} = useParams();
+  const { id } = useParams();
+  const navigate = useNavigate();
 
   const [variants, setVariants] = useState([]);
   const [addOns, setAddOns] = useState([]);
@@ -27,12 +27,68 @@ export default function UpdateMenuItem() {
   const [newTag, setNewTag] = useState("");
   const [tagError, setTagError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-  const [vegetarian, setVegetarian] = useState(null);
+  const [originalImageUrl, setOriginalImageUrl] = useState(null);
 
   const fileInputRef = useRef();
   const { currentUser, userData } = useAuth();
+
+  // Fetch menu item data when component mounts
+  useEffect(() => {
+    async function fetchMenuItem() {
+      try {
+        setInitialLoading(true);
+        const menuItemData = await getMenuItem(id);
+        
+        // Populate form with fetched data
+        setValue("name", menuItemData.name);
+        setValue("description", menuItemData.description);
+        
+        // Handle the type field
+        if (["Starter", "Main Course", "Drinks", "Cold Beverages", "Desserts"].includes(menuItemData.type)) {
+          setValue("type", menuItemData.type);
+        } else {
+          setValue("type", "Custom");
+          setValue("customType", menuItemData.type);
+        }
+        
+        setValue("price", menuItemData.price);
+        setValue("vegetarian", menuItemData.vegetarian);
+        setValue("available", menuItemData.available.toString());
+        
+        // Set variants, addOns, and tags
+        if (menuItemData.variants && menuItemData.variants.length > 0) {
+          setVariants(menuItemData.variants);
+        }
+        
+        if (menuItemData.addOns && menuItemData.addOns.length > 0) {
+          setAddOns(menuItemData.addOns);
+        }
+        
+        if (menuItemData.tags && menuItemData.tags.length > 0) {
+          setTags(menuItemData.tags);
+        }
+        
+        // Handle image preview
+        if (menuItemData.imageUrl) {
+          setOriginalImageUrl(menuItemData.imageUrl);
+          setImagePreview(menuItemData.imageUrl);
+        }
+        
+      } catch (error) {
+        console.error("Error fetching menu item:", error);
+        toast.error(`Error fetching menu item: ${error.message}`);
+      } finally {
+        setInitialLoading(false);
+      }
+    }
+    
+    if (id) {
+      fetchMenuItem();
+    }
+  }, [id, setValue]);
 
   const addTag = () => {
     const trimmedTag = newTag.trim().toLowerCase();
@@ -71,6 +127,7 @@ export default function UpdateMenuItem() {
   const removeImage = () => {
     setImageFile(null);
     setImagePreview(null);
+    setOriginalImageUrl(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -78,7 +135,7 @@ export default function UpdateMenuItem() {
 
   const onSubmit = async (data) => {
     if (!currentUser) {
-      toast.error("You must be logged in to add menu items!");
+      toast.error("You must be logged in to update menu items!");
       return;
     }
 
@@ -88,45 +145,85 @@ export default function UpdateMenuItem() {
     const finalType =
       data.type === "Custom" ? data.customType.toLowerCase() : data.type;
 
-    const formData = new FormData();
-    formData.append("restaurantID", restaurantID);
-    formData.append("name", data.name.toLowerCase());
-    formData.append("description", data.description.toLowerCase());
-    formData.append("type", finalType);
-    formData.append("price", parseFloat(data.price));
-    formData.append("available", "true");
-    formData.append("vegetarian", data.vegetarian);
+    // Create updated data object according to your API structure
+    const updatedData = {
+      restaurantID: restaurantID,
+      name: data.name.toLowerCase(),
+      description: data.description.toLowerCase(),
+      type: finalType,
+      price: parseFloat(data.price),
+      available: data.available === "true",
+      vegetarian: data.vegetarian
+    };
 
-    if (variants.length !== 0) formData.append("variants", variants);
-    if (addOns.length !== 0) formData.append("addOns", addOns);
-    if (tags.length !== 0) formData.append("tags", tags);
+    // Add arrays if they exist
+    if (variants.length > 0) updatedData.variants = variants;
+    if (addOns.length > 0) updatedData.addOns = addOns;
+    if (tags.length > 0) updatedData.tags = tags;
 
+    // Handle image
     if (imageFile) {
+      // If using FormData is required for image upload
+      const formData = new FormData();
       formData.append("image", imageFile);
+      
+      // First upload the image and get URL back
+      try {
+        // This is a placeholder - you'll need to implement the image upload API
+        // const uploadResponse = await uploadImage(formData);
+        // updatedData.imageUrl = uploadResponse.imageUrl;
+
+        // For now, we'll assume the image is handled separately or in your backend
+        formData.append("data", JSON.stringify(updatedData));
+        
+        await updateMenuItem(id, formData);
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        toast.error(`Error uploading image: ${error.message}`);
+        setLoading(false);
+        return;
+      }
+    } else {
+      // If keeping the original image or no image
+      if (originalImageUrl) {
+        updatedData.imageUrl = originalImageUrl;
+      } else {
+        updatedData.imageUrl = null; // Remove image
+      }
+      
+      // Update menu item without image changes
+      try {
+        await updateMenuItem(id, updatedData);
+      } catch (error) {
+        console.error("Error updating menu item:", error);
+        toast.error(`Error updating menu item: ${error.message}`);
+        setLoading(false);
+        return;
+      }
     }
 
-    try {
-      await addMenuItem(formData);
-      toast.success("Menu item added successfully!");
-      reset();
-      setVariants([]);
-      setAddOns([]);
-      setTags([]);
-      setImageFile(null);
-      setImagePreview(null);
-    } catch (error) {
-      console.error("Error adding menu item:", error);
-      toast.error(`Error adding menu item: ${error.message}`);
-    }
+    toast.success("Menu item updated successfully!");
+    // Navigate back after success
+    setTimeout(() => {
+      navigate(`/dashboard/manage-menu/`); // Adjust path as needed
+    }, 2000);
 
     setLoading(false);
   };
+
+  if (initialLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin h-12 w-12 border-4 border-teal-500 rounded-full border-t-transparent"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 text-gray-900">
       <div className="p-8 rounded-2xl shadow-xl w-full max-w-lg bg-white">
         <h2 className="text-3xl font-extrabold mb-6 text-center">
-          Add New Menu Item
+          Update Menu Item
         </h2>
 
         <form
@@ -491,7 +588,7 @@ export default function UpdateMenuItem() {
             {loading ? (
               <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
             ) : (
-              "Add Menu Item"
+              "Update Menu Item"
             )}
           </button>
         </form>

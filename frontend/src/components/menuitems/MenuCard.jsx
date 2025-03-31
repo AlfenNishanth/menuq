@@ -77,17 +77,19 @@ function MenuCard({ item, onAddToOrder }) {
           </div>
           
           {/* Simplified Veg/Non-Veg indicator */}
-          <div className="absolute top-2 right-2 bg-white p-1 rounded-full shadow-md">
-            <div 
-              className={`w-4 h-4 flex items-center justify-center rounded-full ${isVegItem ? 'bg-green-600' : 'bg-red-600'}`}
-            >
-              {isVegItem ? (
-                <span className="text-white text-xs font-bold"></span>  //if i want i can put letters which can visible inside the circles
-              ) : (
-                <span className="text-white text-xs font-bold"></span>
-              )}
-            </div>
-          </div>
+          <div className="absolute top-2 right-2">
+  <div 
+    className={`w-4 h-4 flex items-center justify-center ${isVegItem ? 'border-2 border-green-600' : 'border-2 border-red-600'}`}
+  >
+    {isVegItem ? (
+      <div className="w-2 h-2 rounded-full bg-green-600"></div>
+    ) : (
+      <svg width="12" height="12" viewBox="0 0 12 12" className="fill-red-600">
+        <polygon points="6,2 10,10 2,10" />
+      </svg>
+    )}
+  </div>
+</div>
         </div>
 
         <div className="flex-grow flex flex-col">
