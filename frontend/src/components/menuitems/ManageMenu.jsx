@@ -64,7 +64,7 @@ const ManageMenu = () => {
     console.log(`menuLayout restaurantId - ${userData?.restaurantId}`); // Logs specific property
 
 
-  const id = 'RX00001'
+  const id = userData?.restaurantId;
   const [menuItems, setMenuItems] = useState({});
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("");
