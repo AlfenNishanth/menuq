@@ -23,7 +23,9 @@ function MenuCard({ item, onAddToOrder }) {
     return text;
   };
 
-  
+  // Check for the correct property name in your backend
+  // Log the item to see the actual structure
+  console.log("Menu item data:", item);
 
   const {
     name,
@@ -35,8 +37,18 @@ function MenuCard({ item, onAddToOrder }) {
     rating,
     ratingCount,
     available,
-    spiceLevel
+    spiceLevel,
+    // Try different possible property names that might be used in your backend
+    isVegetarian,
+    isVeg,
+    vegetarian,
+    veg,
+    foodType
   } = item;
+
+  // Determine if the item is vegetarian using various possible properties
+  const isVegItem = isVegetarian || isVeg || vegetarian || (veg === true) || 
+                   (foodType === 'veg') || (foodType === 'vegetarian');
 
   const FireIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-600">
@@ -49,13 +61,11 @@ function MenuCard({ item, onAddToOrder }) {
       className={`relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 bg-white border-0 flex flex-col max-w-4xl mx-auto ${!available ? 'opacity-60' : ''}`}
     >
       <div className="flex">
-        <div className="w-44 flex-shrink-0 relative group">
+        <div className="w-42 flex-shrink-0 relative group">
           <img 
             className="w-full h-44 object-cover transition-transform duration-300 group-hover:scale-105"
-            // src={imageUrl}
             src={item.imageUrl !== "" ? item.imageUrl : 
               "https://t3.ftcdn.net/jpg/02/68/55/60/360_F_268556012_c1WBaKFN5rjRxR2eyV33znK4qnYeKZjm.jpg"}
-            //"https://archive.org/download/placeholder-image/placeholder-image.jpg"}
             alt={name} 
             loading="lazy"
           />
@@ -64,6 +74,19 @@ function MenuCard({ item, onAddToOrder }) {
               <FireIcon />
               <span className="ml-1">{spiceLevel}</span>
             </span>
+          </div>
+          
+          {/* Simplified Veg/Non-Veg indicator */}
+          <div className="absolute top-2 right-2 bg-white p-1 rounded-full shadow-md">
+            <div 
+              className={`w-4 h-4 flex items-center justify-center rounded-full ${isVegItem ? 'bg-green-600' : 'bg-red-600'}`}
+            >
+              {isVegItem ? (
+                <span className="text-white text-xs font-bold"></span>  //if i want i can put letters which can visible inside the circles
+              ) : (
+                <span className="text-white text-xs font-bold"></span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -84,7 +107,8 @@ function MenuCard({ item, onAddToOrder }) {
               </div>
             </div>
             
-            <p className="text-gray-600 mb-4 line-clamp-2">{truncateText(description)}</p>
+            {/* you can see the description in the top of menu card */}
+            {/* <p className="text-gray-600 mb-4 line-clamp-2">{truncateText(description)}</p> */}  
             
             {tags && tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
@@ -100,7 +124,7 @@ function MenuCard({ item, onAddToOrder }) {
             )}
 
             <div className={`mt-2 text-sm font-medium ${available ? 'text-green-600' : 'text-red-600'}`}>
-              {available ? '' : 'Currently Unavailable'}
+              {available ? 'Available' : 'Currently Unavailable'}
             </div>
           </div>
 
@@ -123,6 +147,9 @@ function MenuCard({ item, onAddToOrder }) {
             <div>
               <h3 className="text-sm font-medium text-gray-700 mb-2">About the Dish</h3>
               <p className="text-gray-600">{description}</p>
+              {/* <p className="text-gray-600 mt-1 font-medium">  //can see in expand button veg or non veg
+                {isVegItem ? '🟢 Vegetarian' : '🔴 Non-Vegetarian'}
+              </p> */}
             </div>
 
             <div className="flex items-center justify-between">

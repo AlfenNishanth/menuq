@@ -77,9 +77,9 @@ import { updateAvailability } from '../../api/menuItem';
       className={`relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 bg-white border-0 flex flex-col max-w-4xl mx-auto ${!isAvailable ? 'opacity-60' : ''}`}
     >
       <div className="flex">
-        <div className="w-44 flex-shrink-0 relative group">
+        <div className="w-42 flex-shrink-0 relative group">
           <img 
-            className="w-full h-54 object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-44 object-cover transition-transform duration-300 group-hover:scale-105"
             src={imageUrl}
             alt={name} 
             loading="lazy"
@@ -116,7 +116,7 @@ import { updateAvailability } from '../../api/menuItem';
               </div>
             </div>
             
-            <p className="text-gray-600 mb-4 line-clamp-2">{truncateText(description)}</p>
+            {/* <p className="text-gray-600 mb-4 line-clamp-2">{truncateText(description)}</p> */}
             
             {tags && tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
