@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { Upload, XCircleIcon, XIcon } from "lucide-react";
 import { v4 } from "uuid";
 import { updateMenuItem } from "../api/menuItem";
+import { useParams } from "react-router-dom";
 
 export default function UpdateMenuItem() {
   const {
@@ -17,6 +18,8 @@ export default function UpdateMenuItem() {
     setValue,
     formState: { errors },
   } = useForm();
+
+  const {id} = useParams();
 
   const [variants, setVariants] = useState([]);
   const [addOns, setAddOns] = useState([]);

@@ -11,6 +11,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { capitalizeWords } from '../../utils/format';
 import { updateAvailability } from '../../api/menuItem';
 
+
  function MenuCardAdmin({ item, onAddToOrder }) {
   const [expanded, setExpanded] = useState(false);
   const [isAvailable, setIsAvailable] = useState(item.available);
@@ -41,8 +42,7 @@ import { updateAvailability } from '../../api/menuItem';
   };
 
   const handleEditItem = () => {
-    // Navigate to the EditMenuItem page with the item ID as a parameter
-    navigate(`/edit-menu-item/${item._id}`);
+    navigate(`/dashboard/edit-menu-item/${item._id}`);
   };
 
   // Function to truncate text to 200 words
