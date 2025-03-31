@@ -73,7 +73,7 @@ import { updateAvailability } from '../../api/menuItem';
   );
 
   return (
-    <div 
+  <div 
       className={`relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 bg-white border-0 flex flex-col max-w-4xl mx-auto ${!isAvailable ? 'opacity-60' : ''}`}
     >
       <div className="flex">

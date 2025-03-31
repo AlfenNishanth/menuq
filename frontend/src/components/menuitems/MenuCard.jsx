@@ -100,7 +100,7 @@ function MenuCard({ item, onAddToOrder }) {
             )}
 
             <div className={`mt-2 text-sm font-medium ${available ? 'text-green-600' : 'text-red-600'}`}>
-              {available ? 'Available' : 'Currently Unavailable'}
+              {available ? '' : 'Currently Unavailable'}
             </div>
           </div>
 
