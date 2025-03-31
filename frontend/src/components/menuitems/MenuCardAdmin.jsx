@@ -42,7 +42,7 @@ import { updateAvailability } from '../../api/menuItem';
 
   const handleEditItem = () => {
     // Navigate to the EditMenuItem page with the item ID as a parameter
-    navigate(`/edit-menu-item/${item.id}`);
+    navigate(`/edit-menu-item/${item._id}`);
   };
 
   // Function to truncate text to 200 words
