@@ -4,7 +4,7 @@ GET http://localhost:3000/menuq/WMiNOcc6j4aRbAkpD4unBsM7rOG3
 GET http://localhost:3000/menuq/byId/RX00001
 
 ###
-GET http://localhost:3000/menu/RX00001
+GET http://localhost:3000/menu/RX00029
 
 ###
 GET http://localhost:3000/menu/RX00028

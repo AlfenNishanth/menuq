@@ -77,7 +77,7 @@ router.post("/", upload.single("image"), async (req, res) => {
       addOns,
       imageUrl,
       available,
-      parsedTags,
+      tags:parsedTags,
       vegetarian
     });
     console.log("trying to save to mongo");

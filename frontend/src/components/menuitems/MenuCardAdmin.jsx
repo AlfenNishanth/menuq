@@ -117,7 +117,6 @@ import { updateAvailability } from '../../api/menuItem';
             </div>
             
             {/* <p className="text-gray-600 mb-4 line-clamp-2">{truncateText(description)}</p> */}
-            
             {tags && tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {tags.map((tag, index) => (
