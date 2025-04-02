@@ -6,8 +6,18 @@ const menuItemSchema = new mongoose.Schema({
   description: { type: String },
   type: { type: String, required: true },
   price: { type: Number, required: true },
-  variants: { type: Array, default: [] }, 
-  addOns: { type: Array, default: [] }, 
+  variants: [
+    {
+      name: { type: String, required: true }, 
+      price: { type: Number, required: true } 
+    }
+  ],
+  addOns: [
+    {
+      name: { type: String, required: true },
+      price: { type: Number, required: true } 
+    }
+  ],
   imageUrl: { type: String },
   available: { type: Boolean, default: true },
   tags: { type: [String], default: [] },

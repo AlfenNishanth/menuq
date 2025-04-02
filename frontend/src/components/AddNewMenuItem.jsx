@@ -74,7 +74,6 @@ export default function AddNewMenuItem() {
   };
 
   const onSubmit = async (data) => {
-    console.log(tags);
     if (!currentUser) {
       toast.error("You must be logged in to add menu items!");
       return;
@@ -96,13 +95,14 @@ export default function AddNewMenuItem() {
     formData.append("available", "true");
     formData.append("vegetarian", data.vegetarian);
     
-    if (variants.length !== 0) formData.append("variants", variants);
-    if (addOns.length !== 0) formData.append("addOns", addOns);
+    if (variants.length !== 0) formData.append("variants", JSON.stringify(variants));
+    if (addOns.length !== 0) formData.append("addOns", JSON.stringify(addOns));
     // if (tags.length !== 0) formData.append("tags", tags);
 
     if (tags.length !== 0)  formData.append("tags", JSON.stringify(tags));
 
-    console.log("Tags data:", tags);
+    console.log("variants:", variants);
+    console.log("Addons:", addOns);
     console.log("Form data:", formData);
 
     if (imageFile) {
@@ -230,7 +230,7 @@ export default function AddNewMenuItem() {
             {/* Price */}
             <input
               type="number"
-              step="0.01"
+              step="1"
               {...register("price", { required: "Price is required" })}
               placeholder="Base Price"
               className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900"
@@ -335,7 +335,7 @@ export default function AddNewMenuItem() {
                   />
                   <input
                     type="number"
-                    step="0.01"
+                    step="1"
                     placeholder="Price"
                     value={variant.price}
                     onChange={(e) => {
@@ -387,7 +387,7 @@ export default function AddNewMenuItem() {
                   />
                   <input
                     type="number"
-                    step="0.01"
+                    step="1"
                     placeholder="Price"
                     value={addOn.price}
                     onChange={(e) => {

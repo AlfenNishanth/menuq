@@ -66,6 +66,8 @@ router.post("/", upload.single("image"), async (req, res) => {
     }
 
     parsedTags = tags ? JSON.parse(tags) : [];
+    parsedVariants = variants ? JSON.parse(variants) : [];
+    parsedAddOns = addOns ? JSON.parse(addOns) : [];
 
     const newMenuItem = new MenuItem({
       restaurantID,
@@ -73,8 +75,8 @@ router.post("/", upload.single("image"), async (req, res) => {
       description,
       type,
       price,
-      variants,
-      addOns,
+      variants:parsedVariants,
+      addOns:parsedAddOns,
       imageUrl,
       available,
       tags:parsedTags,
