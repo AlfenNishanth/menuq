@@ -3,12 +3,16 @@ import {
   ChevronDown, 
   ChevronUp, 
   Clock, 
-  Star
+  Star,
+  Plus,
+  Minus
 } from 'lucide-react';
 import { capitalizeWords } from '../../utils/format';
 
 function MenuCard({ item, onAddToOrder }) {
   const [expanded, setExpanded] = useState(false);
+  const [selectedVariant, setSelectedVariant] = useState(null);
+  const [selectedAddOns, setSelectedAddOns] = useState([]);
 
   const toggleExpand = () => {
     setExpanded(!expanded);
@@ -43,7 +47,9 @@ function MenuCard({ item, onAddToOrder }) {
     isVeg,
     vegetarian,
     veg,
-    foodType
+    foodType,
+    variants,
+    addOns
   } = item;
 
   // Determine if the item is vegetarian using various possible properties
@@ -56,6 +62,43 @@ function MenuCard({ item, onAddToOrder }) {
     </svg>
   );
 
+  // Toggle add-on selection
+  const toggleAddOn = (addOn) => {
+    setSelectedAddOns(prev => {
+      const isSelected = prev.some(item => item.name === addOn.name);
+      if (isSelected) {
+        return prev.filter(item => item.name !== addOn.name);
+      } else {
+        return [...prev, addOn];
+      }
+    });
+  };
+
+  // Calculate total price
+  const calculateTotalPrice = () => {
+    let total = selectedVariant ? selectedVariant.price : price;
+    
+    // Add selected add-ons prices
+    if (selectedAddOns.length > 0) {
+      total += selectedAddOns.reduce((sum, addOn) => sum + addOn.price, 0);
+    }
+    
+    return total;
+  };
+
+  // Handle "Add to Order" with selected variants and add-ons
+  const handleAddToOrder = () => {
+    if (onAddToOrder) {
+      const orderItem = {
+        ...item,
+        selectedVariant,
+        selectedAddOns,
+        totalPrice: calculateTotalPrice()
+      };
+      onAddToOrder(orderItem);
+    }
+  };
+
   return (
     <div 
       className={`relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 bg-white border-0 flex flex-col max-w-4xl mx-auto ${!available ? 'opacity-60' : ''}`}
@@ -63,7 +106,7 @@ function MenuCard({ item, onAddToOrder }) {
       <div className="flex">
         <div className="w-42 flex-shrink-0 relative group">
           <img 
-            className="w-full h-44 object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-46 object-cover transition-transform duration-300 group-hover:scale-105"
             src={item.imageUrl !== "" ? item.imageUrl : 
               "https://t3.ftcdn.net/jpg/02/68/55/60/360_F_268556012_c1WBaKFN5rjRxR2eyV33znK4qnYeKZjm.jpg"}
             alt={name} 
@@ -154,6 +197,71 @@ function MenuCard({ item, onAddToOrder }) {
               </p> */}
             </div>
 
+            {/* Variants Section */}
+            {variants && variants.length > 0 && (
+              <div className="pt-2">
+                <h3 className="text-sm font-medium text-gray-700 mb-2">Variants</h3>
+                <div className="grid grid-cols-1 gap-2">
+                  {/* Default variant option */}
+                  <div 
+                    className={`flex justify-between items-center p-3 rounded-md cursor-pointer border ${selectedVariant === null ? 'border-amber-600 bg-amber-50' : 'border-gray-200 hover:border-amber-300'}`}
+                    onClick={() => setSelectedVariant(null)}
+                  >
+                    <div className="flex items-center">
+                      <div className={`w-4 h-4 rounded-full border ${selectedVariant === null ? 'border-amber-600 bg-amber-600' : 'border-gray-400'}`}>
+                        {selectedVariant === null && <div className="w-2 h-2 bg-white rounded-full m-auto mt-1"></div>}
+                      </div>
+                      <span className="ml-2 text-sm font-medium">Regular</span>
+                    </div>
+                    <span className="font-medium text-gray-800">₹{price}</span>
+                  </div>
+                  
+                  {variants.map((variant, index) => (
+                    <div 
+                      key={index}
+                      className={`flex justify-between items-center p-3 rounded-md cursor-pointer border ${selectedVariant?.name === variant.name ? 'border-amber-600 bg-amber-50' : 'border-gray-200 hover:border-amber-300'}`}
+                      onClick={() => setSelectedVariant(variant)}
+                    >
+                      <div className="flex items-center">
+                        <div className={`w-4 h-4 rounded-full border ${selectedVariant?.name === variant.name ? 'border-amber-600 bg-amber-600' : 'border-gray-400'}`}>
+                          {selectedVariant?.name === variant.name && <div className="w-2 h-2 bg-white rounded-full m-auto mt-1"></div>}
+                        </div>
+                        <span className="ml-2 text-sm font-medium">{capitalizeWords(variant.name)}</span>
+                      </div>
+                      <span className="font-medium text-gray-800">₹{variant.price}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Add-ons Section */}
+            {addOns && addOns.length > 0 && (
+              <div className="pt-2">
+                <h3 className="text-sm font-medium text-gray-700 mb-2">Add-ons</h3>
+                <div className="grid grid-cols-1 gap-2">
+                  {addOns.map((addOn, index) => {
+                    const isSelected = selectedAddOns.some(item => item.name === addOn.name);
+                    return (
+                      <div 
+                        key={index}
+                        className={`flex justify-between items-center p-3 rounded-md cursor-pointer border ${isSelected ? 'border-amber-600 bg-amber-50' : 'border-gray-200 hover:border-amber-300'}`}
+                        onClick={() => toggleAddOn(addOn)}
+                      >
+                        <div className="flex items-center">
+                          <div className={`w-4 h-4 rounded flex justify-center items-center ${isSelected ? 'bg-amber-600 text-white' : 'border border-gray-400'}`}>
+                            {isSelected && <Check className="w-3 h-3" />}
+                          </div>
+                          <span className="ml-2 text-sm font-medium">{capitalizeWords(addOn.name)}</span>
+                        </div>
+                        <span className="font-medium text-gray-800">+₹{addOn.price}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <Clock className="w-5 h-5 text-amber-600 mr-2" />
@@ -165,11 +273,12 @@ function MenuCard({ item, onAddToOrder }) {
             <div className="mt-4">
               {available ? (
                 <div className="flex space-x-2">
+                  {/* New button that uses the selected variants and add-ons */}
                   <button 
-                    onClick={() => onAddToOrder && onAddToOrder(item)}
+                    onClick={handleAddToOrder}
                     className="flex-grow bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 rounded-md transition-colors duration-200"
                   >
-                    Add to Order
+                    Add to Order • ₹{calculateTotalPrice()}
                   </button>
                 </div>
               ) : (
@@ -184,5 +293,21 @@ function MenuCard({ item, onAddToOrder }) {
     </div>
   );
 }
+
+// Check component to use with add-ons selection
+const Check = ({ className }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="3" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+  >
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+);
 
 export default MenuCard;

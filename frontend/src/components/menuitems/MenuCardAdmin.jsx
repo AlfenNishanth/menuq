@@ -79,7 +79,7 @@ import { updateAvailability } from '../../api/menuItem';
       <div className="flex">
         <div className="w-42 flex-shrink-0 relative group">
           <img 
-            className="w-full h-44 object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-46 object-cover transition-transform duration-300 group-hover:scale-105"
             src={imageUrl}
             alt={name} 
             loading="lazy"
