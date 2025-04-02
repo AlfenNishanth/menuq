@@ -27,6 +27,8 @@ export default function AddNewMenuItem() {
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [vegetarian, setVegetarian] = useState(null);
+
+  const vegetarianValue = watch("vegetarian");
   
   const fileInputRef = useRef();
   const { currentUser, userData, updateUserData } = useAuth();
@@ -94,7 +96,8 @@ export default function AddNewMenuItem() {
     formData.append("price", parseFloat(data.price));
     formData.append("available", "true");
     formData.append("vegetarian", data.vegetarian);
-    
+    // formData.append("vegetarian", watch(vegetarian));
+
     if (variants.length !== 0) formData.append("variants", JSON.stringify(variants));
     if (addOns.length !== 0) formData.append("addOns", JSON.stringify(addOns));
     // if (tags.length !== 0) formData.append("tags", tags);
