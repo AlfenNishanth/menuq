@@ -258,7 +258,18 @@ export default function AddNewMenuItem() {
             />
 */}
             {/* Image Upload */}
-            <div className="border-2 border-dashed rounded-lg p-4 transition border-gray-300 hover:border-teal-400 text-center">
+            <div className="border-2 border-dashed rounded-lg p-4 transition border-gray-300 hover:border-teal-400 text-center"
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault();
+                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                  const file = e.dataTransfer.files[0];
+                  setImageFile(file);
+                  setImagePreview(URL.createObjectURL(file));
+                  e.dataTransfer.clearData();
+                }
+              }}
+            >
               <div className="space-y-2">
                 {imagePreview ? (
                   <div className="relative">
