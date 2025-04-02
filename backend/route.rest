@@ -22,6 +22,15 @@ Content-Type: application/json
 {
   "available": false
 }
+
+###
+PATCH http://localhost:3000/menu/prepTime/67aadaa454641ff4345fb9d6
+Content-Type: application/json
+
+{
+  "prepTime": 20
+}
+
 ###
 POST http://localhost:3000/menuq
 Content-Type: application/json

@@ -162,6 +162,33 @@ router.patch("/availability/:id", async (req, res) => {
   }
 });
 
+//update prepTime
+router.patch("/prepTime/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { prepTime } = req.body;
+
+    if (typeof prepTime !== "number") {
+      return res.status(400).json({ message: "Invalid prepTime value" });
+    }
+
+    const updatedMenuItem = await MenuItem.findByIdAndUpdate(
+      id,
+      { prepTime },
+      { new: true }
+    );
+
+    if (!updatedMenuItem) {
+      return res.status(404).json({ message: "Menu item not found" });
+    }
+
+    return res.status(200).json(updatedMenuItem);
+  } catch (error) {
+    console.error("Error updating prepTime:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+})
+
 
 //upload file
 async function uploadFileToS3(file) {

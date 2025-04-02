@@ -26,6 +26,7 @@ const menuItemSchema = new mongoose.Schema({
   vegetarian: { type: Boolean },
   rating: { type: Number, min: 1, max: 5},
   numRatings: { type: Number, default: 0 },
+  prepTime: { type: Number, default: 0 },
 });
 
 module.exports = mongoose.model("MenuItem", menuItemSchema);

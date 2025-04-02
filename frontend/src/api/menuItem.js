@@ -53,6 +53,22 @@ export async function updateAvailability(menuItemId, available) {
   }
 }
 
+export async function updatePrepTime(menuItemId, prepTime) {
+  try {
+    const response = await axios.patch(
+      `${config.MENU}/prepTime/${menuItemId}`,
+      { prepTime }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error updating prep time:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+}
+
 export async function getRestaurantMenu(id) {
   try {
     const response = await axios.get(`${config.MENU}/${id}`);
