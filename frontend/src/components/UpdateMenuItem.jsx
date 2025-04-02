@@ -15,7 +15,7 @@ export default function UpdateMenuItem() {
     control,
     reset,
     setValue,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm();
 
   const { id } = useParams();
@@ -31,9 +31,42 @@ export default function UpdateMenuItem() {
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [originalImageUrl, setOriginalImageUrl] = useState(null);
+  
+  // For tracking changes
+  const [originalData, setOriginalData] = useState(null);
+  const [originalVariants, setOriginalVariants] = useState([]);
+  const [originalAddOns, setOriginalAddOns] = useState([]);
+  const [originalTags, setOriginalTags] = useState([]);
+  const [hasChanges, setHasChanges] = useState(false);
 
   const fileInputRef = useRef();
   const { currentUser, userData } = useAuth();
+
+  // Function to check for changes
+  const checkForChanges = () => {
+    if (!originalData) return false;
+    
+    const currentValues = watch();
+    
+    // Check if form values have changed
+    const isFormChanged = isDirty;
+    
+    // Check if arrays have changed
+    const areVariantsChanged = JSON.stringify(variants) !== JSON.stringify(originalVariants);
+    const areAddOnsChanged = JSON.stringify(addOns) !== JSON.stringify(originalAddOns);
+    const areTagsChanged = JSON.stringify(tags) !== JSON.stringify(originalTags);
+    
+    // Check if image has changed
+    const isImageChanged = 
+      (imageFile !== null) || 
+      (imagePreview !== originalImageUrl && 
+      (imagePreview === null || originalImageUrl === null));
+    
+    const hasAnyChange = isFormChanged || areVariantsChanged || areAddOnsChanged || areTagsChanged || isImageChanged;
+    
+    setHasChanges(hasAnyChange);
+    return hasAnyChange;
+  };
 
   // Fetch menu item data when component mounts
   useEffect(() => {
@@ -41,6 +74,9 @@ export default function UpdateMenuItem() {
       try {
         setInitialLoading(true);
         const menuItemData = await getMenuItem(id);
+        
+        // Store original data for comparison
+        setOriginalData(menuItemData);
         
         // Populate form with fetched data
         setValue("name", menuItemData.name);
@@ -61,14 +97,17 @@ export default function UpdateMenuItem() {
         // Set variants, addOns, and tags
         if (menuItemData.variants && menuItemData.variants.length > 0) {
           setVariants(menuItemData.variants);
+          setOriginalVariants(JSON.parse(JSON.stringify(menuItemData.variants)));
         }
         
         if (menuItemData.addOns && menuItemData.addOns.length > 0) {
           setAddOns(menuItemData.addOns);
+          setOriginalAddOns(JSON.parse(JSON.stringify(menuItemData.addOns)));
         }
         
         if (menuItemData.tags && menuItemData.tags.length > 0) {
           setTags(menuItemData.tags);
+          setOriginalTags([...menuItemData.tags]);
         }
         
         // Handle image preview
@@ -76,6 +115,21 @@ export default function UpdateMenuItem() {
           setOriginalImageUrl(menuItemData.imageUrl);
           setImagePreview(menuItemData.imageUrl);
         }
+        
+        // Reset form's dirty state after populating data
+        reset({
+          name: menuItemData.name,
+          description: menuItemData.description,
+          type: ["Starter", "Main Course", "Drinks", "Cold Beverages", "Desserts"].includes(menuItemData.type) 
+            ? menuItemData.type 
+            : "Custom",
+          customType: !["Starter", "Main Course", "Drinks", "Cold Beverages", "Desserts"].includes(menuItemData.type) 
+            ? menuItemData.type 
+            : "",
+          price: menuItemData.price,
+          vegetarian: menuItemData.vegetarian,
+          available: menuItemData.available.toString()
+        });
         
       } catch (error) {
         console.error("Error fetching menu item:", error);
@@ -88,7 +142,12 @@ export default function UpdateMenuItem() {
     if (id) {
       fetchMenuItem();
     }
-  }, [id, setValue]);
+  }, [id, setValue, reset]);
+  
+  // Check for changes whenever relevant data changes
+  useEffect(() => {
+    checkForChanges();
+  }, [watch, variants, addOns, tags, imageFile, imagePreview]);
 
   const addTag = () => {
     const trimmedTag = newTag.trim().toLowerCase();
@@ -136,6 +195,12 @@ export default function UpdateMenuItem() {
   const onSubmit = async (data) => {
     if (!currentUser) {
       toast.error("You must be logged in to update menu items!");
+      return;
+    }
+
+    // Check if anything has changed
+    if (!hasChanges) {
+      toast.info("No changes detected. Nothing to update.");
       return;
     }
 
@@ -580,10 +645,23 @@ export default function UpdateMenuItem() {
             )}
           </div>
 
+          {/* Status message for changes */}
+          <div className="text-center text-sm">
+            {hasChanges ? (
+              <p className="text-teal-600">Changes detected. Ready to update.</p>
+            ) : (
+              <p className="text-gray-500">No changes detected.</p>
+            )}
+          </div>
+
           <button
             type="submit"
-            className="w-full bg-teal-600 text-white p-3 rounded-lg font-semibold hover:bg-teal-700 transition duration-300 shadow-lg disabled:opacity-50 flex justify-center items-center"
-            disabled={loading}
+            className={`w-full text-white p-3 rounded-lg font-semibold transition duration-300 shadow-lg flex justify-center items-center ${
+              hasChanges 
+                ? "bg-teal-600 hover:bg-teal-700" 
+                : "bg-gray-400 cursor-not-allowed"
+            }`}
+            disabled={loading || !hasChanges}
           >
             {loading ? (
               <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
