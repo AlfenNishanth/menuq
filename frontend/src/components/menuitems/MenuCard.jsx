@@ -263,14 +263,14 @@ function MenuCard({ item, onAddToOrder }) {
             )}
 
             {/* Only show prep time section if prepTime is not zero */}
-            {prepTime && prepTime !== '0' && prepTime !== 0 && (
-              <div className="flex items-center">
-              <Clock className="w-5 h-5 text-amber-600 mr-2" />
-              <span className="text-xs font-semibold text-gray-600">Prep Time:</span>
-              <span className="text-sm font-medium ml-1">{prepTime} mins</span>
-            </div>
-            
-            )}
+            {prepTime > 0 && (
+                  <div className="flex items-center">
+                    <Clock className="w-5 h-5 text-amber-600 mr-2" />
+                    <span className="text-xs font-semibold text-gray-600">Prep Time:</span>
+                    <span className="text-sm font-medium ml-1">{prepTime} mins</span>
+                  </div>
+                )}
+
             
             <div className="mt-4">
               {available ? (
