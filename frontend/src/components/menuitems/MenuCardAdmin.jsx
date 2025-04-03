@@ -18,7 +18,7 @@ function MenuCardAdmin({ item, onAddToOrder }) {
   const [expanded, setExpanded] = useState(false);
   const [isAvailable, setIsAvailable] = useState(item.available);
   const [isEditingPrepTime, setIsEditingPrepTime] = useState(false);
-  const [prepTimeValue, setPrepTimeValue] = useState(item.prepTime);
+  const [prepTimeValue, setPrepTimeValue] = useState(item.prepTime ==0 ? '-' : item.prepTime);
   const navigate = useNavigate();
 
   const toggleExpand = () => {
@@ -89,9 +89,10 @@ function MenuCardAdmin({ item, onAddToOrder }) {
     }
   };
 
-  const handleCancelEditPrepTime = () => {
-    setPrepTimeValue(item.prepTime); // Reset to original value
+  const handleCancelEditPrepTime = async () => {
+    setPrepTimeValue('-'); 
     setIsEditingPrepTime(false);
+    const result = await updatePrepTime(item._id, 0);
   };
 
   const handleEditItem = () => {
