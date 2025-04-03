@@ -5,16 +5,20 @@ import {
   ChevronUp, 
   Clock, 
   Star,
-  Edit
+  Edit,
+  X
 } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; // Make sure this import is in your file
 import { capitalizeWords } from '../../utils/format';
-import { updateAvailability } from '../../api/menuItem';
+import { updateAvailability, updatePrepTime } from '../../api/menuItem';
 
 
- function MenuCardAdmin({ item, onAddToOrder }) {
+function MenuCardAdmin({ item, onAddToOrder }) {
   const [expanded, setExpanded] = useState(false);
   const [isAvailable, setIsAvailable] = useState(item.available);
+  const [isEditingPrepTime, setIsEditingPrepTime] = useState(false);
+  const [prepTimeValue, setPrepTimeValue] = useState(item.prepTime);
   const navigate = useNavigate();
 
   const toggleExpand = () => {
@@ -23,22 +27,71 @@ import { updateAvailability } from '../../api/menuItem';
 
   const handleToggleAvailability = async () => {
     const newAvailability = !isAvailable;
-    try{
-    setIsAvailable(newAvailability);
-    console.log(item._id);
+    try {
+      setIsAvailable(newAvailability);
+      console.log(item._id);
 
-    await updateAvailability(item._id, newAvailability)
-    
-}catch(error){
-  console.error("Error updating availability:", error.response?.data || error.message); 
-  toast.error("Error updating availability. Please try again later.");
-  setIsAvailable(!newAvailability); // Revert the state change
-}
+      await updateAvailability(item._id, newAvailability)
+      toast.success(`Item ${newAvailability ? 'available' : 'unavailable'} now`, {
+        autoClose: 3000, 
+        closeButton: true
+      });
+    } catch(error) {
+      console.error("Error updating availability:", error.response?.data || error.message); 
+      toast.error("Error updating availability. Please try again later.", {
+        autoClose: 3000,
+        closeButton: true
+      });
+      setIsAvailable(!newAvailability); // Revert the state change
+    }
     
     // Call the parent component's function with updated item
     if (onAddToOrder) {
       onAddToOrder({ ...item, available: newAvailability });
     }
+  };
+
+  const handleEditPrepTime = () => {
+    setIsEditingPrepTime(true);
+  };
+
+  const handleSavePrepTime = async () => {
+    try {
+      // Parse the prepTimeValue to a number
+      const prepTimeNumber = parseInt(prepTimeValue, 10);
+      
+      // Validate that it's a valid number
+      if (isNaN(prepTimeNumber)) {
+        toast.error("Prep time must be a valid number", {
+          autoClose: 3000,
+          closeButton: true
+        });
+        return;
+      }
+      
+      console.log(`Attempting to update prep time for ${item._id} to ${prepTimeNumber}`);
+      
+      const result = await updatePrepTime(item._id, prepTimeNumber);
+      console.log('Update result:', result);
+      
+      setIsEditingPrepTime(false);
+      toast.success("Prep time updated successfully!", {
+        autoClose: 3000,
+        closeButton: true
+      });
+    } catch (error) {
+      console.error("Error updating prep time:", error);
+      toast.error("Error updating prep time. Please try again later.", {
+        autoClose: 3000,
+        closeButton: true
+      });
+      setPrepTimeValue(item.prepTime); // Revert to original value
+    }
+  };
+
+  const handleCancelEditPrepTime = () => {
+    setPrepTimeValue(item.prepTime); // Reset to original value
+    setIsEditingPrepTime(false);
   };
 
   const handleEditItem = () => {
@@ -73,7 +126,7 @@ import { updateAvailability } from '../../api/menuItem';
   );
 
   return (
-  <div 
+    <div 
       className={`relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 bg-white border-0 flex flex-col max-w-4xl mx-auto ${!isAvailable ? 'opacity-60' : ''}`}
     >
       <div className="flex">
@@ -132,10 +185,9 @@ import { updateAvailability } from '../../api/menuItem';
 
             {/* Improved Availability Toggle Switch */}
             <div className="mt-4 flex items-center justify-between">
-              {/* <span className="text-sm font-medium text-gray-700">{isAvailable? "Available" : "Unavailable"}:</span> */}
               <div className={`mt-2 text-sm font-medium align-top ${isAvailable ? 'text-green-600' : 'text-red-600'}`}>
-              {isAvailable ? 'Available' : 'Currently Unavailable'}
-            </div>
+                {isAvailable ? 'Available' : 'Currently Unavailable'}
+              </div>
               <button
                 onClick={handleToggleAvailability}
                 className="relative inline-flex h-6 w-11 items-center rounded-full focus:outline-none cursor-pointer"
@@ -148,8 +200,6 @@ import { updateAvailability } from '../../api/menuItem';
                 ></span>
               </button>
             </div>
-            
-
           </div>
 
           <button 
@@ -178,7 +228,45 @@ import { updateAvailability } from '../../api/menuItem';
                 <Clock className="w-5 h-5 text-amber-600 mr-2" />
                 <span className="text-xs text-gray-500">Prep Time</span>
               </div>
-              <span className="text-sm font-medium">{prepTime}</span>
+              
+              {isEditingPrepTime ? (
+                <div className="flex items-center space-x-2">
+                  <input 
+                    type="number" 
+                    value={prepTimeValue}
+                    onChange={(e) => setPrepTimeValue(e.target.value)}
+                    className="border border-gray-300 rounded px-2 py-1 text-sm w-24"
+                    placeholder="Minutes"
+                    min="0"
+                  />
+                  <button 
+                    onClick={handleSavePrepTime}
+                    className="text-green-600 hover:text-green-800"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                      <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                      <polyline points="7 3 7 8 15 8"></polyline>
+                    </svg>
+                  </button>
+                  <button 
+                    onClick={handleCancelEditPrepTime}
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center">
+                  <span className="text-sm font-medium mr-2">{prepTimeValue} mins</span>
+                  <button 
+                    onClick={handleEditPrepTime}
+                    className="text-blue-600 hover:text-blue-800"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
             </div>
             
             <div className="mt-4">
@@ -200,7 +288,20 @@ import { updateAvailability } from '../../api/menuItem';
           </div>
         </div>
       )}
-      <ToastContainer/>
+      {/* Toast container with explicit close button configuration */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={true}
+        rtl={false}
+        pauseOnFocusLoss={true}
+        draggable={true}
+        pauseOnHover={true}
+        closeButton={true}
+        theme="light"
+      />
     </div>
   );
 }
