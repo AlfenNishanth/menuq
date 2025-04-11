@@ -329,8 +329,11 @@ const ManageMenu = () => {
                 {menuItems[category].map((item) => (
                     <div 
                       key={item._id}
-                      className="flex basis-[calc(100%-2rem)] md:basis-[calc(50%-1rem)] lg:basis-[calc(33.333%-1.5rem)] 
-                       transform transition-all duration-500 hover:-translate-y-1"
+                      className="flex basis-[calc(100%-2rem)] 
+                      md:basis-[calc(50%-1rem)] lg:basis-[calc(33.333%-1.5rem)] 
+                      transform transition-all duration-500 hover:-translate-y-1"
+
+                    // className="grid"
                     >
                       <MenuCardAdmin item={item} />
                     </div>
