@@ -49,7 +49,22 @@ export default function UpdateMenuItem() {
     const currentValues = watch();
     
     // Check if form values have changed
-    const isFormChanged = isDirty;
+    let isFormChanged = isDirty;
+    
+    // Explicitly check if the price has changed
+    if (originalData.price !== parseFloat(currentValues.price)) {
+      isFormChanged = true;
+    }
+    
+    // Check if the type has changed
+    const originalType = originalData.type;
+    const currentType = currentValues.type === "Custom" 
+      ? currentValues.customType.toLowerCase() 
+      : currentValues.type;
+      
+    if (originalType !== currentType) {
+      isFormChanged = true;
+    }
     
     // Check if arrays have changed
     const areVariantsChanged = JSON.stringify(variants) !== JSON.stringify(originalVariants);
@@ -146,8 +161,9 @@ export default function UpdateMenuItem() {
   
   // Check for changes whenever relevant data changes
   useEffect(() => {
+    const watchedValues = watch();
     checkForChanges();
-  }, [watch, variants, addOns, tags, imageFile, imagePreview]);
+  }, [watch(), variants, addOns, tags, imageFile, imagePreview]);
 
   const addTag = () => {
     const trimmedTag = newTag.trim().toLowerCase();
@@ -401,6 +417,11 @@ export default function UpdateMenuItem() {
               placeholder="Base Price"
               className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900"
               disabled={loading}
+              onChange={(e) => {
+                setValue("price", e.target.value);
+                // Force checking for changes whenever price is updated
+                setTimeout(checkForChanges, 0);
+              }}
             />
             {errors.price && (
               <p className="text-red-500 text-sm -mt-3">
