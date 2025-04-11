@@ -234,6 +234,7 @@ export default function AddNewMenuItem() {
             <input
               type="number"
               step="1"
+              min="0"
               {...register("price", { required: "Price is required" })}
               placeholder="Base Price"
               className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900"
@@ -350,6 +351,7 @@ export default function AddNewMenuItem() {
                   <input
                     type="number"
                     step="1"
+                    min="0"
                     placeholder="Price"
                     value={variant.price}
                     onChange={(e) => {
@@ -402,6 +404,7 @@ export default function AddNewMenuItem() {
                   <input
                     type="number"
                     step="1"
+                    min="0"
                     placeholder="Price"
                     value={addOn.price}
                     onChange={(e) => {
