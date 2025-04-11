@@ -130,6 +130,7 @@ const Login = () => {
       toast.success("Password reset email sent!");
     } catch (err) {
       toast.error("Failed to send reset email");
+      console.log(err)
     }
   }
 

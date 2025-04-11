@@ -5,6 +5,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import axios from "axios";
@@ -34,6 +35,11 @@ function AuthProvider({ children }) {
   function logout() {
     return signOut(auth);
   }
+
+  function resetPassword(email) {
+    return sendPasswordResetEmail(auth, email);
+  }
+
 
   //using then
   // useEffect(() => {
@@ -137,7 +143,7 @@ function AuthProvider({ children }) {
     login,
     logout,
     updateUserData, 
-    loading
+    loading, resetPassword
   };
 
   return (
