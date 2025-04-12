@@ -36,8 +36,8 @@ function App() {
           >
             {/* Default dashboard view */}
 
-            {/* <Route index element={<DashboardIndex/>} /> */}
-            <Route index element={<Dashboard_plain/>} />
+            <Route index element={<DashboardIndex/>} />
+            {/* <Route index element={<Dashboard_plain/>} /> */}
             
             {/* Nested routes */}
             <Route path="update-profile" element={<UpdateProfile />}/>
