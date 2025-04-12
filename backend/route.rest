@@ -1,13 +1,35 @@
-GET http://localhost:3000/menuq/ds6Xpv0xPmQceDOuCzeqiMT7CSk2
+GET http://localhost:3000/menuq/WMiNOcc6j4aRbAkpD4unBsM7rOG3
 
 ###
-GET http://localhost:3000/menuq/byId/RX00003
+GET http://localhost:3000/menuq/byId/RX00001
 
 ###
-GET http://localhost:3000/menuq/RX00002
+GET http://localhost:3000/menu/RX00029
+
+###
+GET http://localhost:3000/menu/RX00028
+
+###
+GET http://localhost:3000/menu/item/67aadaa454641ff4345fb9d6
 
 ###
 GET http://localhost:3000/menuq/
+
+###
+PATCH http://localhost:3000/menu/availability/67aadaa454641ff4345fb9d6
+Content-Type: application/json
+
+{
+  "available": false
+}
+
+###
+PATCH http://localhost:3000/menu/prepTime/67aadaa454641ff4345fb9d6
+Content-Type: application/json
+
+{
+  "prepTime": 20
+}
 
 ###
 POST http://localhost:3000/menuq
@@ -25,4 +47,4 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:3000/menu/RX00001
+GET http://localhost:3000/menu/RX00028

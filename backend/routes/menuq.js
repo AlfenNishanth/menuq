@@ -5,7 +5,7 @@ const Restaurant = require("../models/restaurants");
 const MenuItem = require("../models/menuItem");
 const multer = require("multer");
 const { v4 } = require("uuid");
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client, PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
@@ -144,66 +144,8 @@ async function getRestaurantById(req, res, next) {
   next();
 }
 
-//Menu
-router.post("/menu", upload.single("image"), async (req, res) => {
-  try {
-    const {
-      restaurantID,
-      name,
-      description,
-      type,
-      price,
-      variants,
-      addOns,
-      available,
-      tags,
-      vegetarian
-    } = req.body;
+// ----------------------------------------
 
-    let imageUrl = "";
-    if (req.file) {
-      console.log("calling upload func");
-      imageUrl = await uploadFileToS3(req.file);
-    }
 
-    const newMenuItem = new MenuItem({
-      restaurantID,
-      name,
-      description,
-      type,
-      price,
-      variants,
-      addOns,
-      imageUrl,
-      available,
-      tags,
-      vegetarian
-    });
-    console.log("trying to save to mongo");
-    const savedMenuItem = await newMenuItem.save();
-    res.status(201).json(savedMenuItem); // Respond with the saved menu item
-  } catch (err) {
-    console.log(`Error while tyring to create menu: ${err}`);
-    res.status(400).json({ message: err.message });
-  }
-});
-
-//upload file
-async function uploadFileToS3(file) {
-  console.log("trying to upload file");
-  const fileName = `${file.originalname}_${v4()}`;
-  const params = {
-    Bucket: process.env.AWS_BUCKET_NAME,
-    Key: fileName,
-    Body: file.buffer,
-    ContentType: file.mimetype,
-    // ACL: "public-read",
-  };
-
-  const command = new PutObjectCommand(params);
-  await s3Client.send(command);
-  // Manually construct the URL (this assumes your bucket’s public URL format)
-  return `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
-}
 
 module.exports = router;

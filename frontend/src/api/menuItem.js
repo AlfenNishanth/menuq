@@ -9,18 +9,70 @@ import config from "../../config"; // Adjust the path if needed
 
 export async function addMenuItem(menuItem) {
   try {
-    const response = await axios.post(`${config.MENUQ}/menu`, menuItem);
+    const response = await axios.post(`${config.MENU}`, menuItem);
     return response.data;
   } catch (error) {
     throw error;
   }
 }
 
-export async function getRestaurantMenu(id) {
+export async function updateMenuItem(menuItemId, updatedData) {
+  try {
+    const response = await axios.patch(
+      `${config.MENU}/${menuItemId}`,
+      updatedData
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
 
+export async function getMenuItem(menuItemId) {
+  try {
+    const response = await axios.get(`${config.MENU}/item/${menuItemId}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function updateAvailability(menuItemId, available) {
+  try {
+    const response = await axios.patch(
+      `${config.MENU}/availability/${menuItemId}`,
+      { available }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error updating availability:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+}
+
+export async function updatePrepTime(menuItemId, prepTime) {
+  try {
+    const response = await axios.patch(
+      `${config.MENU}/prepTime/${menuItemId}`,
+      { prepTime }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error updating prep time:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+}
+
+export async function getRestaurantMenu(id) {
   try {
     const response = await axios.get(`${config.MENU}/${id}`);
-  console.log(`${config.MENUQ}/${id}`)
+    console.log(`${config.MENUQ}/${id}`);
     return response.data;
   } catch (error) {
     throw error;

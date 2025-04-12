@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import MenuCard from "./MenuCard";
+import MenuCardAdmin from "./MenuCardAdmin";
 import { getRestaurantMenu } from "../../api/menuItem";
 import {capitalizeWords} from "../../utils/format";
 import { useAuth } from "../../contexts/AuthContext";
@@ -64,7 +64,7 @@ const ManageMenu = () => {
     console.log(`menuLayout restaurantId - ${userData?.restaurantId}`); // Logs specific property
 
 
-  const id = 'RX00001'
+  const id = userData?.restaurantId;
   const [menuItems, setMenuItems] = useState({});
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("");
@@ -329,10 +329,13 @@ const ManageMenu = () => {
                 {menuItems[category].map((item) => (
                     <div 
                       key={item._id}
-                      className="flex basis-[calc(100%-2rem)] md:basis-[calc(50%-1rem)] lg:basis-[calc(33.333%-1.5rem)] 
-                       transform transition-all duration-500 hover:-translate-y-1"
+                      className="flex basis-[calc(100%-2rem)] 
+                      md:basis-[calc(50%-1rem)] lg:basis-[calc(33.333%-1.5rem)] 
+                      transform transition-all duration-500 hover:-translate-y-1"
+
+                    // className="grid"
                     >
-                      <MenuCard item={item} />
+                      <MenuCardAdmin item={item} />
                     </div>
                   ))}
                 </div>

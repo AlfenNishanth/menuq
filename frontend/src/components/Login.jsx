@@ -130,6 +130,7 @@ const Login = () => {
       toast.success("Password reset email sent!");
     } catch (err) {
       toast.error("Failed to send reset email");
+      console.log(err)
     }
   }
 
@@ -182,7 +183,7 @@ const Login = () => {
               }`}
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
+              {showPassword ? <FaEyeSlash className="mt-1.5"/> : <FaEye className="mt-1.5"/>}
             </button>
           </div>
 

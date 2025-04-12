@@ -1,13 +1,13 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useAuth } from "../contexts/AuthContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Upload, XCircleIcon, XIcon } from "lucide-react";
-import { v4 } from "uuid";
-import { addMenuItem } from "../api/menuItem";
+import { updateMenuItem, getMenuItem } from "../api/menuItem";
+import { useParams, useNavigate } from "react-router-dom";
 
-export default function AddNewMenuItem() {
+export default function UpdateMenuItem() {
   const {
     register,
     handleSubmit,
@@ -15,23 +15,155 @@ export default function AddNewMenuItem() {
     control,
     reset,
     setValue,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm();
-  
+
+  const { id } = useParams();
+  const navigate = useNavigate();
+
   const [variants, setVariants] = useState([]);
   const [addOns, setAddOns] = useState([]);
   const [tags, setTags] = useState([]);
   const [newTag, setNewTag] = useState("");
   const [tagError, setTagError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-  const [vegetarian, setVegetarian] = useState(null);
-
-  const vegetarianValue = watch("vegetarian");
+  const [originalImageUrl, setOriginalImageUrl] = useState(null);
   
+  // For tracking changes
+  const [originalData, setOriginalData] = useState(null);
+  const [originalVariants, setOriginalVariants] = useState([]);
+  const [originalAddOns, setOriginalAddOns] = useState([]);
+  const [originalTags, setOriginalTags] = useState([]);
+  const [hasChanges, setHasChanges] = useState(false);
+
   const fileInputRef = useRef();
-  const { currentUser, userData, updateUserData } = useAuth();
+  const { currentUser, userData } = useAuth();
+
+  // Function to check for changes
+  const checkForChanges = () => {
+    if (!originalData) return false;
+    
+    const currentValues = watch();
+    
+    // Check if form values have changed
+    let isFormChanged = isDirty;
+    
+    // Explicitly check if the price has changed
+    if (originalData.price !== parseFloat(currentValues.price)) {
+      isFormChanged = true;
+    }
+    
+    // Check if the type has changed
+    const originalType = originalData.type;
+    const currentType = currentValues.type === "Custom" 
+      ? currentValues.customType.toLowerCase() 
+      : currentValues.type;
+      
+    if (originalType !== currentType) {
+      isFormChanged = true;
+    }
+    
+    // Check if arrays have changed
+    const areVariantsChanged = JSON.stringify(variants) !== JSON.stringify(originalVariants);
+    const areAddOnsChanged = JSON.stringify(addOns) !== JSON.stringify(originalAddOns);
+    const areTagsChanged = JSON.stringify(tags) !== JSON.stringify(originalTags);
+    
+    // Check if image has changed
+    const isImageChanged = 
+      (imageFile !== null) || 
+      (imagePreview !== originalImageUrl && 
+      (imagePreview === null || originalImageUrl === null));
+    
+    const hasAnyChange = isFormChanged || areVariantsChanged || areAddOnsChanged || areTagsChanged || isImageChanged;
+    
+    setHasChanges(hasAnyChange);
+    return hasAnyChange;
+  };
+
+  // Fetch menu item data when component mounts
+  useEffect(() => {
+    async function fetchMenuItem() {
+      try {
+        setInitialLoading(true);
+        const menuItemData = await getMenuItem(id);
+        
+        // Store original data for comparison
+        setOriginalData(menuItemData);
+        
+        // Populate form with fetched data
+        setValue("name", menuItemData.name);
+        setValue("description", menuItemData.description);
+        
+        // Handle the type field
+        if (["Starter", "Main Course", "Drinks", "Cold Beverages", "Desserts"].includes(menuItemData.type)) {
+          setValue("type", menuItemData.type);
+        } else {
+          setValue("type", "Custom");
+          setValue("customType", menuItemData.type);
+        }
+        
+        setValue("price", menuItemData.price);
+        setValue("vegetarian", menuItemData.vegetarian);
+        setValue("available", menuItemData.available.toString());
+        
+        // Set variants, addOns, and tags
+        if (menuItemData.variants && menuItemData.variants.length > 0) {
+          setVariants(menuItemData.variants);
+          setOriginalVariants(JSON.parse(JSON.stringify(menuItemData.variants)));
+        }
+        
+        if (menuItemData.addOns && menuItemData.addOns.length > 0) {
+          setAddOns(menuItemData.addOns);
+          setOriginalAddOns(JSON.parse(JSON.stringify(menuItemData.addOns)));
+        }
+        
+        if (menuItemData.tags && menuItemData.tags.length > 0) {
+          setTags(menuItemData.tags);
+          setOriginalTags([...menuItemData.tags]);
+        }
+        
+        // Handle image preview
+        if (menuItemData.imageUrl) {
+          setOriginalImageUrl(menuItemData.imageUrl);
+          setImagePreview(menuItemData.imageUrl);
+        }
+        
+        // Reset form's dirty state after populating data
+        reset({
+          name: menuItemData.name,
+          description: menuItemData.description,
+          type: ["Starter", "Main Course", "Drinks", "Cold Beverages", "Desserts"].includes(menuItemData.type) 
+            ? menuItemData.type 
+            : "Custom",
+          customType: !["Starter", "Main Course", "Drinks", "Cold Beverages", "Desserts"].includes(menuItemData.type) 
+            ? menuItemData.type 
+            : "",
+          price: menuItemData.price,
+          vegetarian: menuItemData.vegetarian,
+          available: menuItemData.available.toString()
+        });
+        
+      } catch (error) {
+        console.error("Error fetching menu item:", error);
+        toast.error(`Error fetching menu item: ${error.message}`);
+      } finally {
+        setInitialLoading(false);
+      }
+    }
+    
+    if (id) {
+      fetchMenuItem();
+    }
+  }, [id, setValue, reset]);
+  
+  // Check for changes whenever relevant data changes
+  useEffect(() => {
+    const watchedValues = watch();
+    checkForChanges();
+  }, [watch(), variants, addOns, tags, imageFile, imagePreview]);
 
   const addTag = () => {
     const trimmedTag = newTag.trim().toLowerCase();
@@ -57,7 +189,7 @@ export default function AddNewMenuItem() {
         toast.error("Image size should be less than 5MB");
         return;
       }
-      
+
       setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -70,6 +202,7 @@ export default function AddNewMenuItem() {
   const removeImage = () => {
     setImageFile(null);
     setImagePreview(null);
+    setOriginalImageUrl(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -77,65 +210,105 @@ export default function AddNewMenuItem() {
 
   const onSubmit = async (data) => {
     if (!currentUser) {
-      toast.error("You must be logged in to add menu items!");
+      toast.error("You must be logged in to update menu items!");
+      return;
+    }
+
+    // Check if anything has changed
+    if (!hasChanges) {
+      toast.info("No changes detected. Nothing to update.");
       return;
     }
 
     setLoading(true);
-    if(userData === null) {
-      await updateUserData();
-    }
+
     const restaurantID = userData.restaurantId;
-    const finalType = data.type === "Custom" ? data.customType.toLowerCase() : data.type;
+    const finalType =
+      data.type === "Custom" ? data.customType.toLowerCase() : data.type;
 
-    const formData = new FormData();
-    formData.append("restaurantID", restaurantID);
-    formData.append("name", data.name.toLowerCase());
-    formData.append("description", data.description.toLowerCase());
-    formData.append("type", finalType);
-    formData.append("price", parseFloat(data.price));
-    formData.append("available", "true");
-    formData.append("vegetarian", data.vegetarian);
-    // formData.append("vegetarian", watch(vegetarian));
+    // Create updated data object according to your API structure
+    const updatedData = {
+      restaurantID: restaurantID,
+      name: data.name.toLowerCase(),
+      description: data.description.toLowerCase(),
+      type: finalType,
+      price: parseFloat(data.price),
+      available: data.available === "true",
+      vegetarian: data.vegetarian
+    };
 
-    if (variants.length !== 0) formData.append("variants", JSON.stringify(variants));
-    if (addOns.length !== 0) formData.append("addOns", JSON.stringify(addOns));
-    // if (tags.length !== 0) formData.append("tags", tags);
+    // Add arrays if they exist
+    if (variants.length > 0) updatedData.variants = variants;
+    if (addOns.length > 0) updatedData.addOns = addOns;
+    if (tags.length > 0) updatedData.tags = tags;
 
-    if (tags.length !== 0)  formData.append("tags", JSON.stringify(tags));
-
-    console.log("variants:", variants);
-    console.log("Addons:", addOns);
-    console.log("Form data:", formData);
-
+    // Handle image
     if (imageFile) {
+      // If using FormData is required for image upload
+      const formData = new FormData();
       formData.append("image", imageFile);
+      
+      // First upload the image and get URL back
+      try {
+        // This is a placeholder - you'll need to implement the image upload API
+        // const uploadResponse = await uploadImage(formData);
+        // updatedData.imageUrl = uploadResponse.imageUrl;
+
+        // For now, we'll assume the image is handled separately or in your backend
+        formData.append("data", JSON.stringify(updatedData));
+        
+        await updateMenuItem(id, formData);
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        toast.error(`Error uploading image: ${error.message}`);
+        setLoading(false);
+        return;
+      }
+    } else {
+      // If keeping the original image or no image
+      if (originalImageUrl) {
+        updatedData.imageUrl = originalImageUrl;
+      } else {
+        updatedData.imageUrl = null; // Remove image
+      }
+      
+      // Update menu item without image changes
+      try {
+        await updateMenuItem(id, updatedData);
+      } catch (error) {
+        console.error("Error updating menu item:", error);
+        toast.error(`Error updating menu item: ${error.message}`);
+        setLoading(false);
+        return;
+      }
     }
 
-    try {
-      await addMenuItem(formData);
-      toast.success("Menu item added successfully!");
-      reset();
-      setVariants([]);
-      setAddOns([]);
-      setTags([]);
-      setImageFile(null);
-      setImagePreview(null);
-    } catch (error) {
-      console.error("Error adding menu item:", error);
-      toast.error(`Error adding menu item: ${error.message}`);
-    }
-    
+    toast.success("Menu item updated successfully!");
+    // Navigate back after success
+    setTimeout(() => {
+      navigate(`/dashboard/manage-menu/`); // Adjust path as needed
+    }, 2000);
+
     setLoading(false);
   };
+
+  if (initialLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin h-12 w-12 border-4 border-teal-500 rounded-full border-t-transparent"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 text-gray-900">
       <div className="p-8 rounded-2xl shadow-xl w-full max-w-lg bg-white">
-        <h2 className="text-3xl font-extrabold mb-6 text-center">Add New Menu Item</h2>
-        
-        <form 
-          onSubmit={handleSubmit(onSubmit)} 
+        <h2 className="text-3xl font-extrabold mb-6 text-center">
+          Update Menu Item
+        </h2>
+
+        <form
+          onSubmit={handleSubmit(onSubmit)}
           className="space-y-4"
           onKeyDown={(e) => {
             if (e.key === "Enter" && e.target.tagName !== "TEXTAREA") {
@@ -154,7 +327,9 @@ export default function AddNewMenuItem() {
               disabled={loading}
             />
             {errors.name && (
-              <p className="text-red-500 text-sm -mt-3">{errors.name.message}</p>
+              <p className="text-red-500 text-sm -mt-3">
+                {errors.name.message}
+              </p>
             )}
 
             {/* Description */}
@@ -189,7 +364,9 @@ export default function AddNewMenuItem() {
             {/* Custom Type Input (Only when "Custom" is selected) */}
             {watch("type") === "Custom" && (
               <input
-                {...register("customType", { required: "Custom type is required" })}
+                {...register("customType", {
+                  required: "Custom type is required",
+                })}
                 type="text"
                 placeholder="Enter custom category"
                 className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900 ${
@@ -199,7 +376,9 @@ export default function AddNewMenuItem() {
               />
             )}
             {errors.customType && (
-              <p className="text-red-500 text-sm -mt-3">{errors.customType.message}</p>
+              <p className="text-red-500 text-sm -mt-3">
+                {errors.customType.message}
+              </p>
             )}
 
             {/* Vegetarian Toggle */}
@@ -212,17 +391,17 @@ export default function AddNewMenuItem() {
                 control={control}
                 defaultValue={false}
                 render={({ field: { onChange, value } }) => (
-                  <button 
+                  <button
                     type="button"
                     onClick={() => onChange(!value)}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      value ? 'bg-teal-600' : 'bg-gray-400'
+                      value ? "bg-teal-600" : "bg-gray-400"
                     }`}
                     disabled={loading}
                   >
-                    <span 
+                    <span
                       className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        value ? 'translate-x-6' : 'translate-x-1'
+                        value ? "translate-x-6" : "translate-x-1"
                       }`}
                     />
                   </button>
@@ -239,19 +418,26 @@ export default function AddNewMenuItem() {
               placeholder="Base Price"
               className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900"
               disabled={loading}
+              onChange={(e) => {
+                setValue("price", e.target.value);
+                // Force checking for changes whenever price is updated
+                setTimeout(checkForChanges, 0);
+              }}
             />
             {errors.price && (
-              <p className="text-red-500 text-sm -mt-3">{errors.price.message}</p>
+              <p className="text-red-500 text-sm -mt-3">
+                {errors.price.message}
+              </p>
             )}
 
             {/* Availability Toggle */}
-         {/*   <Controller
+            <Controller
               name="available"
               control={control}
               defaultValue="true"
               render={({ field }) => (
-                <select 
-                  {...field} 
+                <select
+                  {...field}
                   className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900"
                   disabled={loading}
                 >
@@ -260,30 +446,19 @@ export default function AddNewMenuItem() {
                 </select>
               )}
             />
-*/}
+
             {/* Image Upload */}
-            <div className="border-2 border-dashed rounded-lg p-4 transition border-gray-300 hover:border-teal-400 text-center"
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => {
-                e.preventDefault();
-                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                  const file = e.dataTransfer.files[0];
-                  setImageFile(file);
-                  setImagePreview(URL.createObjectURL(file));
-                  e.dataTransfer.clearData();
-                }
-              }}
-            >
+            <div className="border-2 border-dashed rounded-lg p-4 transition border-gray-300 hover:border-teal-400 text-center">
               <div className="space-y-2">
                 {imagePreview ? (
                   <div className="relative">
-                    <img 
-                      src={imagePreview} 
-                      alt="Menu Item Preview" 
+                    <img
+                      src={imagePreview}
+                      alt="Menu Item Preview"
                       className="mx-auto h-36 object-cover rounded-lg"
                     />
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       onClick={removeImage}
                       className="absolute -top-2 -right-2 bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 transition"
                     >
@@ -293,11 +468,13 @@ export default function AddNewMenuItem() {
                 ) : (
                   <div className="text-center py-4 text-gray-500">
                     <Upload className="mx-auto text-4xl mb-2" />
-                    <p className="text-sm font-medium">Upload Menu Item Image</p>
+                    <p className="text-sm font-medium">
+                      Upload Menu Item Image
+                    </p>
                     <p className="text-xs mt-1">JPG, PNG or GIF (Max. 5MB)</p>
                   </div>
                 )}
-                
+
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -306,7 +483,7 @@ export default function AddNewMenuItem() {
                   className="hidden"
                   id="menu-item-image"
                 />
-                
+
                 {!imagePreview && (
                   <button
                     type="button"
@@ -316,7 +493,7 @@ export default function AddNewMenuItem() {
                     Browse Image
                   </button>
                 )}
-                
+
                 {imagePreview && (
                   <button
                     type="button"
@@ -364,7 +541,9 @@ export default function AddNewMenuItem() {
                   />
                   <button
                     type="button"
-                    onClick={() => setVariants(variants.filter((_, i) => i !== index))}
+                    onClick={() =>
+                      setVariants(variants.filter((_, i) => i !== index))
+                    }
                     className="bg-red-500 text-white px-3 rounded-lg hover:bg-red-600 transition flex items-center justify-center"
                     disabled={loading}
                   >
@@ -374,7 +553,9 @@ export default function AddNewMenuItem() {
               ))}
               <button
                 type="button"
-                onClick={() => setVariants([...variants, { name: "", price: 0 }])}
+                onClick={() =>
+                  setVariants([...variants, { name: "", price: 0 }])
+                }
                 disabled={loading}
                 className="mt-2 w-full px-4 py-2 text-sm font-medium rounded-md transition-colors bg-teal-600 text-white hover:bg-teal-700"
               >
@@ -417,7 +598,9 @@ export default function AddNewMenuItem() {
                   />
                   <button
                     type="button"
-                    onClick={() => setAddOns(addOns.filter((_, i) => i !== index))}
+                    onClick={() =>
+                      setAddOns(addOns.filter((_, i) => i !== index))
+                    }
                     className="bg-red-500 text-white px-3 rounded-lg hover:bg-red-600 transition flex items-center justify-center"
                     disabled={loading}
                   >
@@ -486,28 +669,41 @@ export default function AddNewMenuItem() {
             )}
           </div>
 
-          <button 
-            type="submit" 
-            className="w-full bg-teal-600 text-white p-3 rounded-lg font-semibold hover:bg-teal-700 transition duration-300 shadow-lg disabled:opacity-50 flex justify-center items-center" 
-            disabled={loading}
+          {/* Status message for changes */}
+          <div className="text-center text-sm">
+            {hasChanges ? (
+              <p className="text-teal-600">Changes detected. Ready to update.</p>
+            ) : (
+              <p className="text-gray-500">No changes detected.</p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            className={`w-full text-white p-3 rounded-lg font-semibold transition duration-300 shadow-lg flex justify-center items-center ${
+              hasChanges 
+                ? "bg-teal-600 hover:bg-teal-700" 
+                : "bg-gray-400 cursor-not-allowed"
+            }`}
+            disabled={loading || !hasChanges}
           >
             {loading ? (
               <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
             ) : (
-              "Add Menu Item"
+              "Update Menu Item"
             )}
           </button>
         </form>
       </div>
 
-      <ToastContainer 
-        position="top-right" 
-        autoClose={3000} 
-        hideProgressBar={false} 
-        closeOnClick 
-        pauseOnHover 
-        draggable 
-        theme="light" 
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="light"
       />
     </div>
   );

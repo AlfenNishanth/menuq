@@ -1,17 +1,102 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   ChevronDown, 
   ChevronUp, 
   Clock, 
-  Star
+  Star,
+  Edit,
+  X
 } from 'lucide-react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; // Make sure this import is in your file
 import { capitalizeWords } from '../../utils/format';
+import { updateAvailability, updatePrepTime } from '../../api/menuItem';
 
-function MenuCard({ item, onAddToOrder }) {
+
+function MenuCardAdmin({ item, onAddToOrder }) {
   const [expanded, setExpanded] = useState(false);
+  const [isAvailable, setIsAvailable] = useState(item.available);
+  const [isEditingPrepTime, setIsEditingPrepTime] = useState(false);
+  const [prepTimeValue, setPrepTimeValue] = useState(item.prepTime ==0 ? '-' : item.prepTime);
+  const navigate = useNavigate();
 
   const toggleExpand = () => {
     setExpanded(!expanded);
+  };
+
+  const handleToggleAvailability = async () => {
+    const newAvailability = !isAvailable;
+    try {
+      setIsAvailable(newAvailability);
+      console.log(item._id);
+
+      await updateAvailability(item._id, newAvailability)
+      toast.success(`Item ${newAvailability ? 'available' : 'unavailable'} now`, {
+        autoClose: 3000, 
+        closeButton: true
+      });
+    } catch(error) {
+      console.error("Error updating availability:", error.response?.data || error.message); 
+      toast.error("Error updating availability. Please try again later.", {
+        autoClose: 3000,
+        closeButton: true
+      });
+      setIsAvailable(!newAvailability); // Revert the state change
+    }
+    
+    // Call the parent component's function with updated item
+    if (onAddToOrder) {
+      onAddToOrder({ ...item, available: newAvailability });
+    }
+  };
+
+  const handleEditPrepTime = () => {
+    setIsEditingPrepTime(true);
+  };
+
+  const handleSavePrepTime = async () => {
+    try {
+      // Parse the prepTimeValue to a number
+      const prepTimeNumber = parseInt(prepTimeValue, 10);
+      
+      // Validate that it's a valid number
+      if (isNaN(prepTimeNumber)) {
+        toast.error("Prep time must be a valid number", {
+          autoClose: 3000,
+          closeButton: true
+        });
+        return;
+      }
+      
+      console.log(`Attempting to update prep time for ${item._id} to ${prepTimeNumber}`);
+      
+      const result = await updatePrepTime(item._id, prepTimeNumber);
+      console.log('Update result:', result);
+      
+      setIsEditingPrepTime(false);
+      toast.success("Prep time updated successfully!", {
+        autoClose: 3000,
+        closeButton: true
+      });
+    } catch (error) {
+      console.error("Error updating prep time:", error);
+      toast.error("Error updating prep time. Please try again later.", {
+        autoClose: 3000,
+        closeButton: true
+      });
+      setPrepTimeValue(item.prepTime); // Revert to original value
+    }
+  };
+
+  const handleCancelEditPrepTime = async () => {
+    setPrepTimeValue('-'); 
+    setIsEditingPrepTime(false);
+    const result = await updatePrepTime(item._id, 0);
+  };
+
+  const handleEditItem = () => {
+    navigate(`/dashboard/edit-menu-item/${item._id}`);
   };
 
   // Function to truncate text to 200 words
@@ -23,8 +108,6 @@ function MenuCard({ item, onAddToOrder }) {
     return text;
   };
 
-  
-
   const {
     name,
     price,
@@ -34,7 +117,6 @@ function MenuCard({ item, onAddToOrder }) {
     prepTime,
     rating,
     ratingCount,
-    available,
     spiceLevel
   } = item;
 
@@ -46,12 +128,12 @@ function MenuCard({ item, onAddToOrder }) {
 
   return (
     <div 
-      className={`relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 bg-white border-0 flex flex-col max-w-4xl mx-auto ${!available ? 'opacity-60' : ''}`}
+      className={`relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 bg-white border-0 flex flex-col max-w-4xl mx-auto ${!isAvailable ? 'opacity-60' : ''}`}
     >
       <div className="flex">
-        <div className="w-44 flex-shrink-0 relative group">
+        <div className="w-42 flex-shrink-0 relative group">
           <img 
-            className="w-full h-44 object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-46 object-cover transition-transform duration-300 group-hover:scale-105"
             src={imageUrl}
             alt={name} 
             loading="lazy"
@@ -65,7 +147,7 @@ function MenuCard({ item, onAddToOrder }) {
         </div>
 
         <div className="flex-grow flex flex-col">
-          <div className="p-6 pb-0">
+          <div className="p-6 pb-2">
             <div className="flex justify-between items-start mb-4">
               <div className="flex-grow pr-4">
                 <h2 className="text-xl font-serif tracking-wide">{capitalizeWords(name)}</h2>
@@ -76,13 +158,19 @@ function MenuCard({ item, onAddToOrder }) {
                   </span>
                 </div>
               </div>
-              <div className="text-right">
+              <div className="text-right flex flex-col items-end">
                 <span className="text-lg font-medium text-amber-700 block">₹{price}</span>
+                <button 
+                  onClick={handleEditItem}
+                  className="mt-2 flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+                >
+                  <Edit className="w-4 h-4 mr-1 cursor-pointer" />
+                  <span className="text-sm">Edit</span>
+                </button>
               </div>
             </div>
             
-            <p className="text-gray-600 mb-4 line-clamp-2">{truncateText(description)}</p>
-            
+            {/* <p className="text-gray-600 mb-4 line-clamp-2">{truncateText(description)}</p> */}
             {tags && tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {tags.map((tag, index) => (
@@ -96,14 +184,28 @@ function MenuCard({ item, onAddToOrder }) {
               </div>
             )}
 
-            <div className={`mt-2 text-sm font-medium ${available ? 'text-green-600' : 'text-red-600'}`}>
-              {available ? 'Available' : 'Currently Unavailable'}
+            {/* Improved Availability Toggle Switch */}
+            <div className="mt-4 flex items-center justify-between">
+              <div className={`mt-2 text-sm font-medium align-top ${isAvailable ? 'text-green-600' : 'text-red-600'}`}>
+                {isAvailable ? 'Available' : 'Currently Unavailable'}
+              </div>
+              <button
+                onClick={handleToggleAvailability}
+                className="relative inline-flex h-6 w-11 items-center rounded-full focus:outline-none cursor-pointer"
+                aria-pressed={isAvailable}
+                type="button"
+              >
+                <span className={`absolute h-5 w-10 rounded-full transition ${isAvailable ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+                <span 
+                  className={`absolute inset-y-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-md transition-all ${isAvailable ? 'translate-x-5' : 'translate-x-0'}`}
+                ></span>
+              </button>
             </div>
           </div>
 
           <button 
             onClick={toggleExpand}
-            className="mt-4 flex items-center justify-center w-full py-2 text-amber-700 hover:text-amber-900 transition-colors duration-200 font-medium"
+            className="mt-2 flex items-center justify-center w-full py-2 text-amber-700 hover:text-amber-900 transition-colors duration-200 font-medium"
           >
             {expanded ? (
               <>Show Less <ChevronUp className="ml-1 w-4 h-4" /></>
@@ -111,15 +213,6 @@ function MenuCard({ item, onAddToOrder }) {
               <>View Details <ChevronDown className="ml-1 w-4 h-4" /></>
             )}
           </button>
-        <button
-            onClick={() => onAddToOrder && onAddToOrder({ ...item, available: !available })}
-            className="mt-2 flex items-center justify-center w-full py-2 text-amber-700 hover:text-amber-900 transition-colors duration-200 font-medium"
-        >
-            <span className="mr-2">Toggle Availability</span>
-            <div className={`w-10 h-6 rounded-full ${available ? 'bg-green-500' : 'bg-gray-300'} relative transition-colors duration-200`}>
-                <div className={`absolute top-1 ${available ? 'right-1' : 'left-1'} w-4 h-4 bg-white rounded-full transition-all duration-200`} />
-            </div>
-        </button>
         </div>
       </div>
       
@@ -136,11 +229,49 @@ function MenuCard({ item, onAddToOrder }) {
                 <Clock className="w-5 h-5 text-amber-600 mr-2" />
                 <span className="text-xs text-gray-500">Prep Time</span>
               </div>
-              <span className="text-sm font-medium">{prepTime}</span>
+              
+              {isEditingPrepTime ? (
+                <div className="flex items-center space-x-2">
+                  <input 
+                    type="number" 
+                    value={prepTimeValue}
+                    onChange={(e) => setPrepTimeValue(e.target.value)}
+                    className="border border-gray-300 rounded px-2 py-1 text-sm w-24"
+                    placeholder="Minutes"
+                    min="0"
+                  />
+                  <button 
+                    onClick={handleSavePrepTime}
+                    className="text-green-600 hover:text-green-800"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                      <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                      <polyline points="7 3 7 8 15 8"></polyline>
+                    </svg>
+                  </button>
+                  <button 
+                    onClick={handleCancelEditPrepTime}
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center">
+                  <span className="text-sm font-medium mr-2">{prepTimeValue} mins</span>
+                  <button 
+                    onClick={handleEditPrepTime}
+                    className="text-blue-600 hover:text-blue-800"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
             </div>
             
             <div className="mt-4">
-              {available ? (
+              {isAvailable ? (
                 <div className="flex space-x-2">
                   <button 
                     onClick={() => onAddToOrder && onAddToOrder(item)}
@@ -158,8 +289,22 @@ function MenuCard({ item, onAddToOrder }) {
           </div>
         </div>
       )}
+      {/* Toast container with explicit close button configuration */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={true}
+        rtl={false}
+        pauseOnFocusLoss={true}
+        draggable={true}
+        pauseOnHover={true}
+        closeButton={true}
+        theme="light"
+      />
     </div>
   );
 }
 
-export default MenuCard;
+export default MenuCardAdmin;

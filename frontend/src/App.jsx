@@ -12,6 +12,9 @@ import AddNewMenuItem from "./components/AddNewMenuItem";
 import MenuLayout from "./components/menuitems/MenuLayout";
 import LandingPage from './components/LandingPage';
 import ManageMenu from "./components/menuitems/ManageMenu";
+import UpdateMenuItem from "./components/UpdateMenuItem";
+import Dashboard_plain from "./components/Dashboard_plain";
+
 
 function App() {
 
@@ -32,11 +35,15 @@ function App() {
             }
           >
             {/* Default dashboard view */}
-            <Route index element={<DashboardIndex/>} />
+
+            {/* <Route index element={<DashboardIndex/>} /> */}
+            <Route index element={<Dashboard_plain/>} />
+            
             {/* Nested routes */}
             <Route path="update-profile" element={<UpdateProfile />}/>
             <Route path="add-new-menu-item" element={<AddNewMenuItem/>}/>
             <Route path="manage-menu" element={<ManageMenu/>}/>
+            <Route path="edit-menu-item/:id" element={<UpdateMenuItem/>}/>
 
             {/* <Route path="add-new-item" element={<AddNewItem />} /> */}
           </Route>
