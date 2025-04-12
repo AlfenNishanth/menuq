@@ -183,7 +183,7 @@ const Login = () => {
               }`}
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
+              {showPassword ? <FaEyeSlash className="mt-1.5"/> : <FaEye className="mt-1.5"/>}
             </button>
           </div>
 
