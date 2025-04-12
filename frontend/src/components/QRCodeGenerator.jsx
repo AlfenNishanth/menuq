@@ -1,5 +1,5 @@
 // QRCodeGenerator.jsx
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -53,48 +53,57 @@ const QRCodeGenerator = ({
   fgColor = '#000000',
 }) => {
   const qrCodeRef = useRef(null);
+  const [logoImage, setLogoImage] = useState(null);
+
+  // Preload the logo image
+  useEffect(() => {
+    if (logoUrl) {
+      const img = new Image();
+      img.crossOrigin = "Anonymous"; // This helps with CORS issues
+      img.onload = () => {
+        setLogoImage(img);
+      };
+      img.src = logoUrl;
+    }
+  }, [logoUrl]);
 
   const downloadQRCode = () => {
     if (!qrCodeRef.current) return;
     
-    // Create a canvas element to draw the QR code
     const canvas = document.createElement('canvas');
-    const svgElement = qrCodeRef.current.querySelector('svg');
-    const { width, height } = svgElement.getBoundingClientRect();
-    
-    canvas.width = width;
-    canvas.height = height;
+    canvas.width = size;
+    canvas.height = size;
     const ctx = canvas.getContext('2d');
     
-    // Draw white background
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Convert SVG to data URL
+    // Draw QR code to canvas first
+    const svgElement = qrCodeRef.current.querySelector('svg');
     const svgData = new XMLSerializer().serializeToString(svgElement);
-    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-    const reader = new FileReader();
+    const svgURL = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgData);
     
-    reader.onload = function(event) {
-      const img = new Image();
-      img.onload = function() {
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        
-        // Convert canvas to blob and download
-        canvas.toBlob(function(blob) {
-          const link = document.createElement('a');
-          link.href = URL.createObjectURL(blob);
-          link.download = 'qrcode.png';
-          link.click();
-        });
-      };
-      img.src = event.target.result;
+    const img = new Image();
+    img.onload = () => {
+      // Draw QR code
+      ctx.drawImage(img, 0, 0, size, size);
+      
+      // Draw logo on top if we have it loaded
+      if (logoImage && logoUrl) {
+        // Calculate center position
+        const centerPos = (size - logoSize) / 2;
+        ctx.drawImage(logoImage, centerPos, centerPos, logoSize, logoSize);
+      }
+      
+      // Create download link
+      const link = document.createElement('a');
+      link.download = 'qrcode.png';
+      canvas.toBlob((blob) => {
+        link.href = URL.createObjectURL(blob);
+        link.click();
+      }, 'image/png');
     };
-    
-    reader.readAsDataURL(svgBlob);
+    img.src = svgURL;
   };
 
-  const imageSettings = logoUrl
+  const imageSettings = logoUrl && logoImage
     ? {
         src: logoUrl,
         height: logoSize,
@@ -126,6 +135,17 @@ const QRCodeGenerator = ({
       </ButtonContainer>
     </QRCodeContainer>
   );
+};
+
+QRCodeGenerator.propTypes = {
+  url: PropTypes.string.isRequired,
+  size: PropTypes.number,
+  logoUrl: PropTypes.string,
+  logoSize: PropTypes.number,
+  showLabel: PropTypes.bool,
+  labelText: PropTypes.string,
+  bgColor: PropTypes.string,
+  fgColor: PropTypes.string,
 };
 
 export default QRCodeGenerator;
