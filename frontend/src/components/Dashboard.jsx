@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { db } from "../fireabse/firebase"; // Fixed typo in the import path
 import { collection, query, getDocs, orderBy, limit, addDoc, serverTimestamp } from "firebase/firestore";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { Calendar, Clock, BarChart2, Users, Coffee, Download, Loader } from "lucide-react";
+import { Calendar, Clock, BarChart2, Users, Coffee, Download, Loader, QrCode } from "lucide-react";
 import { QRCodeSVG } from 'qrcode.react';
 import styled from 'styled-components';
 
@@ -45,95 +45,112 @@ const DownloadButton = styled.button`
   }
 `;
 
-// QR Code Generator Component
-const QRCodeGenerator = ({
+// QR Code Display Component
+const QRCodeDisplay = ({
   url,
   size = 200,
-  logoUrl = '/vite.svg',
-  logoSize = 40,
   showLabel = true,
   labelText = '',
   bgColor = '#ffffff',
   fgColor = '#000000',
+  labelPosition = 'bottom',
+  labelSize = '14px',
+  labelFont = 'Arial',
+  labelColor = '#333333',
+  restaurantName = 'Restaurant'
 }) => {
   const qrCodeRef = useRef(null);
-  const [logoImage, setLogoImage] = useState(null);
 
-  // Preload the logo image
-  useEffect(() => {
-    if (logoUrl) {
+  // Handle download QR code as PNG using your specific implementation
+  const downloadQrCode = () => {
+    if (qrCodeRef.current) {
+      const svg = qrCodeRef.current.querySelector('svg');
+      const svgData = new XMLSerializer().serializeToString(svg);
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
       const img = new Image();
-      img.crossOrigin = "Anonymous"; // This helps with CORS issues
+      
+      // Calculate proper size with padding
+      const padding = 20;
+      const finalSize = size + (padding * 2);
+      
+      canvas.width = finalSize;
+      canvas.height = finalSize;
+      
       img.onload = () => {
-        setLogoImage(img);
+        // Fill with background color
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(0, 0, finalSize, finalSize);
+        
+        // Draw QR code
+        ctx.drawImage(img, padding, padding);
+        
+        // If we have a label
+        if (showLabel) {
+          ctx.font = `${labelSize} ${labelFont}`;
+          ctx.fillStyle = labelColor;
+          ctx.textAlign = 'center';
+          
+          if (labelPosition === 'bottom') {
+            ctx.fillText(labelText, finalSize / 2, finalSize - 5);
+          } else {
+            ctx.fillText(labelText, finalSize / 2, 15);
+          }
+        }
+        
+        // Download the image
+        const dataUrl = canvas.toDataURL('image/png');
+        const a = document.createElement('a');
+        a.download = `${restaurantName.replace(/\s+/g, '-').toLowerCase()}-qr-code.png`;
+        a.href = dataUrl;
+        a.click();
       };
-      img.src = logoUrl;
+      
+      img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
     }
-  }, [logoUrl]);
-
-  const downloadQRCode = () => {
-    if (!qrCodeRef.current) return;
-    
-    const canvas = document.createElement('canvas');
-    canvas.width = size;
-    canvas.height = size;
-    const ctx = canvas.getContext('2d');
-    
-    // Draw QR code to canvas first
-    const svgElement = qrCodeRef.current.querySelector('svg');
-    const svgData = new XMLSerializer().serializeToString(svgElement);
-    const svgURL = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgData);
-    
-    const img = new Image();
-    img.onload = () => {
-      // Draw QR code
-      ctx.drawImage(img, 0, 0, size, size);
-      
-      // Draw logo on top if we have it loaded
-      if (logoImage && logoUrl) {
-        // Calculate center position
-        const centerPos = (size - logoSize) / 2;
-        ctx.drawImage(logoImage, centerPos, centerPos, logoSize, logoSize);
-      }
-      
-      // Create download link
-      const link = document.createElement('a');
-      link.download = 'qrcode.png';
-      canvas.toBlob((blob) => {
-        link.href = URL.createObjectURL(blob);
-        link.click();
-      }, 'image/png');
-    };
-    img.src = svgURL;
   };
 
-  const imageSettings = logoUrl && logoImage
-    ? {
-        src: logoUrl,
-        height: logoSize,
-        width: logoSize,
-        excavate: true,
-      }
-    : undefined;
+  // Container style based on label position
+  const containerStyle = {
+    display: 'flex',
+    flexDirection: labelPosition === 'bottom' ? 'column' : 'column-reverse',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '10px'
+  };
+
+  // Label style
+  const labelStyle = {
+    marginTop: labelPosition === 'bottom' ? '10px' : '0',
+    marginBottom: labelPosition === 'top' ? '10px' : '0',
+    fontSize: labelSize,
+    fontFamily: labelFont,
+    color: labelColor,
+    textAlign: 'center'
+  };
 
   return (
     <QRCodeContainer>
-      <div ref={qrCodeRef}>
+      <div ref={qrCodeRef} style={containerStyle}>
+        {labelPosition === 'top' && showLabel && (
+          <div style={labelStyle}>{labelText}</div>
+        )}
+        
         <QRCodeSVG
           value={url}
           size={size}
           bgColor={bgColor}
           fgColor={fgColor}
-          level={'H'} // High error correction for logo overlay
-          includeMargin={true}
-          imageSettings={imageSettings}
+          level={'H'} // High error correction
+          includeMargin={false}
         />
+        
+        {labelPosition === 'bottom' && showLabel && (
+          <div style={labelStyle}>{labelText}</div>
+        )}
       </div>
-      {showLabel && (
-        <QRLabel>{labelText || `Scan to visit ${url}`}</QRLabel>
-      )}
       <ButtonContainer>
-        <DownloadButton onClick={downloadQRCode}>
+        <DownloadButton onClick={downloadQrCode}>
           Download QR Code
         </DownloadButton>
       </ButtonContainer>
@@ -150,10 +167,28 @@ const DashboardHome = () => {
     weeklyData: []
   });
   
-  // State for QR code generator
-  const [showQRGenerator, setShowQRGenerator] = useState(false);
+  // State for QR code selector
+  const [showQRDownloader, setShowQRDownloader] = useState(false);
   const [qrURL, setQrURL] = useState('https://yourrestaurant.com/menu');
-  const [qrLabel, setQrLabel] = useState('');
+  const [qrLabel, setQrLabel] = useState('Restaurant Menu');
+  const [restaurantName, setRestaurantName] = useState('Your Restaurant');
+  
+  // QR Code visual options
+  const [qrOptions, setQrOptions] = useState({
+    size: 200,
+    backgroundColor: '#ffffff',
+    foregroundColor: '#000000',
+    showLabel: true,
+    labelText: 'Scan for Menu',
+    labelPosition: 'bottom',
+    labelSize: '14px',
+    labelFont: 'Arial',
+    labelColor: '#333333'
+  });
+  
+  // List of existing QR codes
+  const [qrCodes, setQrCodes] = useState([]);
+  const [selectedQrCode, setSelectedQrCode] = useState(null);
   
   // Loading state
   const [loading, setLoading] = useState(true);
@@ -221,33 +256,78 @@ const DashboardHome = () => {
 
     fetchScanData();
     
+    // Fetch existing QR codes
+    const fetchQRCodes = async () => {
+      try {
+        const qrCodesRef = collection(db, "GeneratedQRCodes");
+        const qrSnapshot = await getDocs(qrCodesRef);
+        
+        const codes = qrSnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            qrId: data.qrId,
+            url: data.url,
+            label: data.label,
+            createdAt: data.createdAt?.toDate() || new Date(),
+            scans: data.scans || 0,
+            options: data.options || {}
+          };
+        });
+        
+        setQrCodes(codes);
+        
+        // Set default selected QR code to the most recent one
+        if (codes.length > 0) {
+          const mostRecent = codes.sort((a, b) => b.createdAt - a.createdAt)[0];
+          setSelectedQrCode(mostRecent);
+          setQrURL(mostRecent.url);
+          setQrLabel(mostRecent.label);
+          
+          // Set QR options if available
+          if (mostRecent.options) {
+            setQrOptions(prev => ({
+              ...prev,
+              ...mostRecent.options
+            }));
+          }
+        }
+        
+      } catch (error) {
+        console.error("Error fetching QR codes:", error);
+      }
+    };
+    
+    fetchQRCodes();
+    
     // Set up a real-time listener (simulated with interval refresh)
     const refreshInterval = setInterval(fetchScanData, 60000); // Refresh every minute
     
     return () => clearInterval(refreshInterval);
   }, []);
   
-  // Function to generate a new QR code (with database entry)
-  const generateNewQRCode = async () => {
-    setShowQRGenerator(true);
+  // Function to show QR code downloader
+  const showQRCodeDownloader = () => {
+    setShowQRDownloader(true);
+  };
+  
+  // Function to handle QR code selection change
+  const handleQRCodeChange = (e) => {
+    const selectedId = e.target.value;
+    const selected = qrCodes.find(code => code.id === selectedId);
     
-    // Generate a unique ID for this QR code
-    const uniqueId = 'qr-' + Date.now();
-    const newUrl = `https://yourrestaurant.com/menu?id=${uniqueId}`;
-    setQrURL(newUrl);
-    setQrLabel(`Restaurant Menu (${uniqueId})`);
-    
-    try {
-      // Add a record of this QR code to Firestore
-      await addDoc(collection(db, "GeneratedQRCodes"), {
-        qrId: uniqueId,
-        url: newUrl,
-        createdAt: serverTimestamp(),
-        label: `Restaurant Menu (${uniqueId})`,
-        scans: 0
-      });
-    } catch (error) {
-      console.error("Error creating QR code record:", error);
+    if (selected) {
+      setSelectedQrCode(selected);
+      setQrURL(selected.url);
+      setQrLabel(selected.label);
+      
+      // Update QR options if available
+      if (selected.options) {
+        setQrOptions(prev => ({
+          ...prev,
+          ...selected.options
+        }));
+      }
     }
   };
   
@@ -366,51 +446,63 @@ const DashboardHome = () => {
         </div>
       </div>
       
-      {/* QR Code Generator Modal */}
-      {showQRGenerator && (
+      {/* QR Code Downloader Modal */}
+      {showQRDownloader && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 max-w-md w-full">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Generate QR Code</h2>
+              <h2 className="text-xl font-semibold">Download QR Code</h2>
               <button 
-                onClick={() => setShowQRGenerator(false)}
+                onClick={() => setShowQRDownloader(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
                 ✕
               </button>
             </div>
             
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                QR Code URL:
-              </label>
-              <input
-                type="text"
-                value={qrURL}
-                onChange={(e) => setQrURL(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-            </div>
-            
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Label:
-              </label>
-              <input
-                type="text"
-                value={qrLabel}
-                onChange={(e) => setQrLabel(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-            </div>
-            
-            <div className="flex justify-center my-4">
-              <QRCodeGenerator 
-                url={qrURL}
-                labelText={qrLabel}
-                size={240}
-              />
-            </div>
+            {qrCodes.length > 0 ? (
+              <>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Select QR Code:
+                  </label>
+                  <select
+                    value={selectedQrCode?.id || ""}
+                    onChange={handleQRCodeChange}
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                  >
+                    {qrCodes.map(code => (
+                      <option key={code.id} value={code.id}>
+                        {code.label} ({code.scans} scans)
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div className="flex justify-center my-4">
+                  <QRCodeDisplay 
+                    url={qrURL}
+                    labelText={qrLabel}
+                    size={qrOptions.size}
+                    showLabel={qrOptions.showLabel}
+                    bgColor={qrOptions.backgroundColor}
+                    fgColor={qrOptions.foregroundColor}
+                    labelPosition={qrOptions.labelPosition}
+                    labelSize={qrOptions.labelSize}
+                    labelFont={qrOptions.labelFont}
+                    labelColor={qrOptions.labelColor}
+                    restaurantName={restaurantName}
+                  />
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-6">
+                <p className="text-gray-500">No QR codes available.</p>
+                <p className="text-sm text-gray-400 mt-2">
+                  Visit the QR Generator page to create new codes.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -536,10 +628,11 @@ const DashboardHome = () => {
           <h2 className="text-xl font-semibold mb-6">Quick Actions</h2>
           <div className="space-y-4">
             <button 
-              onClick={generateNewQRCode}
+              onClick={showQRCodeDownloader}
               className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-3 px-4 rounded-xl transition duration-150 font-medium flex items-center justify-center"
             >
-              Generate New QR Code
+              <QrCode size={16} className="mr-2" />
+              Download QR Code
             </button>
             <button 
               onClick={exportScanData}
