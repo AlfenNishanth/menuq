@@ -47,6 +47,7 @@ import config from "../../config";
  */
 
 export async function fetchRestaurantByUID(firebaseUID) {
+  console.log("calling fetRestaurantByUID API");
   try {
     const response = await axios.get(`${config.MENUQ}/${firebaseUID}`);
     return response.data;

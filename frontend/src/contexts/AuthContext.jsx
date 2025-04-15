@@ -136,6 +136,33 @@ function AuthProvider({ children }) {
   //     console.log("Updated userDAta in the context: ", userData);
   // }, [userData]);
 
+
+
+  // --------------------
+  // Logging out user if no data:
+
+  // Add this useEffect after your other useEffect hooks
+
+useEffect(() => {
+  if (currentUser && userData === null) {
+
+    const timeoutId = setTimeout(() => {
+      console.log("No user data found, logging out...");
+      logout()
+        .then(() => {
+          console.log("User logged out successfully");
+        })
+        .catch((error) => {
+          console.error("Error logging out:", error);
+        });
+    }, 1000);
+
+    return () => clearTimeout(timeoutId);
+  }
+}, [userData, currentUser]);
+
+
+
   const value = {
     currentUser,
     userData,

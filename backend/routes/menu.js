@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const router = express.Router();
 const MenuItem = require("../models/menuItem");
+const logger = require('../logger');
 
 const multer = require("multer");
 const { v4 } = require("uuid");
@@ -21,16 +22,19 @@ const upload = multer({ storage });
 
 router.get("/:id", async (req, res) => {
   try {
+    logger.info(`GET /menu/${req.params.id} - Fetching menu items for restaurant`);
     const id = req.params.id;
     const items = await MenuItem.find({ restaurantID: id });
 
     if (!items.length) {
+      logger.info(`GET /menu/${id} - No items found for restaurant`);
       return res
         .status(404)
         .json({ message: "No items found for this restaurant" });
     }
     res.json(items);
   } catch (error) {
+    logger.error(`GET /menu/${req.params.id} - Error: ${error.message}`);
     console.error("Error while fetching menu for restaurant: ", error);
     res.status(500).json({ message: error.message });
   }
@@ -39,14 +43,17 @@ router.get("/:id", async (req, res) => {
 
 router.get("/item/:id", async (req, res) => {
   try {
+    logger.info(`GET /menu/item/${req.params.id} - Fetching single menu item`);
     const id = req.params.id;
     const item = await MenuItem.findById(id);
 
     if (!item) {
+      logger.info(`GET /menu/item/${id} - Item not found`);
       return res.status(404).json({ message: "Item not found" });
     }
     res.json(item);
   } catch (error) {
+    logger.error(`GET /menu/item/${req.params.id} - Error: ${error.message}`);
     console.error("Error while fetching menu item: ", error);
     res.status(500).json({ message: error.message });
   }
@@ -54,6 +61,8 @@ router.get("/item/:id", async (req, res) => {
 
 router.post("/", upload.single("image"), async (req, res) => {
   try {
+    logger.info(`POST /menu - Creating new menu item for restaurant ${req.body.restaurantID}`);
+
     const {
       restaurantID,
       name,
@@ -92,9 +101,11 @@ router.post("/", upload.single("image"), async (req, res) => {
     });
     console.log("trying to save to mongo");
     const savedMenuItem = await newMenuItem.save();
+    logger.info(`POST /menu - Successfully created menu item with ID: ${savedMenuItem._id}`);
     res.status(201).json(savedMenuItem); // Respond with the saved menu item
   } catch (err) {
-    console.log(`Error while tyring to create menu: ${err}`);
+    logger.error(`POST /menu - Error creating menu item: ${err.message}`);
+    console.error(`Error while tyring to create menu: ${err}`);
     res.status(400).json({ message: err.message });
   }
 });
@@ -102,6 +113,7 @@ router.post("/", upload.single("image"), async (req, res) => {
 //update menu
 router.patch("/:id", upload.single("image"), async (req, res) => {
   try {
+    logger.info(`PATCH /menu/${req.params.id} - Updating menu item`);
     const { id } = req.params;
     const updateData = req.body;
 
@@ -127,9 +139,11 @@ router.patch("/:id", upload.single("image"), async (req, res) => {
 
     // Update the menu item
     const updatedMenuItem = await MenuItem.findByIdAndUpdate(id, updateData, { new: true });
+    logger.info(`PATCH /menu/${id} - Successfully updated menu item`);
 
     res.json(updatedMenuItem);
   } catch (err) {
+    logger.error(`PATCH /menu/${req.params.id} - Error: ${err.message}`);
     console.error(`Error updating menu: ${err}`);
     res.status(500).json({ message: "Server error" });
   }
@@ -138,6 +152,8 @@ router.patch("/:id", upload.single("image"), async (req, res) => {
 // Availability route
 router.patch("/availability/:id", async (req, res) => {
   try {
+    logger.info(`PATCH /menu/availability/${req.params.id} - Updating availability`);
+
     const { id } = req.params;
     const { available } = req.body;
 
@@ -154,9 +170,11 @@ router.patch("/availability/:id", async (req, res) => {
     if (!updatedMenuItem) {
       return res.status(404).json({ message: "Menu item not found" });
     }
+    logger.info(`PATCH /menu/availability/${id} - Successfully updated availability to: ${available}`);
 
     return res.status(200).json(updatedMenuItem);
   } catch (error) {
+    logger.error(`PATCH /menu/availability/${req.params.id} - Error: ${error.message}`);
     console.error("Error updating availability:", error);
     return res.status(500).json({ message: "Server error" });
   }
@@ -165,6 +183,7 @@ router.patch("/availability/:id", async (req, res) => {
 //update prepTime
 router.patch("/prepTime/:id", async (req, res) => {
   try {
+    logger.info(`PATCH /menu/prepTime/${req.params.id} - Updating prep time`);
     const { id } = req.params;
     const { prepTime } = req.body;
 
@@ -179,11 +198,13 @@ router.patch("/prepTime/:id", async (req, res) => {
     );
 
     if (!updatedMenuItem) {
+      logger.error(`PATCH /menu/prepTime/${req.params.id} - Error - not found`);
       return res.status(404).json({ message: "Menu item not found" });
     }
-
+    logger.info(`PATCH /menu/prepTime/${id} - Successfully updated prep time to: ${prepTime}`);
     return res.status(200).json(updatedMenuItem);
   } catch (error) {
+    logger.error(`PATCH /menu/prepTime/${req.params.id} - Error: ${error.message}`);
     console.error("Error updating prepTime:", error);
     return res.status(500).json({ message: "Server error" });
   }
@@ -192,7 +213,10 @@ router.patch("/prepTime/:id", async (req, res) => {
 
 //upload file
 async function uploadFileToS3(file) {
+  logger.info(`Uploading file: ${file.originalname} to S3`);
   console.log("trying to upload file");
+
+  try{
   const fileName = `${file.originalname}_${v4()}`;
   const params = {
     Bucket: process.env.AWS_BUCKET_NAME,
@@ -204,12 +228,22 @@ async function uploadFileToS3(file) {
 
   const command = new PutObjectCommand(params);
   await s3Client.send(command);
+  
+  logger.info(`Successfully uploaded file: ${fileName} to S3`);
+
   // Manually construct the URL (this assumes your bucket’s public URL format)
   return `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+
+  } catch (error) {
+    logger.error(`Error uploading file to S3: ${error.message}`);
+    console.error("Error uploading file to S3:", error);
+    throw error;
+  }
 }
 
 async function deleteFileFromS3(imageUrl) {
   try {
+    logger.info(`Deleting file from S3: ${imageUrl}`);
     console.log("Trying to delete file:", imageUrl);
 
     // Extract the file name from the URL
@@ -223,8 +257,10 @@ async function deleteFileFromS3(imageUrl) {
     const command = new DeleteObjectCommand(params);
     await s3Client.send(command);
 
+    logger.info(`Successfully deleted file: ${fileName} from S3`);
     console.log("File deleted successfully:", fileName);
   } catch (error) {
+    logger.error(`Error deleting file from S3: ${error.message}`);
     console.error("Error deleting file from S3:", error);
     throw new Error("Failed to delete file from S3");
   }
