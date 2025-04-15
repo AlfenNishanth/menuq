@@ -31,7 +31,7 @@ const ButtonContainer = styled.div`
 `;
 
 const DownloadButton = styled.button`
-  background-color: #4a90e2;
+  background-color: #d97706; /* Amber-600 */
   color: white;
   border: none;
   border-radius: 4px;
@@ -41,7 +41,7 @@ const DownloadButton = styled.button`
   transition: background-color 0.2s;
   
   &:hover {
-    background-color: #3a7bc8;
+    background-color: #b45309; /* Amber-700 */
   }
 `;
 
@@ -424,22 +424,22 @@ const DashboardHome = () => {
   };
 
   return (
-    <div className="px-6 py-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    <div className="px-6 py-8 bg-gradient-to-br from-amber-50/40 to-white min-h-screen">
       {/* Dashboard Header with Glass Morphism */}
-      <div className="bg-white bg-opacity-70 backdrop-blur-lg rounded-xl shadow-md p-6 mb-8 border border-gray-200">
+      <div className="bg-white bg-opacity-70 backdrop-blur-lg rounded-xl shadow-md p-6 mb-8 border border-amber-200">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Restaurant Dashboard</h1>
-            <p className="text-gray-600 flex items-center">
+            <h1 className="text-3xl font-bold text-amber-800 mb-2">Restaurant Dashboard</h1>
+            <p className="text-amber-700 flex items-center">
               <Clock size={16} className="mr-2" /> 
               <span>Last updated: {getCurrentTime()}</span>
             </p>
           </div>
           <div className="mt-4 md:mt-0 flex space-x-2">
-            <button className="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg transition duration-150 flex items-center">
+            <button className="bg-amber-600 hover:bg-amber-700 text-white py-2 px-4 rounded-lg transition duration-150 flex items-center">
               <BarChart2 size={16} className="mr-2" /> Analytics
             </button>
-            <button className="bg-white hover:bg-gray-50 text-gray-800 border border-gray-300 py-2 px-4 rounded-lg transition duration-150">
+            <button className="bg-white hover:bg-gray-50 text-amber-800 border border-amber-300 py-2 px-4 rounded-lg transition duration-150">
               Settings
             </button>
           </div>
@@ -451,10 +451,10 @@ const DashboardHome = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 max-w-md w-full">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Download QR Code</h2>
+              <h2 className="text-xl font-semibold text-amber-700">Download QR Code</h2>
               <button 
                 onClick={() => setShowQRDownloader(false)}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-amber-500 hover:text-amber-700"
               >
                 ✕
               </button>
@@ -469,7 +469,7 @@ const DashboardHome = () => {
                   <select
                     value={selectedQrCode?.id || ""}
                     onChange={handleQRCodeChange}
-                    className="w-full p-2 border border-gray-300 rounded-md"
+                    className="w-full p-2 border border-amber-300 rounded-md focus:ring-amber-500 focus:border-amber-500"
                   >
                     {qrCodes.map(code => (
                       <option key={code.id} value={code.id}>
@@ -509,7 +509,7 @@ const DashboardHome = () => {
       
       {/* KPI Cards Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl shadow-md overflow-hidden">
+        <div className="bg-gradient-to-br from-amber-600 to-amber-800 rounded-xl shadow-md overflow-hidden">
           <div className="flex items-start p-6">
             <div className="p-3 bg-white bg-opacity-30 rounded-lg mr-4">
               <BarChart2 size={24} className="text-white" />
@@ -518,7 +518,7 @@ const DashboardHome = () => {
               <p className="text-white font-medium text-sm">Total Scans</p>
               <h3 className="text-2xl font-bold mt-1 text-white">{loading ? "..." : scanStats.totalScans}</h3>
               <div className="flex items-center mt-2">
-                <span className="text-xs font-medium bg-white text-indigo-700 px-2 py-1 rounded-full">
+                <span className="text-xs font-medium bg-white text-amber-700 px-2 py-1 rounded-full">
                   {loading ? "Loading..." : getGrowthPercentage()}
                 </span>
               </div>
@@ -526,7 +526,7 @@ const DashboardHome = () => {
           </div>
         </div>
         
-        <div className="bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl shadow-md overflow-hidden">
+        <div className="bg-gradient-to-br from-amber-500 to-amber-700 rounded-xl shadow-md overflow-hidden">
           <div className="flex items-start p-6">
             <div className="p-3 bg-white bg-opacity-30 rounded-lg mr-4">
               <Calendar size={24} className="text-white" />
@@ -535,7 +535,7 @@ const DashboardHome = () => {
               <p className="text-white font-medium text-sm">Today's Scans</p>
               <h3 className="text-2xl font-bold mt-1 text-white">{loading ? "..." : scanStats.todayScans}</h3>
               <div className="flex items-center mt-2">
-                <span className="text-xs font-medium bg-white text-blue-700 px-2 py-1 rounded-full">
+                <span className="text-xs font-medium bg-white text-amber-700 px-2 py-1 rounded-full">
                   {loading ? "Loading..." : scanStats.todayScans > getAverageDailyScans() ? 
                     `+${Math.round((scanStats.todayScans/getAverageDailyScans() - 1) * 100)}% vs avg` : 
                     `${Math.round((scanStats.todayScans/getAverageDailyScans() - 1) * 100)}% vs avg`}
@@ -554,7 +554,7 @@ const DashboardHome = () => {
               <p className="text-white font-medium text-sm">Conversion Rate</p>
               <h3 className="text-2xl font-bold mt-1 text-white">65%</h3>
               <div className="flex items-center mt-2">
-                <span className="text-xs font-medium bg-white text-orange-700 px-2 py-1 rounded-full">
+                <span className="text-xs font-medium bg-white text-amber-700 px-2 py-1 rounded-full">
                   +3% improvement
                 </span>
               </div>
@@ -562,7 +562,7 @@ const DashboardHome = () => {
           </div>
         </div>
         
-        <div className="bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl shadow-md overflow-hidden">
+        <div className="bg-gradient-to-br from-amber-600 to-amber-800 rounded-xl shadow-md overflow-hidden">
           <div className="flex items-start p-6">
             <div className="p-3 bg-white bg-opacity-30 rounded-lg mr-4">
               <Coffee size={24} className="text-white" />
@@ -571,7 +571,7 @@ const DashboardHome = () => {
               <p className="text-white font-medium text-sm">Menu Engagement</p>
               <h3 className="text-2xl font-bold mt-1 text-white">78%</h3>
               <div className="flex items-center mt-2">
-                <span className="text-xs font-medium bg-white text-green-700 px-2 py-1 rounded-full">
+                <span className="text-xs font-medium bg-white text-amber-700 px-2 py-1 rounded-full">
                   High performance
                 </span>
               </div>
@@ -583,11 +583,11 @@ const DashboardHome = () => {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         {/* Weekly Scan Chart */}
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-md p-6 border border-gray-100">
-          <h2 className="text-xl font-semibold mb-6">Weekly Scan Activity</h2>
+        <div className="lg:col-span-2 bg-white rounded-xl shadow-md p-6 border border-amber-100">
+          <h2 className="text-xl font-semibold text-amber-800 mb-6">Weekly Scan Activity</h2>
           {loading ? (
             <div className="flex justify-center items-center h-64">
-              <div className="animate-spin h-8 w-8 border-4 border-t-transparent border-indigo-600 rounded-full"></div>
+              <div className="animate-spin h-8 w-8 border-4 border-t-transparent border-amber-600 rounded-full"></div>
             </div>
           ) : (
             <div className="h-64">
@@ -602,34 +602,34 @@ const DashboardHome = () => {
                       return `${label} (${dataPoint ? dataPoint.date : ''})`;
                     }}
                   />
-                  <Bar dataKey="scans" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="scans" fill="#d97706" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           )}
           <div className="mt-4 grid grid-cols-3 gap-4">
-            <div className="p-3 bg-indigo-50 rounded-lg text-center">
+            <div className="p-3 bg-amber-50 rounded-lg text-center">
               <p className="text-xs text-gray-500">Peak Day</p>
-              <p className="font-semibold text-indigo-700">{loading ? "..." : getPeakDay()}</p>
+              <p className="font-semibold text-amber-700">{loading ? "..." : getPeakDay()}</p>
             </div>
-            <div className="p-3 bg-indigo-50 rounded-lg text-center">
+            <div className="p-3 bg-amber-50 rounded-lg text-center">
               <p className="text-xs text-gray-500">Avg. Daily</p>
-              <p className="font-semibold text-indigo-700">{loading ? "..." : getAverageDailyScans()} Scans</p>
+              <p className="font-semibold text-amber-700">{loading ? "..." : getAverageDailyScans()} Scans</p>
             </div>
-            <div className="p-3 bg-indigo-50 rounded-lg text-center">
+            <div className="p-3 bg-amber-50 rounded-lg text-center">
               <p className="text-xs text-gray-500">Growth</p>
-              <p className="font-semibold text-indigo-700">{loading ? "..." : getGrowthPercentage()}</p>
+              <p className="font-semibold text-amber-700">{loading ? "..." : getGrowthPercentage()}</p>
             </div>
           </div>
         </div>
         
         {/* Quick Actions Panel */}
-        <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-          <h2 className="text-xl font-semibold mb-6">Quick Actions</h2>
+        <div className="bg-white rounded-xl shadow-md p-6 border border-amber-100">
+          <h2 className="text-xl font-semibold text-amber-800 mb-6">Quick Actions</h2>
           <div className="space-y-4">
             <button 
               onClick={showQRCodeDownloader}
-              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-3 px-4 rounded-xl transition duration-150 font-medium flex items-center justify-center"
+              className="w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white py-3 px-4 rounded-xl transition duration-150 font-medium flex items-center justify-center"
             >
               <QrCode size={16} className="mr-2" />
               Download QR Code
@@ -637,7 +637,7 @@ const DashboardHome = () => {
             <button 
               onClick={exportScanData}
               disabled={exporting}
-              className="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white py-3 px-4 rounded-xl transition duration-150 font-medium flex items-center justify-center"
+              className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-3 px-4 rounded-xl transition duration-150 font-medium flex items-center justify-center"
             >
               {exporting ? (
                 <>
@@ -651,14 +651,14 @@ const DashboardHome = () => {
                 </>
               )}
             </button>
-            <button className="w-full border border-gray-300 hover:bg-gray-50 text-gray-800 py-3 px-4 rounded-xl transition duration-150 font-medium">
+            <button className="w-full border border-amber-300 hover:bg-amber-50 text-amber-800 py-3 px-4 rounded-xl transition duration-150 font-medium">
               View Detailed Reports
             </button>
           </div>
           
           {/* Restaurant Status Card */}
-          <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-            <h3 className="text-md font-medium mb-2 text-blue-800">Restaurant Status</h3>
+          <div className="mt-6 p-4 bg-gradient-to-r from-amber-50 to-amber-100/50 rounded-xl border border-amber-200">
+            <h3 className="text-md font-medium mb-2 text-amber-800">Restaurant Status</h3>
             <div className="flex items-center mb-3">
               <div className="h-3 w-3 bg-green-500 rounded-full mr-2"></div>
               <span className="text-sm font-medium">Open Now</span>

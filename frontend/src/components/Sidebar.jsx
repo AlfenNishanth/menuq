@@ -42,20 +42,20 @@ function SidebarItem({ icon, text, to, badge, onClick, children }) {
           onClick={handleClick}
           className={`relative flex items-center py-2.5 px-3 rounded-lg transition-all duration-200 group ${
             isActive
-              ? "bg-gradient-to-tr from-indigo-100 to-indigo-50 text-indigo-800"
-              : "hover:bg-indigo-50 text-gray-700"
+              ? "bg-gradient-to-tr from-amber-100 to-amber-50 text-amber-800"
+              : "hover:bg-amber-50 text-gray-700"
           }`}
         >
           {/* Consistent icon placement - centered when collapsed */}
           <div className={`flex items-center ${!expanded ? "mx-auto" : ""}`}>
-            <div className={`text-indigo-600 flex items-center justify-center w-5 ${!expanded ? "mx-auto" : ""}`}>
+            <div className={`text-amber-600 flex items-center justify-center w-5 ${!expanded ? "mx-auto" : ""}`}>
               {icon}
             </div>
             {expanded && (
               <>
                 <span className="ml-3 font-medium">{text}</span>
                 {badge && (
-                  <span className="ml-2 text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-full">
+                  <span className="ml-2 text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">
                     {badge}
                   </span>
                 )}
@@ -76,14 +76,14 @@ function SidebarItem({ icon, text, to, badge, onClick, children }) {
           {!expanded && (
             <div
               className="absolute left-full rounded-md px-2 py-1 ml-6
-                bg-indigo-800 text-white text-sm font-medium
+                bg-amber-800 text-white text-sm font-medium
                 invisible opacity-0 -translate-x-3 transition-all duration-300
                 group-hover:visible group-hover:opacity-100 group-hover:translate-x-0
                 z-50 whitespace-nowrap"
             >
               {text}
               {badge && (
-                <span className="ml-1 text-xs px-1 py-0.5 rounded-full bg-indigo-700">
+                <span className="ml-1 text-xs px-1 py-0.5 rounded-full bg-amber-700">
                   {badge}
                 </span>
               )}
@@ -107,9 +107,9 @@ function SidebarItem({ icon, text, to, badge, onClick, children }) {
     return (
       <li onClick={handleClick} className="cursor-pointer mb-2">
         <div
-          className="relative flex items-center py-2.5 px-3 rounded-lg transition-colors group hover:bg-indigo-50 text-gray-700"
+          className="relative flex items-center py-2.5 px-3 rounded-lg transition-colors group hover:bg-amber-50 text-gray-700"
         >
-          <div className={`text-indigo-600 flex items-center justify-center w-5 ${!expanded ? "mx-auto" : ""}`}>
+          <div className={`text-amber-600 flex items-center justify-center w-5 ${!expanded ? "mx-auto" : ""}`}>
             {icon}
           </div>
           {expanded && (
@@ -119,7 +119,7 @@ function SidebarItem({ icon, text, to, badge, onClick, children }) {
           {!expanded && (
             <div
               className="absolute left-full rounded-md px-2 py-1 ml-6
-                bg-indigo-800 text-white text-sm font-medium
+                bg-amber-800 text-white text-sm font-medium
                 invisible opacity-0 -translate-x-3 transition-all duration-300
                 group-hover:visible group-hover:opacity-100 group-hover:translate-x-0
                 z-50 whitespace-nowrap"
@@ -135,7 +135,7 @@ function SidebarItem({ icon, text, to, badge, onClick, children }) {
 
 function SidebarSubItem({ text, icon }) {
   return (
-    <li className="py-2 px-2 text-sm flex items-center gap-2 rounded-md cursor-pointer transition-colors text-gray-600 hover:text-indigo-800 hover:bg-indigo-50">
+    <li className="py-2 px-2 text-sm flex items-center gap-2 rounded-md cursor-pointer transition-colors text-gray-600 hover:text-amber-800 hover:bg-amber-50">
       {icon}
       <span>{text}</span>
     </li>
@@ -164,16 +164,16 @@ const Sidebar = ({ onLogoutClick }) => {
   // Get avatar from API or use initials
   const iconApi = `https://ui-avatars.com/api/?name=${String(
     user?.displayName || "User"
-  ).replace(/ /g, "+")}/?background=c7d2fe&color=3730a3&bold=true`;
+  ).replace(/ /g, "+")}/?background=fef3c7&color=92400e&bold=true`;
   
   return (
     <aside className={`h-screen sticky top-0 bg-white border-r transition-all duration-300 ease-in-out ${expanded ? 'w-64' : 'w-16'} ${animate ? "animate-pulse" : ""}`}>
       <div className="flex flex-col h-full">
         <div className="flex items-center justify-between px-3 py-4 border-b">
-          {expanded && <span className="font-bold text-lg text-indigo-700">Menu Q</span>}
+          {expanded && <span className="font-serif font-bold text-lg text-amber-700">Menu Q</span>}
           <button 
             onClick={toggleSidebar} 
-            className={`p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 ${!expanded && 'mx-auto'}`}
+            className={`p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-600 ${!expanded && 'mx-auto'}`}
           >
             {expanded ? <ChevronLeft size={18} /> : <Menu size={18} />}
           </button>
@@ -265,7 +265,7 @@ const Sidebar = ({ onLogoutClick }) => {
             </div>
           </div>
           {expanded && (
-            <button className="p-1.5 rounded-lg hover:bg-gray-100">
+            <button className="p-1.5 rounded-lg hover:bg-amber-50">
               <MoreVertical size={16} />
             </button>
           )}

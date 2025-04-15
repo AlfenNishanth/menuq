@@ -102,7 +102,7 @@ export default function AddNewMenuItem() {
     if (addOns.length !== 0) formData.append("addOns", JSON.stringify(addOns));
     // if (tags.length !== 0) formData.append("tags", tags);
 
-    if (tags.length !== 0)  formData.append("tags", JSON.stringify(tags));
+    if (tags.length !== 0) formData.append("tags", JSON.stringify(tags));
 
     console.log("variants:", variants);
     console.log("Addons:", addOns);
@@ -130,9 +130,17 @@ export default function AddNewMenuItem() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 text-gray-900">
-      <div className="p-8 rounded-2xl shadow-xl w-full max-w-lg bg-white">
-        <h2 className="text-3xl font-extrabold mb-6 text-center">Add New Menu Item</h2>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-gray-50 to-white text-gray-900">
+      {/* Decorative Elements - Like in the landing page */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-10 pointer-events-none">
+        <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-amber-300 mix-blend-multiply"></div>
+        <div className="absolute top-1/3 right-1/4 w-64 h-64 rounded-full bg-amber-200 mix-blend-multiply"></div>
+        <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full bg-amber-100 mix-blend-multiply"></div>
+      </div>
+      
+      <div className="p-8 rounded-2xl shadow-xl w-full max-w-lg bg-white relative z-10">
+        <h2 className="text-4xl font-serif font-bold mb-6 text-center text-amber-700">Add New Menu Item</h2>
+        <div className="w-16 h-1 bg-amber-500 mx-auto mb-8"></div>
         
         <form 
           onSubmit={handleSubmit(onSubmit)} 
@@ -148,7 +156,7 @@ export default function AddNewMenuItem() {
             <input
               {...register("name", { required: "Name is required" })}
               placeholder="Item Name"
-              className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900 ${
+              className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-amber-200 text-gray-900 ${
                 errors.name ? "border-red-500 ring-1 ring-red-500" : ""
               }`}
               disabled={loading}
@@ -161,7 +169,7 @@ export default function AddNewMenuItem() {
             <textarea
               {...register("description")}
               placeholder="Description"
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900"
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-amber-200 text-gray-900"
               disabled={loading}
               rows={3}
             />
@@ -169,7 +177,7 @@ export default function AddNewMenuItem() {
             {/* Type Dropdown */}
             <select
               {...register("type")}
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900"
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-amber-200 text-gray-900"
               onChange={(e) => {
                 setValue("type", e.target.value);
                 if (e.target.value !== "Custom") {
@@ -192,7 +200,7 @@ export default function AddNewMenuItem() {
                 {...register("customType", { required: "Custom type is required" })}
                 type="text"
                 placeholder="Enter custom category"
-                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900 ${
+                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-amber-200 text-gray-900 ${
                   errors.customType ? "border-red-500 ring-1 ring-red-500" : ""
                 }`}
                 disabled={loading}
@@ -203,8 +211,8 @@ export default function AddNewMenuItem() {
             )}
 
             {/* Vegetarian Toggle */}
-            <div className="flex items-center justify-between p-3 rounded-lg bg-gray-200">
-              <span className="font-medium">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-amber-200">
+              <span className="font-medium text-gray-800">
                 {watch("vegetarian") ? "Vegetarian" : "Non-vegetarian"}
               </span>
               <Controller
@@ -216,7 +224,7 @@ export default function AddNewMenuItem() {
                     type="button"
                     onClick={() => onChange(!value)}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      value ? 'bg-teal-600' : 'bg-gray-400'
+                      value ? 'bg-amber-600' : 'bg-gray-400'
                     }`}
                     disabled={loading}
                   >
@@ -237,7 +245,7 @@ export default function AddNewMenuItem() {
               min="0"
               {...register("price", { required: "Price is required" })}
               placeholder="Base Price"
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900"
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-amber-200 text-gray-900"
               disabled={loading}
             />
             {errors.price && (
@@ -252,7 +260,7 @@ export default function AddNewMenuItem() {
               render={({ field }) => (
                 <select 
                   {...field} 
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900"
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-amber-200 text-gray-900"
                   disabled={loading}
                 >
                   <option value="true">Available</option>
@@ -262,7 +270,7 @@ export default function AddNewMenuItem() {
             />
 */}
             {/* Image Upload */}
-            <div className="border-2 border-dashed rounded-lg p-4 transition border-gray-300 hover:border-teal-400 text-center"
+            <div className="border-2 border-dashed rounded-lg p-4 transition border-amber-300 hover:border-amber-400 text-center"
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => {
                 e.preventDefault();
@@ -292,7 +300,7 @@ export default function AddNewMenuItem() {
                   </div>
                 ) : (
                   <div className="text-center py-4 text-gray-500">
-                    <Upload className="mx-auto text-4xl mb-2" />
+                    <Upload className="mx-auto text-4xl mb-2 text-amber-600" />
                     <p className="text-sm font-medium">Upload Menu Item Image</p>
                     <p className="text-xs mt-1">JPG, PNG or GIF (Max. 5MB)</p>
                   </div>
@@ -311,7 +319,7 @@ export default function AddNewMenuItem() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current.click()}
-                    className="mt-2 inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-teal-600 text-white hover:bg-teal-700 transition-colors"
+                    className="mt-2 inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-amber-600 text-white hover:bg-amber-700 transition-colors"
                   >
                     Browse Image
                   </button>
@@ -331,8 +339,8 @@ export default function AddNewMenuItem() {
           </div>
 
           {/* Variants Section */}
-          <div className="p-4 rounded-lg shadow-md transition bg-gray-50">
-            <h3 className="font-semibold mb-2">Variants</h3>
+          <div className="p-4 rounded-lg shadow-md transition bg-white border border-amber-50">
+            <h3 className="font-serif text-xl font-semibold mb-2 text-amber-700">Variants</h3>
             <div className="space-y-2">
               {variants.map((variant, index) => (
                 <div key={index} className="flex space-x-2">
@@ -345,7 +353,7 @@ export default function AddNewMenuItem() {
                       newVariants[index].name = e.target.value;
                       setVariants(newVariants);
                     }}
-                    className="p-3 border rounded-lg transition flex-1 bg-gray-200 border-gray-300 text-gray-900"
+                    className="p-3 border rounded-lg transition flex-1 bg-gray-50 border-amber-200 text-gray-900"
                     disabled={loading}
                   />
                   <input
@@ -359,7 +367,7 @@ export default function AddNewMenuItem() {
                       newVariants[index].price = parseFloat(e.target.value);
                       setVariants(newVariants);
                     }}
-                    className="p-3 border rounded-lg transition w-24 bg-gray-200 border-gray-300 text-gray-900"
+                    className="p-3 border rounded-lg transition w-24 bg-gray-50 border-amber-200 text-gray-900"
                     disabled={loading}
                   />
                   <button
@@ -376,7 +384,7 @@ export default function AddNewMenuItem() {
                 type="button"
                 onClick={() => setVariants([...variants, { name: "", price: 0 }])}
                 disabled={loading}
-                className="mt-2 w-full px-4 py-2 text-sm font-medium rounded-md transition-colors bg-teal-600 text-white hover:bg-teal-700"
+                className="mt-2 w-full px-4 py-2 text-sm font-medium rounded-md transition-colors bg-amber-600 text-white hover:bg-amber-700"
               >
                 Add Variant
               </button>
@@ -384,8 +392,8 @@ export default function AddNewMenuItem() {
           </div>
 
           {/* Add Ons Section */}
-          <div className="p-4 rounded-lg shadow-md transition bg-gray-50">
-            <h3 className="font-semibold mb-2">Add Ons</h3>
+          <div className="p-4 rounded-lg shadow-md transition bg-white border border-amber-50">
+            <h3 className="font-serif text-xl font-semibold mb-2 text-amber-700">Add Ons</h3>
             <div className="space-y-2">
               {addOns.map((addOn, index) => (
                 <div key={index} className="flex space-x-2">
@@ -398,7 +406,7 @@ export default function AddNewMenuItem() {
                       newAddOns[index].name = e.target.value;
                       setAddOns(newAddOns);
                     }}
-                    className="p-3 border rounded-lg transition flex-1 bg-gray-200 border-gray-300 text-gray-900"
+                    className="p-3 border rounded-lg transition flex-1 bg-gray-50 border-amber-200 text-gray-900"
                     disabled={loading}
                   />
                   <input
@@ -412,7 +420,7 @@ export default function AddNewMenuItem() {
                       newAddOns[index].price = parseFloat(e.target.value);
                       setAddOns(newAddOns);
                     }}
-                    className="p-3 border rounded-lg transition w-24 bg-gray-200 border-gray-300 text-gray-900"
+                    className="p-3 border rounded-lg transition w-24 bg-gray-50 border-amber-200 text-gray-900"
                     disabled={loading}
                   />
                   <button
@@ -429,7 +437,7 @@ export default function AddNewMenuItem() {
                 type="button"
                 onClick={() => setAddOns([...addOns, { name: "", price: 0 }])}
                 disabled={loading}
-                className="mt-2 w-full px-4 py-2 text-sm font-medium rounded-md transition-colors bg-teal-600 text-white hover:bg-teal-700"
+                className="mt-2 w-full px-4 py-2 text-sm font-medium rounded-md transition-colors bg-amber-600 text-white hover:bg-amber-700"
               >
                 Add New
               </button>
@@ -437,19 +445,19 @@ export default function AddNewMenuItem() {
           </div>
 
           {/* Tags Section */}
-          <div className="p-4 rounded-lg shadow-md transition bg-gray-50">
-            <h3 className="font-semibold mb-2">Tags</h3>
+          <div className="p-4 rounded-lg shadow-md transition bg-white border border-amber-50">
+            <h3 className="font-serif text-xl font-semibold mb-2 text-amber-700">Tags</h3>
             <div className="mb-2 flex flex-wrap gap-2">
               {tags.map((tag, index) => (
                 <span
                   key={index}
-                  className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-teal-100 text-teal-800"
+                  className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-800"
                 >
                   {tag}
                   <button
                     type="button"
                     onClick={() => setTags(tags.filter((_, i) => i !== index))}
-                    className="ml-2 -mr-1 h-4 w-4 rounded-full inline-flex items-center justify-center transition bg-teal-200 text-teal-600 hover:bg-teal-300"
+                    className="ml-2 -mr-1 h-4 w-4 rounded-full inline-flex items-center justify-center transition bg-amber-200 text-amber-600 hover:bg-amber-300"
                     disabled={loading}
                   >
                     <span className="text-xs">×</span>
@@ -469,13 +477,13 @@ export default function AddNewMenuItem() {
                     addTag();
                   }
                 }}
-                className="flex-1 p-3 border rounded-lg transition bg-gray-200 border-gray-300 text-gray-900"
+                className="flex-1 p-3 border rounded-lg transition bg-gray-50 border-amber-200 text-gray-900"
                 disabled={loading}
               />
               <button
                 type="button"
                 onClick={addTag}
-                className="px-4 py-2 font-medium rounded-lg transition-colors bg-teal-600 text-white hover:bg-teal-700"
+                className="px-4 py-2 font-medium rounded-lg transition-colors bg-amber-600 text-white hover:bg-amber-700"
                 disabled={loading}
               >
                 Add
@@ -488,14 +496,17 @@ export default function AddNewMenuItem() {
 
           <button 
             type="submit" 
-            className="w-full bg-teal-600 text-white p-3 rounded-lg font-semibold hover:bg-teal-700 transition duration-300 shadow-lg disabled:opacity-50 flex justify-center items-center" 
+            className="w-full bg-amber-600 text-white p-3 rounded-lg font-semibold hover:bg-amber-700 transition duration-300 shadow-lg disabled:opacity-50 flex justify-center items-center group relative overflow-hidden" 
             disabled={loading}
           >
-            {loading ? (
-              <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
-            ) : (
-              "Add Menu Item"
-            )}
+            <span className="absolute inset-0 w-full h-full transition-all duration-300 ease-out transform translate-x-full bg-amber-700 group-hover:translate-x-0"></span>
+            <span className="relative flex items-center">
+              {loading ? (
+                <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+              ) : (
+                "Add Menu Item"
+              )}
+            </span>
           </button>
         </form>
       </div>

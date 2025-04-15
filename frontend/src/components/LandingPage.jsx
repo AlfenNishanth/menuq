@@ -147,7 +147,7 @@ function LandingPage() {
           {/* Main Image */}
           <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/50">
             <img 
-              src="/api/placeholder/300/600" 
+              src="/api/placeholder/300/600"
               alt="Sophisticated dining experience" 
               className="relative z-10 transition-all duration-700 hover:scale-105 transform-gpu"
             />
@@ -161,7 +161,7 @@ function LandingPage() {
             <div className="flex items-center gap-4">
               <div className="relative">
                 <div className="absolute inset-0 bg-amber-100 rounded-md rotate-45 transform -translate-x-1 translate-y-1"></div>
-                <img src="/api/placeholder/80/80" alt="QR code" className="w-16 h-16 relative z-10" />
+                <img src="/8-removebg.png" alt="QR code" className="w-20 h-20 relative z-10" />
               </div>
               <div className="text-sm font-medium">
                 <span className="block text-amber-700 font-serif text-base">Experience MenuQ</span>
