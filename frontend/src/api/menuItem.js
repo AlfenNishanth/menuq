@@ -8,6 +8,7 @@ import config from "../../config"; // Adjust the path if needed
  */
 
 export async function addMenuItem(menuItem) {
+  console.log("Calling addMenuItem API");
   try {
     const response = await axios.post(`${config.MENU}`, menuItem);
     return response.data;
@@ -17,6 +18,7 @@ export async function addMenuItem(menuItem) {
 }
 
 export async function updateMenuItem(menuItemId, updatedData) {
+  console.log("Calling updateMenuItem API");
   try {
     const response = await axios.patch(
       `${config.MENU}/${menuItemId}`,
@@ -29,6 +31,7 @@ export async function updateMenuItem(menuItemId, updatedData) {
 }
 
 export async function getMenuItem(menuItemId) {
+  console.log("Calling getMenuItem API");
   try {
     const response = await axios.get(`${config.MENU}/item/${menuItemId}`);
     return response.data;
@@ -38,6 +41,7 @@ export async function getMenuItem(menuItemId) {
 }
 
 export async function updateAvailability(menuItemId, available) {
+  console.log('Calling updateAvailability API');
   try {
     const response = await axios.patch(
       `${config.MENU}/availability/${menuItemId}`,
@@ -70,6 +74,7 @@ export async function updatePrepTime(menuItemId, prepTime) {
 }
 
 export async function getRestaurantMenu(id) {
+  console.log("Calling getRestaurantMenu API");
   try {
     const response = await axios.get(`${config.MENU}/${id}`);
     console.log(`${config.MENUQ}/${id}`);
