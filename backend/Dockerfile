@@ -13,6 +13,7 @@ FROM node:${NODE_VERSION}-alpine
 # Use production node environment by default.
 ENV NODE_ENV production
 
+RUN npm install -g pm2
 
 WORKDIR /usr/src/app
 
@@ -35,8 +36,8 @@ COPY . .
 EXPOSE 8080
 
 # Run the application.
-CMD npm start
-
+# CMD npm start
+CMD ["pm2-runtime", "server.js", "-i", "max"]
 
 # FROM node:22-alpine
 

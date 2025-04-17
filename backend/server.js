@@ -5,9 +5,34 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const mongoose = require("mongoose");
+// const { MongoClient } = require("mongodb");
 
 mongoose.connect(process.env.DATABASE_URL);
+console.log(process.env.DATABASE_URL);
 const db = mongoose.connection;
+
+// db.once("open", async () => {
+//   console.log("✅ Database connection established");
+
+//   try {
+//     const client = new MongoClient(process.env.DATABASE_URL);
+//     await client.connect();
+//     const connectedDb = client.db(); // gets default DB from connection string
+
+//     console.log("📂 Using database:", connectedDb.databaseName);
+
+//     const admin = connectedDb.admin();
+//     const serverStatus = await admin.serverStatus();
+//     const collections = await connectedDb.listCollections().toArray();
+
+//     console.log("🛠 MongoDB version:", serverStatus.version);
+//     console.log("📄 Collections:", collections.map((c) => c.name));
+
+//     await client.close();
+//   } catch (err) {
+//     console.error("⚠️ Could not retrieve MongoDB info:", err.message);
+//   }
+// });
 
 //prometheus metrics
 const client = require("prom-client");
