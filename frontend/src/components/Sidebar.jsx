@@ -1,148 +1,245 @@
-import {
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
+import { 
   MoreVertical,
   Menu,
   ChevronLeft,
   Home,
-  BarChart3,
-  ChevronDown,
-  Edit3,
+  ChefHat, 
+  Crown, 
+  Palette, 
+  BookOpen, 
+  TrendingUp, 
+  Sliders, 
+  FileEdit, 
+  Users,
   LogOut,
-  PlusSquare,
-  User,
-  Settings,
-  Settings2, 
-} from "lucide-react";
-import { createContext, useContext, useState, useEffect } from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { NavLink, useLocation } from "react-router-dom";
+  ChevronDown
+} from 'lucide-react';
+import { useAuth } from "../contexts/AuthContext"; // Import your authentication context
 
 // Create context for sidebar state
-const SidebarContext = createContext();
+const SidebarContext = createContext({ expanded: true });
 
-export default function Sidebar({ onLogoutClick }) {
-  const [expanded, setExpanded] = useState(true);
-  const [animate, setAnimate] = useState(false);
-  const { currentUser: user } = useAuth();
-  const { userData } = useAuth();
+function SidebarItem({ icon, text, to, badge, onClick, children }) {
+  const { expanded } = useContext(SidebarContext);
+  const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
+  const handleClick = (e) => {
+    if (onClick) onClick(e);
+    if (children) setIsOpen((prev) => !prev);
+  };
+
+  // Check if current route matches this item
+  const isActive = to && location.pathname.toLowerCase() === to.toLowerCase();
+
+  if (to) {
+    return (
+      <li className="mb-2">
+        <NavLink
+          to={to}
+          onClick={handleClick}
+          className={`relative flex items-center py-2.5 px-3 rounded-lg transition-all duration-200 group ${
+            isActive
+              ? "bg-gradient-to-tr from-amber-100 to-amber-50 text-amber-800"
+              : "hover:bg-amber-50 text-gray-700"
+          }`}
+        >
+          {/* Consistent icon placement - centered when collapsed */}
+          <div className={`flex items-center ${!expanded ? "mx-auto" : ""}`}>
+            <div className={`text-amber-600 flex items-center justify-center w-5 ${!expanded ? "mx-auto" : ""}`}>
+              {icon}
+            </div>
+            {expanded && (
+              <>
+                <span className="ml-3 font-medium">{text}</span>
+                {badge && (
+                  <span className="ml-2 text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">
+                    {badge}
+                  </span>
+                )}
+              </>
+            )}
+          </div>
+          
+          {children && expanded && (
+            <ChevronDown
+              size={16}
+              className={`ml-auto transition-transform duration-300 ${
+                isOpen ? "rotate-180" : "rotate-0"
+              }`}
+            />
+          )}
+          
+          {/* Tooltip for collapsed state */}
+          {!expanded && (
+            <div
+              className="absolute left-full rounded-md px-2 py-1 ml-6
+                bg-amber-800 text-white text-sm font-medium
+                invisible opacity-0 -translate-x-3 transition-all duration-300
+                group-hover:visible group-hover:opacity-100 group-hover:translate-x-0
+                z-50 whitespace-nowrap"
+            >
+              {text}
+              {badge && (
+                <span className="ml-1 text-xs px-1 py-0.5 rounded-full bg-amber-700">
+                  {badge}
+                </span>
+              )}
+            </div>
+          )}
+        </NavLink>
+        
+        {/* Submenu */}
+        {children && (
+          <div
+            className={`overflow-hidden transition-all duration-300 ${
+              isOpen && expanded ? "max-h-40" : "max-h-0"
+            }`}
+          >
+            <ul className="pl-7 pt-1 pb-1">{children}</ul>
+          </div>
+        )}
+      </li>
+    );
+  } else {
+    return (
+      <li onClick={handleClick} className="cursor-pointer mb-2">
+        <div
+          className="relative flex items-center py-2.5 px-3 rounded-lg transition-colors group hover:bg-amber-50 text-gray-700"
+        >
+          <div className={`text-amber-600 flex items-center justify-center w-5 ${!expanded ? "mx-auto" : ""}`}>
+            {icon}
+          </div>
+          {expanded && (
+            <span className="ml-3 font-medium">{text}</span>
+          )}
+          
+          {!expanded && (
+            <div
+              className="absolute left-full rounded-md px-2 py-1 ml-6
+                bg-amber-800 text-white text-sm font-medium
+                invisible opacity-0 -translate-x-3 transition-all duration-300
+                group-hover:visible group-hover:opacity-100 group-hover:translate-x-0
+                z-50 whitespace-nowrap"
+            >
+              {text}
+            </div>
+          )}
+        </div>
+      </li>
+    );
+  }
+}
+
+function SidebarSubItem({ text, icon }) {
+  return (
+    <li className="py-2 px-2 text-sm flex items-center gap-2 rounded-md cursor-pointer transition-colors text-gray-600 hover:text-amber-800 hover:bg-amber-50">
+      {icon}
+      <span>{text}</span>
+    </li>
+  );
+}
+
+const Sidebar = ({ onLogoutClick }) => {
+  const [expanded, setExpanded] = useState(true);
+  const [animate, setAnimate] = useState(false);
+  const location = useLocation();
+  
+  // Use your actual authentication context
+  const { currentUser: user, userData } = useAuth();
+  
   // Toggle sidebar animation
   useEffect(() => {
     setAnimate(true);
     const timeout = setTimeout(() => setAnimate(false), 500);
     return () => clearTimeout(timeout);
   }, [expanded]);
-
-  // Get avatar from API or use initials
-  const getInitials = (name) => {
-    if (!name) return "U";
-    return name
-      .split(" ")
-      .map(part => part[0])
-      .join("")
-      .toUpperCase()
-      .substring(0, 2);
+  
+  const toggleSidebar = () => {
+    setExpanded(!expanded);
   };
-
+  
+  // Get avatar from API or use initials
   const iconApi = `https://ui-avatars.com/api/?name=${String(
-    user.displayName || "User"
-  ).replace(/ /g, "+")}/?background=c7d2fe&color=3730a3&bold=true`;
-
+    user?.displayName || "User"
+  ).replace(/ /g, "+")}/?background=fef3c7&color=92400e&bold=true`;
+  
   return (
-    <aside
-      className={`h-screen transition-all duration-300 ease-in-out ${
-        expanded ? "w-64" : "w-20"
-      } bg-white ${
-        animate ? "animate-pulse" : ""
-      }`}
-    >
-      <nav
-        className="h-full flex flex-col bg-white text-gray-800 shadow-lg border-r border-opacity-20 border-indigo-100"
-      >
-        {/* Logo & Toggle Button */}
-        <div className="p-4 flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <img 
-              // src="frontend/public/short logo.png"
-              className="h-6 w-6" 
-            />
-            <span 
-              className={`font-bold text-lg transition-all duration-300 ${
-                expanded ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
-              }`}
-            >
-              Menu Q
-            </span>
-          </div>
-          <button
-            className="p-2 rounded-lg hover:bg-indigo-50 bg-indigo-50 transition-all duration-200 flex items-center justify-center z-10 h-8 w-8"
-            onClick={() => setExpanded((curr) => !curr)}
+    <aside className={`h-screen sticky top-0 bg-white border-r transition-all duration-300 ease-in-out ${expanded ? 'w-64' : 'w-16'} ${animate ? "animate-pulse" : ""}`}>
+      <div className="flex flex-col h-full">
+        <div className="flex items-center justify-between px-3 py-4 border-b">
+          {expanded && <span className="font-serif font-bold text-lg text-amber-700">Menu Q</span>}
+          <button 
+            onClick={toggleSidebar} 
+            className={`p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-600 ${!expanded && 'mx-auto'}`}
           >
             {expanded ? <ChevronLeft size={18} /> : <Menu size={18} />}
           </button>
         </div>
-
-        {/* Divider */}
-        <div className="mx-3 border-b border-gray-200" />
-
+        
         {/* Menu Items */}
         <SidebarContext.Provider value={{ expanded }}>
-          <ul className="flex-1 px-3 py-4 space-y-2">
+          <ul className="flex-1 px-3 py-4 flex flex-col gap-2">
             <SidebarItem
-              icon={<Home size={18} />}
+              icon={<Crown size={18} className="rotate-3" />}
               text="Dashboard"
               to="/dashboard/"
               badge="New"
             />
             <SidebarItem
-            
-              icon={<Settings2 size={18} />}
+              icon={<ChefHat size={18} />}
               text="Manage Menu"
               to="/dashboard/manage-menu/"
             />
             <SidebarItem
-              icon={<PlusSquare size={18} />}
+              icon={<Palette size={18} />}
               text="Add Menu Item"
               to="/dashboard/add-new-menu-item"
             />
             <SidebarItem
-              icon={<Edit3 size={18} />}
+              icon={<FileEdit size={18} />}
               text="Edit Profile"
               to="/dashboard/update-profile"
             />
-            <SidebarItem
-              icon={<BarChart3 size={18} />}
+            {/* <SidebarItem
+              icon={<TrendingUp size={18} />}
               text="Analytics"
               to="/dashboard/analytics"
             >
-              <SidebarSubItem text="Sales Report" icon={<BarChart3 size={14} />} />
-              <SidebarSubItem text="Customer Traffic" icon={<User size={14} />} />
-            </SidebarItem>
+              <SidebarSubItem text="Sales Report" icon={<BookOpen size={14} />} />
+              <SidebarSubItem text="Customer Traffic" icon={<Users size={14} />} />
+            </SidebarItem> */}
+            
             <SidebarItem
-              icon={<Settings size={18} />}
+              icon={<Sliders size={18} />}
               text="Settings"
               to="/dashboard/settings"
+            />
+            <SidebarItem
+              icon={<Sliders size={18} />}
+              text="QR Code"
+              to="/dashboard/qr-generator/:id"
             />
           </ul>
           
           {/* Logout (separated from main menu) */}
-          <div className="mt-auto px-3 pb-4">
-            <div
-              onClick={onLogoutClick}
-              className="flex items-center py-2.5 px-3 cursor-pointer rounded-md transition-colors hover:bg-red-50 text-red-500"
-            >
-              <div className="flex items-center justify-center w-5">
-                <LogOut size={18} />
-              </div>
-              <span
-                className={`ml-3 transition-all duration-300 ${
-                  expanded ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
-                }`}
+          {onLogoutClick && (
+            <div className="mt-auto px-3 pb-4">
+              <div
+                onClick={onLogoutClick}
+                className="flex items-center py-2.5 px-3 cursor-pointer rounded-md transition-colors hover:bg-red-50 text-red-500"
               >
-                Logout
-              </span>
+                <div className={`flex items-center justify-center w-5 ${!expanded ? "mx-auto" : ""}`}>
+                  <LogOut size={18} />
+                </div>
+                {expanded && (
+                  <span className="ml-3">Logout</span>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </SidebarContext.Provider>
 
         {/* User Profile Section */}
@@ -168,141 +265,30 @@ export default function Sidebar({ onLogoutClick }) {
             </div>
           </div>
           {expanded && (
-            <button className="p-1.5 rounded-lg hover:bg-gray-100">
+            <button className="p-1.5 rounded-lg hover:bg-amber-50">
               <MoreVertical size={16} />
             </button>
           )}
         </div>
-      </nav>
+      </div>
     </aside>
   );
-}
+};
 
-function SidebarItem({ icon, text, to, badge, onClick, children }) {
-  const { expanded } = useContext(SidebarContext);
-  const [isOpen, setIsOpen] = useState(false);
-  const location = useLocation();
-
-  const handleClick = (e) => {
-    if (onClick) onClick(e);
-    if (children) setIsOpen((prev) => !prev);
+// Modify the App component to include the AuthContext provider if needed
+export default function App() {
+  // Example onLogoutClick function - you can replace with your actual logout function
+  const handleLogout = () => {
+    console.log("Logout clicked");
+    // Your actual logout logic here
   };
 
-  // Check if current route matches this item
-  const isActive = to && location.pathname.toLowerCase() === to.toLowerCase();
-
-  if (to) {
-    return (
-      <li>
-        <NavLink
-          to={to}
-          onClick={handleClick}
-          className={`relative flex items-center py-2.5 px-3 my-1 font-medium rounded-md transition-all duration-200 group ${
-            isActive
-              ? "bg-gradient-to-tr from-indigo-100 to-indigo-50 text-indigo-800"
-              : "hover:bg-indigo-50 text-gray-700"
-          }`}
-        >
-          <div className="flex items-center">
-            <div className="flex items-center justify-center w-5">
-              {icon}
-            </div>
-            <span
-              className={`ml-3 transition-all duration-300 ${
-                expanded ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
-              }`}
-            >
-              {text}
-            </span>
-            {badge && expanded && (
-              <span className="ml-2 text-xs font-semibold px-1.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800">
-                {badge}
-              </span>
-            )}
-          </div>
-          {children && expanded && (
-            <ChevronDown
-              size={16}
-              className={`ml-auto transition-transform duration-300 ${
-                isOpen ? "rotate-180" : "rotate-0"
-              }`}
-            />
-          )}
-          
-          {/* Tooltip for collapsed state */}
-          {!expanded && (
-            <div
-              className={`
-                absolute left-full rounded-md px-2 py-1 ml-6
-                bg-indigo-800 text-white text-sm font-medium
-                invisible opacity-0 -translate-x-3 transition-all duration-300
-                group-hover:visible group-hover:opacity-100 group-hover:translate-x-0
-                z-50 whitespace-nowrap
-              `}
-            >
-              {text}
-              {badge && (
-                <span className="ml-1 text-xs px-1 py-0.5 rounded-full bg-indigo-700">
-                  {badge}
-                </span>
-              )}
-            </div>
-          )}
-        </NavLink>
-        
-        {/* Submenu */}
-        {children && (
-          <div
-            className={`overflow-hidden transition-all duration-300 ${
-              isOpen && expanded ? "max-h-40" : "max-h-0"
-            }`}
-          >
-            <ul className="pl-7 pt-1 pb-1">{children}</ul>
-          </div>
-        )}
-      </li>
-    );
-  } else {
-    return (
-      <li onClick={handleClick} className="cursor-pointer">
-        <div
-          className="relative flex items-center py-2.5 px-3 my-1 font-medium rounded-md transition-colors group hover:bg-indigo-50 text-gray-700"
-        >
-          <div className="flex items-center justify-center w-5">
-            {icon}
-          </div>
-          <span
-            className={`ml-3 transition-all duration-300 ${
-              expanded ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
-            }`}
-          >
-            {text}
-          </span>
-          
-          {!expanded && (
-            <div
-              className={`
-                absolute left-full rounded-md px-2 py-1 ml-6
-                bg-indigo-800 text-white text-sm font-medium
-                invisible opacity-0 -translate-x-3 transition-all duration-300
-                group-hover:visible group-hover:opacity-100 group-hover:translate-x-0
-                z-50 whitespace-nowrap
-              `}
-            >
-              {text}
-            </div>
-          )}
-        </div>
-      </li>
-    );
-  }
-}
-
-function SidebarSubItem({ text, icon }) {
   return (
-    <li className="py-2 px-2 text-sm flex items-center gap-2 rounded-md cursor-pointer transition-colors text-gray-600 hover:text-indigo-800 hover:bg-indigo-50">
-      {icon}
-      <span>{text}</span>
-    </li>
+    <div className="flex">
+      <Sidebar onLogoutClick={handleLogout} />
+      {/* <div className="p-6 flex-1">
+        <h1 className="text-2xl font-bold">Dashboard Content</h1>
+      </div> */}
+    </div>
   );
 }

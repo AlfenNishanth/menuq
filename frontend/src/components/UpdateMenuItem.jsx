@@ -295,7 +295,7 @@ export default function UpdateMenuItem() {
   if (initialLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin h-12 w-12 border-4 border-teal-500 rounded-full border-t-transparent"></div>
+        <div className="animate-spin h-12 w-12 border-4 border-amber-500 rounded-full border-t-transparent"></div>
       </div>
     );
   }
@@ -303,7 +303,7 @@ export default function UpdateMenuItem() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 text-gray-900">
       <div className="p-8 rounded-2xl shadow-xl w-full max-w-lg bg-white">
-        <h2 className="text-3xl font-extrabold mb-6 text-center">
+        <h2 className="text-3xl font-extrabold mb-6 text-center text-amber-700">
           Update Menu Item
         </h2>
 
@@ -321,7 +321,7 @@ export default function UpdateMenuItem() {
             <input
               {...register("name", { required: "Name is required" })}
               placeholder="Item Name"
-              className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900 ${
+              className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900 ${
                 errors.name ? "border-red-500 ring-1 ring-red-500" : ""
               }`}
               disabled={loading}
@@ -336,7 +336,7 @@ export default function UpdateMenuItem() {
             <textarea
               {...register("description")}
               placeholder="Description"
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900"
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900"
               disabled={loading}
               rows={3}
             />
@@ -344,7 +344,7 @@ export default function UpdateMenuItem() {
             {/* Type Dropdown */}
             <select
               {...register("type")}
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900"
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900"
               onChange={(e) => {
                 setValue("type", e.target.value);
                 if (e.target.value !== "Custom") {
@@ -369,7 +369,7 @@ export default function UpdateMenuItem() {
                 })}
                 type="text"
                 placeholder="Enter custom category"
-                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900 ${
+                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900 ${
                   errors.customType ? "border-red-500 ring-1 ring-red-500" : ""
                 }`}
                 disabled={loading}
@@ -395,7 +395,7 @@ export default function UpdateMenuItem() {
                     type="button"
                     onClick={() => onChange(!value)}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      value ? "bg-teal-600" : "bg-gray-400"
+                      value ? "bg-amber-600" : "bg-gray-400"
                     }`}
                     disabled={loading}
                   >
@@ -416,7 +416,7 @@ export default function UpdateMenuItem() {
               min="0"
               {...register("price", { required: "Price is required" })}
               placeholder="Base Price"
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900"
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900"
               disabled={loading}
               onChange={(e) => {
                 setValue("price", e.target.value);
@@ -438,7 +438,7 @@ export default function UpdateMenuItem() {
               render={({ field }) => (
                 <select
                   {...field}
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500 transition bg-gray-200 border-gray-300 text-gray-900"
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900"
                   disabled={loading}
                 >
                   <option value="true">Available</option>
@@ -448,7 +448,7 @@ export default function UpdateMenuItem() {
             />
 
             {/* Image Upload */}
-            <div className="border-2 border-dashed rounded-lg p-4 transition border-gray-300 hover:border-teal-400 text-center">
+            <div className="border-2 border-dashed rounded-lg p-4 transition border-gray-300 hover:border-amber-400 text-center">
               <div className="space-y-2">
                 {imagePreview ? (
                   <div className="relative">
@@ -488,7 +488,7 @@ export default function UpdateMenuItem() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current.click()}
-                    className="mt-2 inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-teal-600 text-white hover:bg-teal-700 transition-colors"
+                    className="mt-2 inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-amber-600 text-white hover:bg-amber-700 transition-colors"
                   >
                     Browse Image
                   </button>
@@ -508,8 +508,8 @@ export default function UpdateMenuItem() {
           </div>
 
           {/* Variants Section */}
-          <div className="p-4 rounded-lg shadow-md transition bg-gray-50">
-            <h3 className="font-semibold mb-2">Variants</h3>
+          <div className="p-4 rounded-lg shadow-md transition bg-amber-50">
+            <h3 className="font-semibold mb-2 text-amber-800">Variants</h3>
             <div className="space-y-2">
               {variants.map((variant, index) => (
                 <div key={index} className="flex space-x-2">
@@ -557,7 +557,7 @@ export default function UpdateMenuItem() {
                   setVariants([...variants, { name: "", price: 0 }])
                 }
                 disabled={loading}
-                className="mt-2 w-full px-4 py-2 text-sm font-medium rounded-md transition-colors bg-teal-600 text-white hover:bg-teal-700"
+                className="mt-2 w-full px-4 py-2 text-sm font-medium rounded-md transition-colors bg-amber-600 text-white hover:bg-amber-700"
               >
                 Add Variant
               </button>
@@ -565,8 +565,8 @@ export default function UpdateMenuItem() {
           </div>
 
           {/* Add Ons Section */}
-          <div className="p-4 rounded-lg shadow-md transition bg-gray-50">
-            <h3 className="font-semibold mb-2">Add Ons</h3>
+          <div className="p-4 rounded-lg shadow-md transition bg-amber-50">
+            <h3 className="font-semibold mb-2 text-amber-800">Add Ons</h3>
             <div className="space-y-2">
               {addOns.map((addOn, index) => (
                 <div key={index} className="flex space-x-2">
@@ -612,7 +612,7 @@ export default function UpdateMenuItem() {
                 type="button"
                 onClick={() => setAddOns([...addOns, { name: "", price: 0 }])}
                 disabled={loading}
-                className="mt-2 w-full px-4 py-2 text-sm font-medium rounded-md transition-colors bg-teal-600 text-white hover:bg-teal-700"
+                className="mt-2 w-full px-4 py-2 text-sm font-medium rounded-md transition-colors bg-amber-600 text-white hover:bg-amber-700"
               >
                 Add New
               </button>
@@ -620,19 +620,19 @@ export default function UpdateMenuItem() {
           </div>
 
           {/* Tags Section */}
-          <div className="p-4 rounded-lg shadow-md transition bg-gray-50">
-            <h3 className="font-semibold mb-2">Tags</h3>
+          <div className="p-4 rounded-lg shadow-md transition bg-amber-50">
+            <h3 className="font-semibold mb-2 text-amber-800">Tags</h3>
             <div className="mb-2 flex flex-wrap gap-2">
               {tags.map((tag, index) => (
                 <span
                   key={index}
-                  className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-teal-100 text-teal-800"
+                  className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-800"
                 >
                   {tag}
                   <button
                     type="button"
                     onClick={() => setTags(tags.filter((_, i) => i !== index))}
-                    className="ml-2 -mr-1 h-4 w-4 rounded-full inline-flex items-center justify-center transition bg-teal-200 text-teal-600 hover:bg-teal-300"
+                    className="ml-2 -mr-1 h-4 w-4 rounded-full inline-flex items-center justify-center transition bg-amber-200 text-amber-600 hover:bg-amber-300"
                     disabled={loading}
                   >
                     <span className="text-xs">×</span>
@@ -658,7 +658,7 @@ export default function UpdateMenuItem() {
               <button
                 type="button"
                 onClick={addTag}
-                className="px-4 py-2 font-medium rounded-lg transition-colors bg-teal-600 text-white hover:bg-teal-700"
+                className="px-4 py-2 font-medium rounded-lg transition-colors bg-amber-600 text-white hover:bg-amber-700"
                 disabled={loading}
               >
                 Add
@@ -672,7 +672,7 @@ export default function UpdateMenuItem() {
           {/* Status message for changes */}
           <div className="text-center text-sm">
             {hasChanges ? (
-              <p className="text-teal-600">Changes detected. Ready to update.</p>
+              <p className="text-amber-600">Changes detected. Ready to update.</p>
             ) : (
               <p className="text-gray-500">No changes detected.</p>
             )}
@@ -682,7 +682,7 @@ export default function UpdateMenuItem() {
             type="submit"
             className={`w-full text-white p-3 rounded-lg font-semibold transition duration-300 shadow-lg flex justify-center items-center ${
               hasChanges 
-                ? "bg-teal-600 hover:bg-teal-700" 
+                ? "bg-amber-600 hover:bg-amber-700" 
                 : "bg-gray-400 cursor-not-allowed"
             }`}
             disabled={loading || !hasChanges}
