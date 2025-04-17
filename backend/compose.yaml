@@ -1,32 +1,53 @@
-# Comments are provided throughout this file to help you get started.
-# If you need more help, visit the Docker Compose reference guide at
-# https://docs.docker.com/go/compose-spec-reference/
+  # node-server:
+  #   build:
+  #     context: .
+  #   env_file:
+  #     - .env.production
+  #   environment:
+  #     NODE_ENV: production
+  #   ports:
+  #     - 8080:8080
 
-# Here the instructions define your application as a service called "server".
-# This service is built from the Dockerfile in the current directory.
-# You can add other services your application may depend on here, such as a
-# database or a cache. For examples, see the Awesome Compose repository:
-# https://github.com/docker/awesome-compose
+
+
+version: '3.8'
+
 services:
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    restart: always
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: menuq
+    # ports:
+    #   - 27017:27017  # expose only if you want to access Mongo outside container
+
   node-server:
     build:
       context: .
+    container_name: node-server
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      - mongodb
     env_file:
       - .env.production
     environment:
       NODE_ENV: production
-      # DATABASE_URL: ${DATABASE_URL}
-      # AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-      # AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-      # AWS_REGION: ${AWS_REGION}
-      # AWS_BUCKET_NAME: ${AWS_BUCKET_NAME}
-    ports:
-      - 8080:8080
+      MONGO_URI: mongodb://mongodb:27017/menuq
+    command: ["npm", "run", "start"]  # or your custom prod start command
 
-  prom-server:
-    image: prom/prometheus
-    ports:
-      - 9090:9090
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+volumes:
+  mongo-data:
+
+
+  # prom-server:
+  #   image: prom/prometheus
+  #   ports:
+  #     - 9090:9090
+  #   volumes:
+  #     - ./prometheus.yml:/etc/prometheus/prometheus.yml
 
