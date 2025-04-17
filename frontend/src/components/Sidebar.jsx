@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { 
   MoreVertical,
   Menu,
@@ -142,9 +142,38 @@ function SidebarSubItem({ text, icon }) {
   );
 }
 
+// Logout confirmation modal component
+function LogoutConfirmationModal({ isOpen, onClose, onConfirm }) {
+  if (!isOpen) return null;
+  
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg shadow-lg p-6 w-80 max-w-md">
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Confirm Logout</h3>
+        <p className="text-gray-600 mb-6">Are you sure you want to log out?</p>
+        <div className="flex justify-end gap-3">
+          <button 
+            onClick={onClose}
+            className="px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
+          >
+            Cancel
+          </button>
+          <button 
+            onClick={onConfirm}
+            className="px-4 py-2 rounded-md bg-red-500 hover:bg-red-600 text-white transition-colors"
+          >
+            Yes, Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const Sidebar = ({ onLogoutClick }) => {
   const [expanded, setExpanded] = useState(true);
   const [animate, setAnimate] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const location = useLocation();
   
   // Use your actual authentication context
@@ -161,74 +190,85 @@ const Sidebar = ({ onLogoutClick }) => {
     setExpanded(!expanded);
   };
   
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
+  
+  const confirmLogout = () => {
+    setShowLogoutModal(false);
+    if (onLogoutClick) {
+      onLogoutClick();
+    }
+  };
+  
   // Get avatar from API or use initials
   const iconApi = `https://ui-avatars.com/api/?name=${String(
     user?.displayName || "User"
   ).replace(/ /g, "+")}/?background=fef3c7&color=92400e&bold=true`;
   
   return (
-    <aside className={`h-screen sticky top-0 bg-white border-r transition-all duration-300 ease-in-out ${expanded ? 'w-64' : 'w-16'} ${animate ? "animate-pulse" : ""}`}>
-      <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between px-3 py-4 border-b">
-          {expanded && <span className="font-serif font-bold text-lg text-amber-700">Menu Q</span>}
-          <button 
-            onClick={toggleSidebar} 
-            className={`p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-600 ${!expanded && 'mx-auto'}`}
-          >
-            {expanded ? <ChevronLeft size={18} /> : <Menu size={18} />}
-          </button>
-        </div>
-        
-        {/* Menu Items */}
-        <SidebarContext.Provider value={{ expanded }}>
-          <ul className="flex-1 px-3 py-4 flex flex-col gap-2">
-            <SidebarItem
-              icon={<Crown size={18} className="rotate-3" />}
-              text="Dashboard"
-              to="/dashboard/"
-              badge="New"
-            />
-            <SidebarItem
-              icon={<ChefHat size={18} />}
-              text="Manage Menu"
-              to="/dashboard/manage-menu/"
-            />
-            <SidebarItem
-              icon={<Palette size={18} />}
-              text="Add Menu Item"
-              to="/dashboard/add-new-menu-item"
-            />
-            <SidebarItem
-              icon={<FileEdit size={18} />}
-              text="Edit Profile"
-              to="/dashboard/update-profile"
-            />
-            {/* <SidebarItem
-              icon={<TrendingUp size={18} />}
-              text="Analytics"
-              to="/dashboard/analytics"
+    <>
+      <aside className={`h-screen sticky top-0 bg-white border-r transition-all duration-300 ease-in-out ${expanded ? 'w-64' : 'w-16'} ${animate ? "animate-pulse" : ""}`}>
+        <div className="flex flex-col h-full">
+          <div className="flex items-center justify-between px-3 py-4 border-b">
+            {expanded && <span className="font-serif font-bold text-lg text-amber-700">Menu Q</span>}
+            <button 
+              onClick={toggleSidebar} 
+              className={`p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-600 ${!expanded && 'mx-auto'}`}
             >
-              <SidebarSubItem text="Sales Report" icon={<BookOpen size={14} />} />
-              <SidebarSubItem text="Customer Traffic" icon={<Users size={14} />} />
-            </SidebarItem> */}
-            
-            <SidebarItem
-              icon={<Sliders size={18} />}
-              text="Settings"
-              to="/dashboard/settings"
-            />
-            <SidebarItem
-              icon={<Sliders size={18} />}
-              text="QR Code"
-              to="/dashboard/qr-generator/:id"
-            />
-          </ul>
+              {expanded ? <ChevronLeft size={18} /> : <Menu size={18} />}
+            </button>
+          </div>
           
-          {/* Logout (separated from main menu) */}
-          {onLogoutClick && (
+          {/* Menu Items */}
+          <SidebarContext.Provider value={{ expanded }}>
+            <ul className="flex-1 px-3 py-4 flex flex-col gap-2">
+              <SidebarItem
+                icon={<Crown size={18} className="rotate-3" />}
+                text="Dashboard"
+                to="/dashboard/"
+                badge="New"
+              />
+              <SidebarItem
+                icon={<ChefHat size={18} />}
+                text="Manage Menu"
+                to="/dashboard/manage-menu/"
+              />
+              <SidebarItem
+                icon={<Palette size={18} />}
+                text="Add Menu Item"
+                to="/dashboard/add-new-menu-item"
+              />
+              <SidebarItem
+                icon={<FileEdit size={18} />}
+                text="Edit Profile"
+                to="/dashboard/update-profile"
+              />
+              {/* <SidebarItem
+                icon={<TrendingUp size={18} />}
+                text="Analytics"
+                to="/dashboard/analytics"
+              >
+                <SidebarSubItem text="Sales Report" icon={<BookOpen size={14} />} />
+                <SidebarSubItem text="Customer Traffic" icon={<Users size={14} />} />
+              </SidebarItem> */}
+              
+              <SidebarItem
+                icon={<Sliders size={18} />}
+                text="Settings"
+                to="/dashboard/settings"
+              />
+              <SidebarItem
+                icon={<Sliders size={18} />}
+                text="QR Code"
+                to="/dashboard/qr-generator/:id"
+              />
+            </ul>
+            
+            {/* Logout (separated from main menu) */}
             <div className="mt-auto px-3 pb-4">
               <div
-                onClick={onLogoutClick}
+                onClick={handleLogoutClick}
                 className="flex items-center py-2.5 px-3 cursor-pointer rounded-md transition-colors hover:bg-red-50 text-red-500"
               >
                 <div className={`flex items-center justify-center w-5 ${!expanded ? "mx-auto" : ""}`}>
@@ -239,48 +279,64 @@ const Sidebar = ({ onLogoutClick }) => {
                 )}
               </div>
             </div>
-          )}
-        </SidebarContext.Provider>
+          </SidebarContext.Provider>
 
-        {/* User Profile Section */}
-        <div className="border-t p-3 flex items-center border-gray-200">
-          <div className="relative flex-shrink-0">
-            <img
-              src={iconApi}
-              alt="User Avatar"
-              className="w-10 h-10 rounded-lg shadow-md"
-            />
-            <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 border-2 border-white" />
-          </div>
-          <div
-            className={`flex-1 ml-3 overflow-hidden transition-all duration-300 ${
-              expanded ? "opacity-100" : "opacity-0 w-0"
-            }`}
-          >
-            <div className="truncate font-medium">
-              {user?.displayName || "User"}
+          {/* User Profile Section */}
+          <div className="border-t p-3 flex items-center border-gray-200">
+            <div className="relative flex-shrink-0">
+              <img
+                src={iconApi}
+                alt="User Avatar"
+                className="w-10 h-10 rounded-lg shadow-md"
+              />
+              <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 border-2 border-white" />
             </div>
-            <div className="text-xs truncate text-gray-500">
-              {user?.email || "user@example.com"}
+            <div
+              className={`flex-1 ml-3 overflow-hidden transition-all duration-300 ${
+                expanded ? "opacity-100" : "opacity-0 w-0"
+              }`}
+            >
+              <div className="truncate font-medium">
+                {user?.displayName || "User"}
+              </div>
+              <div className="text-xs truncate text-gray-500">
+                {user?.email || "user@example.com"}
+              </div>
             </div>
+            {expanded && (
+              <button className="p-1.5 rounded-lg hover:bg-amber-50">
+                <MoreVertical size={16} />
+              </button>
+            )}
           </div>
-          {expanded && (
-            <button className="p-1.5 rounded-lg hover:bg-amber-50">
-              <MoreVertical size={16} />
-            </button>
-          )}
         </div>
-      </div>
-    </aside>
+      </aside>
+      
+      {/* Logout Confirmation Modal */}
+      <LogoutConfirmationModal 
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={confirmLogout}
+      />
+    </>
   );
 };
 
-// Modify the App component to include the AuthContext provider if needed
+// Updated App component with proper logout functionality
 export default function App() {
-  // Example onLogoutClick function - you can replace with your actual logout function
-  const handleLogout = () => {
-    console.log("Logout clicked");
-    // Your actual logout logic here
+  const navigate = useNavigate();
+  const { logout } = useAuth(); // Import logout function from authentication context
+  
+  // Implement proper logout function
+  const handleLogout = async () => {
+    try {
+      await logout(); // Call the logout method from your auth context
+      navigate('/login'); // Redirect to login page after successful logout
+      console.log("User logged out successfully");
+    } catch (error) {
+      console.error("Failed to log out:", error);
+      // You might want to display an error message to the user here
+    }
   };
 
   return (
