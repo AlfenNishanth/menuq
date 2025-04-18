@@ -26,10 +26,12 @@ RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=cache,target=/root/.npm \
     npm ci --omit=dev
 
+
+RUN npm install -g pm2 --unsafe-perm
+
 # Run the application as a non-root user.
 USER node
 
-RUN npm install -g pm2 --unsafe-perm
 
 # Copy the rest of the source files into the image.
 COPY . .
