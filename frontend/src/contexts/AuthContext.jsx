@@ -155,7 +155,7 @@ useEffect(() => {
         .catch((error) => {
           console.error("Error logging out:", error);
         });
-    }, 1000);
+    }, 3000);
 
     return () => clearTimeout(timeoutId);
   }
