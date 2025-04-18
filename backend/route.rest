@@ -7,6 +7,9 @@ GET http://localhost:8080/menuq/WMiNOcc6j4aRbAkpD4unBsM7rOG3
 GET http://localhost:8080/menuq/
 
 ###
+GET http://13.234.225.202:8080/menuq
+
+###
 GET http://localhost:8080/menuq/byId/RX00001
 
 ###

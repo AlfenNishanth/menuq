@@ -82,7 +82,9 @@ db.once("open", () => {
   console.log("Database connection established");
 });
 
-app.use(cors());
+app.use(cors(
+  origin
+));
 app.use(express.json());
 
 const resRouter = require("./routes/menuq");
