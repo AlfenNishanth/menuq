@@ -1,5 +1,9 @@
 GET http://localhost:3100/loki/api/v1/label/level/values
 
+
+###
+GET http://localhost:8080/test
+
 ###
 GET http://localhost:8080/menuq/WMiNOcc6j4aRbAkpD4unBsM7rOG3
 

@@ -1,5 +1,5 @@
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config(); 
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
 }
 const express = require("express");
 const app = express();
@@ -42,8 +42,6 @@ const collectDefaultMetrics = client.collectDefaultMetrics;
 
 collectDefaultMetrics({ register: client.register });
 
-
-
 app.get("/metrics", async (req, res) => {
   res.setHeader("Content-Type", client.register.contentType);
   const metrics = await client.register.metrics();
@@ -82,9 +80,7 @@ db.once("open", () => {
   console.log("Database connection established");
 });
 
-app.use(cors(
-  origin
-));
+app.use(cors());
 app.use(express.json());
 
 const resRouter = require("./routes/menuq");
@@ -93,6 +89,9 @@ app.use("/menuq", resRouter);
 const menuRouter = require("./routes/menu");
 app.use("/menu", menuRouter);
 
+//test
+app.get("/test", async (req, res) => {
+  res.send("working");
+});
+
 app.listen(8080, () => console.log("Server running on port 8080"));
-
-
