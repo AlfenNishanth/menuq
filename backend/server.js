@@ -84,14 +84,14 @@ app.use(cors());
 app.use(express.json());
 
 const resRouter = require("./routes/menuq");
-app.use("/menuq", resRouter);
+app.use("/api/menuq", resRouter);
 
 const menuRouter = require("./routes/menu");
-app.use("/menu", menuRouter);
+app.use("//apimenu", menuRouter);
 
 //test
-app.get("/test", async (req, res) => {
-  res.send("working");
+app.get("/api/health", async (req, res) => {
+  res.send("Menuq is up");
 });
 
 app.listen(8080, () => console.log("Server running on port 8080"));
