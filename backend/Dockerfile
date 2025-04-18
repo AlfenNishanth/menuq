@@ -15,7 +15,6 @@ FROM node:$22.12.0-alpine
 # Use production node environment by default.
 ENV NODE_ENV production
 
-
 WORKDIR /usr/src/app
 
 # Download dependencies as a separate step to take advantage of Docker's caching.
@@ -30,6 +29,8 @@ RUN --mount=type=bind,source=package.json,target=package.json \
 # Run the application as a non-root user.
 USER node
 
+RUN npm install -g pm2
+
 # Copy the rest of the source files into the image.
 COPY . .
 
@@ -37,8 +38,8 @@ COPY . .
 EXPOSE 8080
 
 # Run the application.
-CMD npm start
-
+# CMD npm start
+CMD ["pm2-runtime", "server.js", "-i", "max"]
 
 # FROM node:22-alpine
 
