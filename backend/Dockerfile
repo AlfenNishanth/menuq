@@ -4,6 +4,8 @@ ARG NODE_VERSION=22.12.0
 
 FROM node:${NODE_VERSION}-alpine
 
+# FROM node:22.12.0-alpine
+
 # Use production node environment by default.
 ENV NODE_ENV production
 
@@ -15,8 +17,12 @@ RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=cache,target=/root/.npm \
     npm ci --omit=dev
 
-# Install PM2 globally as root so it's available in PATH
-RUN npm install -g pm2
+
+RUN npm install -g pm2 --unsafe-perm
+
+# Run the application as a non-root user.
+USER node
+
 
 # Copy the rest of the source files into the image
 COPY . .

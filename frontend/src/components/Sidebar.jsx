@@ -275,20 +275,35 @@ const Sidebar = ({ onLogoutClick }) => {
   );
 };
 
-// Modify the App component to include the AuthContext provider if needed
+// // Modify the App component to include the AuthContext provider if needed
+// export default function App() {
+//   // Example onLogoutClick function - you can replace with your actual logout function
+//   const handleLogout = () => {
+//     console.log("Logout clicked");
+//     // Your actual logout logic here
+//   };
+
+//   return (
+//     <div className="flex">
+//       <Sidebar onLogoutClick={handleLogout} />
+//       {/* <div className="p-6 flex-1">
+//         <h1 className="text-2xl font-bold">Dashboard Content</h1>
+//       </div> */}
+//     </div>
+//   );
+// }
+
+
 export default function App() {
-  // Example onLogoutClick function - you can replace with your actual logout function
+
   const handleLogout = () => {
     console.log("Logout clicked");
-    // Your actual logout logic here
   };
 
   return (
     <div className="flex">
-      <Sidebar onLogoutClick={handleLogout} />
-      {/* <div className="p-6 flex-1">
-        <h1 className="text-2xl font-bold">Dashboard Content</h1>
-      </div> */}
+      <Sidebar onLogoutClick={() => setShowLogoutModal(true)} />
+
     </div>
   );
 }
