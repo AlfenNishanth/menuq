@@ -19,7 +19,7 @@ GET http://localhost:8080/menu/RX00028
 GET http://localhost:8080/menu/item/67aadaa454641ff4345fb9d6
 
 ###
-GET http://localhost:8080/menuq/
+GET https://menuq.arknishinvent.com/api/menuq/
 
 ###
 PATCH http://localhost:8080/menu/availability/67aadaa454641ff4345fb9d6
