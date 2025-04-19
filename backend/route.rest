@@ -14,7 +14,7 @@ GET http://localhost:8080/api/menuq/
 GET http://13.234.225.202:8080/api/health
 
 ###
-GET https://menuq.arknishinvent.com/health
+GET http://menuq.arknishinvent.com/api/test
 
 ###
 GET http://localhost:8080/api/menuq/byId/RX00001
