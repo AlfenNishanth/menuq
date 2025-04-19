@@ -6,4 +6,3 @@ export default {
   MENU: `${API_BASE_URL}/menu`,
   // Add other endpoints as needed
 };
-11159
