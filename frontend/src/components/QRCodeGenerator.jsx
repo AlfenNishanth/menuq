@@ -1,4 +1,3 @@
-// QRCodeGenerator.jsx
 import React, { useRef, useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 

@@ -1,12 +1,38 @@
-require("dotenv").config();
-
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
 const express = require("express");
 const app = express();
 const cors = require("cors");
 const mongoose = require("mongoose");
+// const { MongoClient } = require("mongodb");
 
 mongoose.connect(process.env.DATABASE_URL);
+console.log(process.env.DATABASE_URL);
 const db = mongoose.connection;
+
+// db.once("open", async () => {
+//   console.log("✅ Database connection established");
+
+//   try {
+//     const client = new MongoClient(process.env.DATABASE_URL);
+//     await client.connect();
+//     const connectedDb = client.db(); // gets default DB from connection string
+
+//     console.log("📂 Using database:", connectedDb.databaseName);
+
+//     const admin = connectedDb.admin();
+//     const serverStatus = await admin.serverStatus();
+//     const collections = await connectedDb.listCollections().toArray();
+
+//     console.log("🛠 MongoDB version:", serverStatus.version);
+//     console.log("📄 Collections:", collections.map((c) => c.name));
+
+//     await client.close();
+//   } catch (err) {
+//     console.error("⚠️ Could not retrieve MongoDB info:", err.message);
+//   }
+// });
 
 //prometheus metrics
 const client = require("prom-client");
@@ -15,8 +41,6 @@ const responseTime = require("response-time");
 const collectDefaultMetrics = client.collectDefaultMetrics;
 
 collectDefaultMetrics({ register: client.register });
-
-
 
 app.get("/metrics", async (req, res) => {
   res.setHeader("Content-Type", client.register.contentType);
@@ -60,11 +84,14 @@ app.use(cors());
 app.use(express.json());
 
 const resRouter = require("./routes/menuq");
-app.use("/menuq", resRouter);
+app.use("/api/menuq", resRouter);
 
 const menuRouter = require("./routes/menu");
-app.use("/menu", menuRouter);
+app.use("//apimenu", menuRouter);
+
+//test
+app.get("/api/health", async (req, res) => {
+  res.send("Menuq is up");
+});
 
 app.listen(8080, () => console.log("Server running on port 8080"));
-
-

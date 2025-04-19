@@ -1,4 +1,6 @@
-require("dotenv").config();
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config(); 
+}
 const express = require("express");
 const router = express.Router();
 const Restaurant = require("../models/restaurants");
@@ -84,8 +86,10 @@ router.post("/", async (req, res) => {
 
     const savedRestaurant = await newRestaurant.save();
     logger.info(`POST /restaurant - Successfully created restaurant with ID: ${savedRestaurant._id}`);
+    console.log(`POST /restaurant - Successfully created restaurant with ID: ${savedRestaurant._id}`);
     res.status(201).json(savedRestaurant);
   } catch (err) {
+    console.log(`POST /restaurant - Error creating restaurant: ${err.message}`);
     logger.error(`POST /restaurant - Error creating restaurant: ${err.message}`);
     res.status(400).json({ message: err.message });
   }

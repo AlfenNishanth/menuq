@@ -341,10 +341,8 @@ export default function App() {
 
   return (
     <div className="flex">
-      <Sidebar onLogoutClick={handleLogout} />
-      {/* <div className="p-6 flex-1">
-        <h1 className="text-2xl font-bold">Dashboard Content</h1>
-      </div> */}
+      <Sidebar onLogoutClick={() => setShowLogoutModal(true)} />
+
     </div>
   );
 }
