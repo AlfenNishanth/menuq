@@ -15,6 +15,7 @@ import ManageMenu from "./components/menuitems/ManageMenu";
 import UpdateMenuItem from "./components/UpdateMenuItem";
 import Dashboard_plain from "./components/Dashboard_plain";
 import QRCodeGenerator from "./components/QRCodeGenerator";
+import HeaderLayout from "./layouts/HeaderLayout";
 
 
 function App() {
@@ -23,9 +24,10 @@ function App() {
     <Router>
       <AuthProvider>
         <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+          {/* Apply HeaderLayout to LandingPage, Login, and Signup */}
+          <Route path="/" element={<HeaderLayout><LandingPage /></HeaderLayout>} />
+          <Route path="/login" element={ <HeaderLayout><Login /></HeaderLayout>} />
+          <Route path="/signup" element={<HeaderLayout><Signup /></HeaderLayout>} />
 
           <Route
             path="/dashboard/*"
@@ -35,6 +37,7 @@ function App() {
               </PrivateRoute>
             }
           >
+
             {/* Default dashboard view */}
 
             <Route index element={<DashboardIndex/>} />
