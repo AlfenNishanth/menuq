@@ -4,19 +4,17 @@ import {
   MoreVertical,
   Menu,
   ChevronLeft,
-  Home,
-  ChefHat, 
-  Crown, 
-  Palette, 
-  BookOpen, 
-  TrendingUp, 
-  Sliders, 
-  FileEdit, 
-  Users,
-  LogOut,
-  ChevronDown
+  ChevronDown,
+  // Updated icons for sidebar functionality
+  LayoutDashboard,    // Dashboard icon
+  MenuSquare,         // Manage Menu icon
+  PlusCircle,         // Add Menu Item icon
+  UserCog,            // Edit Profile icon
+  Settings,           // Settings icon
+  QrCode,             // QR Code generator icon
+  LogOut              // Logout icon
 } from 'lucide-react';
-import { useAuth } from "../contexts/AuthContext"; // Import your authentication context
+import { useAuth } from "../contexts/AuthContext";
 
 // Create context for sidebar state
 const SidebarContext = createContext({ expanded: true });
@@ -224,42 +222,33 @@ const Sidebar = ({ onLogoutClick }) => {
           <SidebarContext.Provider value={{ expanded }}>
             <ul className="flex-1 px-3 py-4 flex flex-col gap-2">
               <SidebarItem
-                icon={<Crown size={18} className="rotate-3" />}
+                icon={<LayoutDashboard size={18} />}
                 text="Dashboard"
                 to="/dashboard/"
                 badge="New"
               />
               <SidebarItem
-                icon={<ChefHat size={18} />}
+                icon={<MenuSquare size={18} />}
                 text="Manage Menu"
                 to="/dashboard/manage-menu/"
               />
               <SidebarItem
-                icon={<Palette size={18} />}
+                icon={<PlusCircle size={18} />}
                 text="Add Menu Item"
                 to="/dashboard/add-new-menu-item"
               />
               <SidebarItem
-                icon={<FileEdit size={18} />}
+                icon={<UserCog size={18} />}
                 text="Edit Profile"
                 to="/dashboard/update-profile"
               />
-              {/* <SidebarItem
-                icon={<TrendingUp size={18} />}
-                text="Analytics"
-                to="/dashboard/analytics"
-              >
-                <SidebarSubItem text="Sales Report" icon={<BookOpen size={14} />} />
-                <SidebarSubItem text="Customer Traffic" icon={<Users size={14} />} />
-              </SidebarItem> */}
-              
               <SidebarItem
-                icon={<Sliders size={18} />}
+                icon={<Settings size={18} />}
                 text="Settings"
                 to="/dashboard/settings"
               />
               <SidebarItem
-                icon={<Sliders size={18} />}
+                icon={<QrCode size={18} />}
                 text="QR Code"
                 to="/dashboard/qr-generator/:id"
               />
@@ -322,27 +311,4 @@ const Sidebar = ({ onLogoutClick }) => {
   );
 };
 
-// Updated App component with proper logout functionality
-export default function App() {
-  const navigate = useNavigate();
-  const { logout } = useAuth(); // Import logout function from authentication context
-  
-  // Implement proper logout function
-  const handleLogout = async () => {
-    try {
-      await logout(); // Call the logout method from your auth context
-      navigate('/login'); // Redirect to login page after successful logout
-      console.log("User logged out successfully");
-    } catch (error) {
-      console.error("Failed to log out:", error);
-      // You might want to display an error message to the user here
-    }
-  };
-
-  return (
-    <div className="flex">
-      <Sidebar onLogoutClick={() => setShowLogoutModal(true)} />
-
-    </div>
-  );
-}
+export default Sidebar;
