@@ -27,7 +27,7 @@ const Signup = () => {
   const [OperatingHours, setOperatingHours] = useState([]);
   const [SocialMedia, setSocialMedia] = useState({});
 
-  const { signUp, socialLogin, currentUser } = useAuth();
+  const { signUp, socialLogin, currentUser,signUpComplete } = useAuth();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -103,14 +103,14 @@ const Signup = () => {
 
     try {
       setError("");
-      const userCredential = await signUp(
-        emailRef.current.value,
-        passwordRef.current.value
-      );
+      // const userCredential = await signUp(
+      //   emailRef.current.value,
+      //   passwordRef.current.value
+      // );
 
-      const user = userCredential.user;
-      if (user) {
-        await updateProfile(user, { displayName: ResNameRef.current.value });
+      // const user = userCredential.user;
+      // if (user) {
+      //   await updateProfile(user, { displayName: ResNameRef.current.value });
         
         let imageUrl = null;
         if (imageFile) {
@@ -119,7 +119,7 @@ const Signup = () => {
         
         // Prepare restaurant data
         const data = {
-          firebaseUid: user.uid,
+          // firebaseUid: user.uid,
           email: emailRef.current.value,
           phone: phoneRef.current.value,
           restaurantName: ResNameRef.current.value,
@@ -134,18 +134,17 @@ const Signup = () => {
         };
         
         // Use your API function to register the restaurant
-        try{
-          await registerRestaurant(data);
+          //await registerRestaurant(data);
           
+        await signUpComplete(
+          emailRef.current.value,
+          passwordRef.current.value,
+          data);
+
           toast.success("Account created successfully!");
           navigate("/dashboard");
-        } catch (error) {
-          console.error("Error registering restaurant in database:", error);
-          setError(`Failed to create an account: ${error}`);
-          console.log("deleting firebase user " + user.uid + " " + user.displayName )
-          await user.delete();
-        }
-      }
+        
+      
     } catch (err) {
       const errorMessage = err.message.replace("Firebase: ", "");
       setError(`Failed to create an account: ${errorMessage}`);

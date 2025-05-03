@@ -10,7 +10,7 @@ import {
 import { doc, getDoc } from "firebase/firestore";
 import axios from "axios";
 import config from "../../config";
-import { fetchRestaurantByUID } from "../api/restaurant";
+import { fetchRestaurantByUID, registerRestaurant } from "../api/restaurant";
 
 const AuthContext = React.createContext();
 
@@ -23,6 +23,7 @@ function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [isSigningUp, setIsSigningUp] = useState(false);
 
   function signUp(email, password) {
     console.log("creating user");
@@ -65,6 +66,38 @@ function AuthProvider({ children }) {
   //   return unsubscribe;
   // }, []);
 
+  async function signUpComplete(email, password, restaurantData) {
+    setIsAuthLoading(true);
+    setIsSigningUp(true); // Set this to true during signup
+    try {
+      // Your existing code...
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      
+      const backendData = {
+        ...restaurantData,
+        firebaseUid: user.uid
+      };
+      
+      await registerRestaurant(backendData);
+      
+      // Manually fetch and set user data instead of relying on the listener
+      const data = await fetchRestaurantByUID(user.uid);
+      setUserData(data);
+      
+      setIsSigningUp(false); // Reset signup flag
+      return userCredential;
+    } catch (error) {
+      if (auth.currentUser) {
+        await auth.currentUser.delete();
+      }
+      setIsAuthLoading(false);
+      setIsSigningUp(false); // Reset signup flag
+      throw error;
+    }
+  }
+
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
@@ -93,6 +126,24 @@ function AuthProvider({ children }) {
 
     return unsubscribe;
   }, []);
+
+  useEffect(() => {
+    if (currentUser && userData === null && !isAuthLoading) {
+      const timeoutId = setTimeout(() => {
+        console.log("No user data found, logging out...");
+        logout()
+          .then(() => {
+            console.log("User logged out successfully");
+          })
+          .catch((error) => {
+            console.error("Error logging out:", error);
+          });
+      }, 3000);
+  
+      return () => clearTimeout(timeoutId);
+    }
+  }, [userData, currentUser, isAuthLoading,isSigningUp]);
+
 
   const updateUserData = async () => {
     if (currentUser) {
@@ -125,28 +176,13 @@ function AuthProvider({ children }) {
   //     console.log("Updated userDAta in the context: ", userData);
   // }, [userData]);
 
-  useEffect(() => {
-    if (currentUser && userData === null && !isAuthLoading) {
-      const timeoutId = setTimeout(() => {
-        console.log("No user data found, logging out...");
-        logout()
-          .then(() => {
-            console.log("User logged out successfully");
-          })
-          .catch((error) => {
-            console.error("Error logging out:", error);
-          });
-      }, 3000);
-  
-      return () => clearTimeout(timeoutId);
-    }
-  }, [userData, currentUser, isAuthLoading]);
 
   
   const value = {
     currentUser,
     userData,
     signUp,
+    signUpComplete,
     login,
     logout,
     updateUserData,
