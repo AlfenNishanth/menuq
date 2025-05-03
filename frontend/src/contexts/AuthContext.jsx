@@ -22,6 +22,7 @@ function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState();
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
 
   function signUp(email, password) {
     console.log("creating user");
@@ -39,7 +40,6 @@ function AuthProvider({ children }) {
   function resetPassword(email) {
     return sendPasswordResetEmail(auth, email);
   }
-
 
   //using then
   // useEffect(() => {
@@ -66,20 +66,10 @@ function AuthProvider({ children }) {
   // }, []);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-      // console.log(JSON.stringify(currentUser) + 'in second ' + loading)
-      // console.log(user ? `1 User logged in: ${JSON.stringify(user)}` : "1 No user logged in");
-      updateUserData();
-    });
-    // console.log(JSON.stringify(currentUser) + " 2 " + loading);
-    return unsubscribe;
-  }, []);
-
-  useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
-      
+      setIsAuthLoading(true);
+
       if (user) {
         try {
           const data = await fetchRestaurantByUID(user.uid);
@@ -88,7 +78,7 @@ function AuthProvider({ children }) {
             console.log("set user data: " + JSON.stringify(data));
           } else {
             setUserData(null);
-            console.log('No user data');
+            console.log("No user data");
           }
         } catch (error) {
           console.log("Error while fetching user data: " + error);
@@ -97,12 +87,12 @@ function AuthProvider({ children }) {
       } else {
         setUserData(null);
       }
-      
-      setLoading(false);
+
+      setIsAuthLoading(false);
     });
-    
+
     return unsubscribe;
-  }, []); // Remove currentUser from dependency array
+  }, []);
 
   const updateUserData = async () => {
     if (currentUser) {
@@ -113,7 +103,7 @@ function AuthProvider({ children }) {
           console.log("sett user data: " + JSON.stringify(data));
         } else {
           setUserData(null);
-          console.log('No user data');
+          console.log("No user data");
           //todo: check and direct to update profile
         }
       } catch (error) {
@@ -123,7 +113,6 @@ function AuthProvider({ children }) {
     } else setUserData(null);
     setLoading(false);
   };
-
 
   // const unsubscribe = onAuthStateChanged(auth, user=> {
   //     console.log(JSON.stringify(currentUser) + 'first ' + loading)
@@ -136,32 +125,22 @@ function AuthProvider({ children }) {
   //     console.log("Updated userDAta in the context: ", userData);
   // }, [userData]);
 
+  useEffect(() => {
+    if (currentUser && userData === null) {
+      const timeoutId = setTimeout(() => {
+        console.log("No user data found, logging out...");
+        logout()
+          .then(() => {
+            console.log("User logged out successfully");
+          })
+          .catch((error) => {
+            console.error("Error logging out:", error);
+          });
+      }, 3000);
 
-
-  // --------------------
-  // Logging out user if no data:
-
-  // Add this useEffect after your other useEffect hooks
-
-useEffect(() => {
-  if (currentUser && userData === null) {
-
-    const timeoutId = setTimeout(() => {
-      console.log("No user data found, logging out...");
-      logout()
-        .then(() => {
-          console.log("User logged out successfully");
-        })
-        .catch((error) => {
-          console.error("Error logging out:", error);
-        });
-    }, 3000);
-
-    return () => clearTimeout(timeoutId);
-  }
-}, [userData, currentUser]);
-
-
+      return () => clearTimeout(timeoutId);
+    }
+  }, [userData, currentUser]);
 
   const value = {
     currentUser,
@@ -169,8 +148,9 @@ useEffect(() => {
     signUp,
     login,
     logout,
-    updateUserData, 
-    loading, resetPassword
+    updateUserData,
+    loading,
+    resetPassword,
   };
 
   return (
