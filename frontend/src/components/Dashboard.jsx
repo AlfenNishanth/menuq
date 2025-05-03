@@ -2,25 +2,21 @@ import React, { useState, useEffect } from "react";
 import { Clock, QrCode, Edit, Save, AlertTriangle, Settings, FileText, ShoppingBag } from "lucide-react";
 import { QRCodeSVG } from 'qrcode.react';
 import axios from 'axios';
+import config from "../../config";
 
-// API base URL - update this with your actual API URL
-const API_BASE_URL = 'https://api.menuq.app/v1';
+const API_BASE_URL = config.API_BASE_URL;
 
-// Main Dashboard Component
 const DashboardHome = () => {
-  // Restaurant status states
   const [isOpen, setIsOpen] = useState(false);
   const [restaurantHours, setRestaurantHours] = useState("Loading...");
   const [editingHours, setEditingHours] = useState(false);
   const [tempHours, setTempHours] = useState("");
   const [restaurantId, setRestaurantId] = useState("");
   
-  // QR code state
   const [showQRDownloader, setShowQRDownloader] = useState(false);
   const [qrURL, setQrURL] = useState('https://menuq.app/your-restaurant');
   const [restaurantName, setRestaurantName] = useState('Your Restaurant');
   
-  // Profile completeness state - very minimal storage impact
   const [profileCompleteness, setProfileCompleteness] = useState({
     hasLogo: false,
     hasAddress: false,

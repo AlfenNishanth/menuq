@@ -46,7 +46,7 @@ export default function AddNewMenuItem() {
     }
 
     setTags([...tags, trimmedTag]);
-    setNewTag(""); // Reset input
+    setNewTag(""); 
     setTagError("");
   };
 

@@ -87,7 +87,7 @@ function AuthProvider({ children }) {
       } else {
         setUserData(null);
       }
-
+      setLoading(false); 
       setIsAuthLoading(false);
     });
 
@@ -126,7 +126,7 @@ function AuthProvider({ children }) {
   // }, [userData]);
 
   useEffect(() => {
-    if (currentUser && userData === null) {
+    if (currentUser && userData === null && !isAuthLoading) {
       const timeoutId = setTimeout(() => {
         console.log("No user data found, logging out...");
         logout()
@@ -137,11 +137,12 @@ function AuthProvider({ children }) {
             console.error("Error logging out:", error);
           });
       }, 3000);
-
+  
       return () => clearTimeout(timeoutId);
     }
-  }, [userData, currentUser]);
+  }, [userData, currentUser, isAuthLoading]);
 
+  
   const value = {
     currentUser,
     userData,
