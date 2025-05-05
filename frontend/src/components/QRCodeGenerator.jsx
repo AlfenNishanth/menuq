@@ -57,32 +57,33 @@ const QRCodeGenerator = () => {
   };
 
   // QR Code shape templates
+  // have to put this remaining different shapes in future updates
   const shapeTemplates = {
     basic: [
       { id: 'square', label: 'Square', path: null },
       { id: 'circle', label: 'Circle', path: null },
       { id: 'rounded', label: 'Rounded', path: null },
-      { id: 'hexagon', label: 'Hexagon', path: "M50,0 L93.3,25 L93.3,75 L50,100 L6.7,75 L6.7,25 Z" },
-      { id: 'diamond', label: 'Diamond', path: "M50,0 L100,50 L50,100 L0,50 Z" },
+      // { id: 'hexagon', label: 'Hexagon', path: "M50,0 L93.3,25 L93.3,75 L50,100 L6.7,75 L6.7,25 Z" },
+      // { id: 'diamond', label: 'Diamond', path: "M50,0 L100,50 L50,100 L0,50 Z" },
     ],
-    food: [
-      { id: 'pizza', label: 'Pizza', path: "M50,0 C77.6,0 100,22.4 100,50 C100,77.6 77.6,100 50,100 C22.4,100 0,77.6 0,50 C0,22.4 22.4,0 50,0 Z M50,10 L10,70 L90,70 Z" },
-      { id: 'cupcake', label: 'Cupcake', path: "M15,40 Q15,20 50,20 Q85,20 85,40 L85,85 Q85,100 50,100 Q15,100 15,85 Z M15,40 L85,40 Z" },
-      { id: 'burger', label: 'Burger', path: "M10,35 Q10,20 50,20 Q90,20 90,35 L90,45 Q90,55 50,55 Q10,55 10,45 Z M10,55 L90,55 L90,85 Q90,100 50,100 Q10,100 10,85 Z" },
-      { id: 'bowl', label: 'Bowl', path: "M10,50 Q50,20 90,50 L90,85 Q90,100 50,100 Q10,100 10,85 Z" },
-    ],
-    drink: [
-      { id: 'coffee-cup', label: 'Coffee Cup', path: "M20,20 L80,20 L70,90 Q60,100 50,100 Q40,100 30,90 Z M80,20 Q90,25 90,35 Q80,40 80,35 Z" },
-      { id: 'wine-glass', label: 'Wine Glass', path: "M35,15 L65,15 L75,50 Q80,80 50,95 Q20,80 25,50 Z M35,15 L35,0 L65,0 L65,15 Z" },
-      { id: 'cocktail', label: 'Cocktail', path: "M10,10 L90,10 L50,70 L50,90 L65,90 L65,100 L35,100 L35,90 L50,90 L50,70 Z" },
-      { id: 'beer-mug', label: 'Beer Mug', path: "M25,10 L75,10 L75,80 Q75,100 50,100 Q25,100 25,80 Z M75,10 Q95,15 95,40 L85,40 Q85,30 75,25 Z" },
-    ],
-    restaurant: [
-      { id: 'plate', label: 'Plate', path: "M50,0 C77.6,0 100,22.4 100,50 C100,77.6 77.6,100 50,100 C22.4,100 0,77.6 0,50 C0,22.4 22.4,0 50,0 Z M50,20 C63.3,20 74,30.7 74,44 C74,57.3 63.3,68 50,68 C36.7,68 26,57.3 26,44 C26,30.7 36.7,20 50,20 Z" },
-      { id: 'chef-hat', label: 'Chef Hat', path: "M25,50 Q25,30 50,30 Q75,30 75,50 Q90,50 90,70 Q90,80 75,80 L25,80 Q10,80 10,70 Q10,50 25,50 Z M25,80 L25,100 L75,100 L75,80 Z" },
-      { id: 'menu-card', label: 'Menu Card', path: "M20,0 L80,0 L80,100 L20,100 Z M30,20 L70,20 M30,40 L70,40 M30,60 L70,60 M30,80 L70,80" },
-      { id: 'table-setting', label: 'Table Setting', path: "M10,10 L90,10 L90,90 L10,90 Z M30,30 C30,40 40,50 50,50 C60,50 70,40 70,30 M50,50 L50,70 M30,70 L70,70" },
-    ]
+    // food: [
+    //   { id: 'pizza', label: 'Pizza', path: "M50,0 C77.6,0 100,22.4 100,50 C100,77.6 77.6,100 50,100 C22.4,100 0,77.6 0,50 C0,22.4 22.4,0 50,0 Z M50,10 L10,70 L90,70 Z" },
+    //   { id: 'cupcake', label: 'Cupcake', path: "M15,40 Q15,20 50,20 Q85,20 85,40 L85,85 Q85,100 50,100 Q15,100 15,85 Z M15,40 L85,40 Z" },
+    //   { id: 'burger', label: 'Burger', path: "M10,35 Q10,20 50,20 Q90,20 90,35 L90,45 Q90,55 50,55 Q10,55 10,45 Z M10,55 L90,55 L90,85 Q90,100 50,100 Q10,100 10,85 Z" },
+    //   { id: 'bowl', label: 'Bowl', path: "M10,50 Q50,20 90,50 L90,85 Q90,100 50,100 Q10,100 10,85 Z" },
+    // ],
+    // drink: [
+    //   { id: 'coffee-cup', label: 'Coffee Cup', path: "M20,20 L80,20 L70,90 Q60,100 50,100 Q40,100 30,90 Z M80,20 Q90,25 90,35 Q80,40 80,35 Z" },
+    //   { id: 'wine-glass', label: 'Wine Glass', path: "M35,15 L65,15 L75,50 Q80,80 50,95 Q20,80 25,50 Z M35,15 L35,0 L65,0 L65,15 Z" },
+    //   { id: 'cocktail', label: 'Cocktail', path: "M10,10 L90,10 L50,70 L50,90 L65,90 L65,100 L35,100 L35,90 L50,90 L50,70 Z" },
+    //   { id: 'beer-mug', label: 'Beer Mug', path: "M25,10 L75,10 L75,80 Q75,100 50,100 Q25,100 25,80 Z M75,10 Q95,15 95,40 L85,40 Q85,30 75,25 Z" },
+    // ],
+    // restaurant: [
+    //   { id: 'plate', label: 'Plate', path: "M50,0 C77.6,0 100,22.4 100,50 C100,77.6 77.6,100 50,100 C22.4,100 0,77.6 0,50 C0,22.4 22.4,0 50,0 Z M50,20 C63.3,20 74,30.7 74,44 C74,57.3 63.3,68 50,68 C36.7,68 26,57.3 26,44 C26,30.7 36.7,20 50,20 Z" },
+    //   { id: 'chef-hat', label: 'Chef Hat', path: "M25,50 Q25,30 50,30 Q75,30 75,50 Q90,50 90,70 Q90,80 75,80 L25,80 Q10,80 10,70 Q10,50 25,50 Z M25,80 L25,100 L75,100 L75,80 Z" },
+    //   { id: 'menu-card', label: 'Menu Card', path: "M20,0 L80,0 L80,100 L20,100 Z M30,20 L70,20 M30,40 L70,40 M30,60 L70,60 M30,80 L70,80" },
+    //   { id: 'table-setting', label: 'Table Setting', path: "M10,10 L90,10 L90,90 L10,90 Z M30,30 C30,40 40,50 50,50 C60,50 70,40 70,30 M50,50 L50,70 M30,70 L70,70" },
+    // ]
   };
 
   // Handle custom logo upload

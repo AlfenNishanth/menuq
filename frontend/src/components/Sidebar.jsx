@@ -5,14 +5,13 @@ import {
   Menu,
   ChevronLeft,
   ChevronDown,
-  // Updated icons for sidebar functionality
-  LayoutDashboard,    // Dashboard icon
-  MenuSquare,         // Manage Menu icon
-  PlusCircle,         // Add Menu Item icon
-  UserCog,            // Edit Profile icon
-  Settings,           // Settings icon
-  QrCode,             // QR Code generator icon
-  LogOut              // Logout icon
+  LayoutDashboard,
+  MenuSquare,
+  PlusCircle,
+  UserCog,
+  Settings,
+  QrCode,
+  LogOut
 } from 'lucide-react';
 import { useAuth } from "../contexts/AuthContext";
 
@@ -131,22 +130,13 @@ function SidebarItem({ icon, text, to, badge, onClick, children }) {
   }
 }
 
-function SidebarSubItem({ text, icon }) {
-  return (
-    <li className="py-2 px-2 text-sm flex items-center gap-2 rounded-md cursor-pointer transition-colors text-gray-600 hover:text-amber-800 hover:bg-amber-50">
-      {icon}
-      <span>{text}</span>
-    </li>
-  );
-}
-
 // Logout confirmation modal component
 function LogoutConfirmationModal({ isOpen, onClose, onConfirm }) {
   if (!isOpen) return null;
   
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-80 max-w-md">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[999]">
+      <div className="bg-white rounded-lg shadow-xl p-6 w-80 max-w-md transform transition-all duration-300 ease-in-out">
         <h3 className="text-lg font-medium text-gray-900 mb-4">Confirm Logout</h3>
         <p className="text-gray-600 mb-6">Are you sure you want to log out?</p>
         <div className="flex justify-end gap-3">
@@ -173,9 +163,10 @@ const Sidebar = ({ onLogoutClick }) => {
   const [animate, setAnimate] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   
   // Use your actual authentication context
-  const { currentUser: user, userData } = useAuth();
+  const { currentUser: user, userData, logout } = useAuth();
   
   // Toggle sidebar animation
   useEffect(() => {
@@ -188,14 +179,24 @@ const Sidebar = ({ onLogoutClick }) => {
     setExpanded(!expanded);
   };
   
+  // Show logout confirmation modal
   const handleLogoutClick = () => {
     setShowLogoutModal(true);
   };
   
-  const confirmLogout = () => {
+  // Handle confirmed logout - directly perform logout here
+  const handleConfirmLogout = () => {
     setShowLogoutModal(false);
-    if (onLogoutClick) {
-      onLogoutClick();
+    
+    // Perform logout directly
+    if (logout) {
+      logout()
+        .then(() => {
+          navigate("/login");
+        })
+        .catch((error) => {
+          console.error("Failed to log out", error);
+        });
     }
   };
   
@@ -254,7 +255,7 @@ const Sidebar = ({ onLogoutClick }) => {
               />
             </ul>
             
-            {/* Logout (separated from main menu) */}
+            {/* Logout button */}
             <div className="mt-auto px-3 pb-4">
               <div
                 onClick={handleLogoutClick}
@@ -301,11 +302,11 @@ const Sidebar = ({ onLogoutClick }) => {
         </div>
       </aside>
       
-      {/* Logout Confirmation Modal */}
+      {/* Logout confirmation modal */}
       <LogoutConfirmationModal 
-        isOpen={showLogoutModal}
-        onClose={() => setShowLogoutModal(false)}
-        onConfirm={confirmLogout}
+        isOpen={showLogoutModal} 
+        onClose={() => setShowLogoutModal(false)} 
+        onConfirm={handleConfirmLogout}
       />
     </>
   );
