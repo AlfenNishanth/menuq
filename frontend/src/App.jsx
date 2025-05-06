@@ -17,7 +17,6 @@ import Dashboard_plain from "./components/Dashboard_plain";
 import QRCodeGenerator from "./components/QRCodeGenerator";
 import HeaderLayout from "./layouts/HeaderLayout";
 
-
 function App() {
 
   return (

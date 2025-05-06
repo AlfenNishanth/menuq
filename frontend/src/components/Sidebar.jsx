@@ -243,11 +243,11 @@ const Sidebar = ({ onLogoutClick }) => {
                 text="Edit Profile"
                 to="/dashboard/update-profile"
               />
-              <SidebarItem
+              {/* <SidebarItem
                 icon={<Settings size={18} />}
                 text="Settings"
                 to="/dashboard/settings"
-              />
+              /> */}
               <SidebarItem
                 icon={<QrCode size={18} />}
                 text="QR Code"
