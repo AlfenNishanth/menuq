@@ -1,24 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Clock, QrCode, Edit, Save, AlertTriangle, Settings, FileText, ShoppingBag } from "lucide-react";
+import { Clock, QrCode, AlertTriangle, Settings, FileText, ShoppingBag } from "lucide-react";
 import { QRCodeSVG } from 'qrcode.react';
 import axios from 'axios';
-
-// API base URL - update this with your actual API URL
-const API_BASE_URL = 'https://api.menuq.app/v1';
+import RestaurantStatusPanel from './RestaurantStatusPanel'; // Importing the RestaurantStatusPanel
 
 // Main Dashboard Component
 const DashboardHome = () => {
-  // Restaurant status states
-  const [isOpen, setIsOpen] = useState(false);
-  const [restaurantHours, setRestaurantHours] = useState("Loading...");
-  const [editingHours, setEditingHours] = useState(false);
-  const [tempHours, setTempHours] = useState("");
-  const [restaurantId, setRestaurantId] = useState("");
+  // Restaurant data states
+  const [restaurant, setRestaurant] = useState(null);
+  const [restaurantName, setRestaurantName] = useState('Your Restaurant');
   
   // QR code state
   const [showQRDownloader, setShowQRDownloader] = useState(false);
   const [qrURL, setQrURL] = useState('https://menuq.app/your-restaurant');
-  const [restaurantName, setRestaurantName] = useState('Your Restaurant');
   
   // Profile completeness state - very minimal storage impact
   const [profileCompleteness, setProfileCompleteness] = useState({
@@ -32,8 +26,9 @@ const DashboardHome = () => {
   // Loading and error states
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [statusUpdating, setStatusUpdating] = useState(false);
-  const [hoursUpdating, setHoursUpdating] = useState(false);
+
+  // Using Vite's environment variable format instead of process.env
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.menuq.app';
   
   // Fetch restaurant data from backend API
   useEffect(() => {
@@ -54,10 +49,8 @@ const DashboardHome = () => {
         const restaurantData = response.data;
         
         // Update state with restaurant data
-        setRestaurantId(restaurantData.id);
+        setRestaurant(restaurantData);
         setRestaurantName(restaurantData.name);
-        setIsOpen(restaurantData.isOpen);
-        setRestaurantHours(restaurantData.businessHours);
         setQrURL(`https://menuq.app/menu/${restaurantData.slug}`);
         
         // Calculate profile completeness (minimal data needed)
@@ -65,7 +58,7 @@ const DashboardHome = () => {
           hasLogo: !!restaurantData.logoUrl,
           hasAddress: !!restaurantData.address,
           hasMenu: (restaurantData.menuItems && restaurantData.menuItems.length > 0),
-          hasHours: !!restaurantData.businessHours,
+          hasHours: (restaurantData.operatingHours && restaurantData.operatingHours.length > 0),
           hasContact: !!restaurantData.contactPhone || !!restaurantData.contactEmail
         });
         
@@ -78,77 +71,29 @@ const DashboardHome = () => {
     };
 
     fetchRestaurantData();
-  }, []);
+  }, [API_BASE_URL]);
+
+  // Handle updates from RestaurantStatusPanel
+  const handleRestaurantUpdate = (updatedRestaurant) => {
+    setRestaurant(updatedRestaurant);
+    
+    // Update other states if needed
+    if (updatedRestaurant.name !== restaurantName) {
+      setRestaurantName(updatedRestaurant.name);
+    }
+    
+    // Update profile completeness
+    setProfileCompleteness(prev => ({
+      ...prev,
+      hasHours: (updatedRestaurant.operatingHours && updatedRestaurant.operatingHours.length > 0)
+    }));
+  };
   
   // Calculate completeness percentage
   const calculateCompleteness = () => {
     const { hasLogo, hasAddress, hasMenu, hasHours, hasContact } = profileCompleteness;
     const completedItems = [hasLogo, hasAddress, hasMenu, hasHours, hasContact].filter(Boolean).length;
     return Math.round((completedItems / 5) * 100);
-  };
-  
-  // Toggle restaurant open/closed status via API
-  const toggleRestaurantStatus = async () => {
-    try {
-      setStatusUpdating(true);
-      const token = localStorage.getItem('authToken');
-      
-      await axios.put(
-        `${API_BASE_URL}/restaurant/${restaurantId}/status`, 
-        { isOpen: !isOpen },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-      
-      setIsOpen(!isOpen);
-      
-    } catch (err) {
-      console.error("Error updating restaurant status:", err);
-      alert("Failed to update restaurant status. Please try again.");
-    } finally {
-      setStatusUpdating(false);
-    }
-  };
-  
-  // Begin editing hours
-  const handleEditHours = () => {
-    setTempHours(restaurantHours);
-    setEditingHours(true);
-  };
-  
-  // Save edited hours to backend API
-  const saveHours = async () => {
-    try {
-      setHoursUpdating(true);
-      const token = localStorage.getItem('authToken');
-      
-      await axios.put(
-        `${API_BASE_URL}/restaurant/${restaurantId}/hours`, 
-        { businessHours: tempHours },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-      
-      setRestaurantHours(tempHours);
-      setEditingHours(false);
-      
-      // Update profile completeness for hours
-      setProfileCompleteness(prev => ({...prev, hasHours: true}));
-      
-    } catch (err) {
-      console.error("Error updating restaurant hours:", err);
-      alert("Failed to update business hours. Please try again.");
-    } finally {
-      setHoursUpdating(false);
-    }
   };
   
   // QR code modal toggle
@@ -297,6 +242,48 @@ const DashboardHome = () => {
                     </div>
                   </div>
                 </div>
+
+                <div className={`p-4 rounded-lg border ${profileCompleteness.hasMenu ? 'bg-green-50 border-green-200' : 'bg-amber-50 border-amber-200'}`}>
+                  <div className="flex items-center">
+                    <div className={`p-2 rounded-full ${profileCompleteness.hasMenu ? 'bg-green-100' : 'bg-amber-100'} mr-3`}>
+                      <FileText size={20} className={profileCompleteness.hasMenu ? 'text-green-600' : 'text-amber-600'} />
+                    </div>
+                    <div>
+                      <h4 className="font-medium">Menu Items</h4>
+                      <p className="text-sm text-gray-600">
+                        {profileCompleteness.hasMenu ? 'Menu items added' : 'Add items to your menu'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={`p-4 rounded-lg border ${profileCompleteness.hasAddress ? 'bg-green-50 border-green-200' : 'bg-amber-50 border-amber-200'}`}>
+                  <div className="flex items-center">
+                    <div className={`p-2 rounded-full ${profileCompleteness.hasAddress ? 'bg-green-100' : 'bg-amber-100'} mr-3`}>
+                      <Settings size={20} className={profileCompleteness.hasAddress ? 'text-green-600' : 'text-amber-600'} />
+                    </div>
+                    <div>
+                      <h4 className="font-medium">Restaurant Address</h4>
+                      <p className="text-sm text-gray-600">
+                        {profileCompleteness.hasAddress ? 'Address added' : 'Add your restaurant address'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={`p-4 rounded-lg border ${profileCompleteness.hasContact ? 'bg-green-50 border-green-200' : 'bg-amber-50 border-amber-200'}`}>
+                  <div className="flex items-center">
+                    <div className={`p-2 rounded-full ${profileCompleteness.hasContact ? 'bg-green-100' : 'bg-amber-100'} mr-3`}>
+                      <ShoppingBag size={20} className={profileCompleteness.hasContact ? 'text-green-600' : 'text-amber-600'} />
+                    </div>
+                    <div>
+                      <h4 className="font-medium">Contact Information</h4>
+                      <p className="text-sm text-gray-600">
+                        {profileCompleteness.hasContact ? 'Contact info added' : 'Add contact information'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
               
               {/* Quick Tips */}
@@ -312,85 +299,12 @@ const DashboardHome = () => {
           )}
         </div>
         
-        {/* Restaurant Status Panel */}
-        <div className="bg-white rounded-xl shadow-md p-6 border border-amber-100">
-          <h2 className="text-xl font-semibold text-amber-800 mb-6">Restaurant Status</h2>
-          
-          {/* Open/Close Toggle */}
-          <div className="flex items-center justify-between mb-6 p-4 bg-amber-50 rounded-xl">
-            <div>
-              <h3 className="font-medium text-amber-800">Current Status</h3>
-              <p className="text-sm text-gray-600">Toggle to update</p>
-            </div>
-            <div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  checked={isOpen} 
-                  onChange={toggleRestaurantStatus} 
-                  disabled={statusUpdating}
-                  className="sr-only peer" 
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
-                <span className="ml-3 text-sm font-medium text-gray-900">
-                  {statusUpdating ? 'Updating...' : isOpen ? 'Open' : 'Closed'}
-                </span>
-              </label>
-            </div>
-          </div>
-          
-          {/* Hours Editor */}
-          <div className="p-4 bg-amber-50 rounded-xl mb-6">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="font-medium text-amber-800">Business Hours</h3>
-              {!editingHours ? (
-                <button 
-                  onClick={handleEditHours}
-                  className="text-amber-600 hover:text-amber-800 flex items-center text-sm"
-                >
-                  <Edit size={14} className="mr-1" /> Edit
-                </button>
-              ) : (
-                <button 
-                  onClick={saveHours}
-                  disabled={hoursUpdating}
-                  className="text-green-600 hover:text-green-800 flex items-center text-sm"
-                >
-                  <Save size={14} className="mr-1" /> {hoursUpdating ? 'Saving...' : 'Save'}
-                </button>
-              )}
-            </div>
-            
-            {!editingHours ? (
-              <p className="text-gray-700">{restaurantHours}</p>
-            ) : (
-              <input
-                type="text"
-                value={tempHours}
-                onChange={(e) => setTempHours(e.target.value)}
-                className="w-full p-2 border border-amber-300 rounded-md focus:ring-amber-500 focus:border-amber-500"
-                placeholder="e.g. 9:00 AM - 10:00 PM"
-                disabled={hoursUpdating}
-              />
-            )}
-          </div>
-          
-          {/* Quick Stats */}
-          <div className="bg-amber-100/50 rounded-xl p-4">
-            <h3 className="font-medium text-amber-800 mb-2">Quick Info</h3>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="p-3 bg-white rounded-lg text-center">
-                <p className="text-xs text-gray-500">Restaurant Name</p>
-                <p className="font-semibold text-amber-700">{restaurantName}</p>
-              </div>
-              <div className="p-3 bg-white rounded-lg text-center">
-                <p className="text-xs text-gray-500">Menu Link</p>
-                <p className="font-semibold text-amber-700 truncate text-xs">
-                  {qrURL.length > 20 ? qrURL.substring(0, 20) + '...' : qrURL}
-                </p>
-              </div>
-            </div>
-          </div>
+        {/* Restaurant Status Panel - Now properly passing props */}
+        <div className="lg:col-span-1">
+          <RestaurantStatusPanel 
+            restaurant={restaurant} 
+            onUpdate={handleRestaurantUpdate} 
+          />
         </div>
       </div>
     </div>
