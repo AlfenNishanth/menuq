@@ -58,6 +58,8 @@ const restaurantSchema = new mongoose.Schema({
     of: String, // Example: { "instagram": "https://instagram.com/restaurant", "facebook": "https://facebook.com/restaurant" }
   },
 
+  resOpen: { type: Boolean, default: true },
+
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

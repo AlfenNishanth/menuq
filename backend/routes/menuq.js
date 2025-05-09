@@ -126,8 +126,33 @@ router.patch("/:id", async (req, res) => {
 
 //Delete one
 router.delete("/:id", (req, res) => {
-  // Add implementation if needed
+
 });
+
+//Toggle status
+router.patch("/:id/status", getRestaurant, async (req, res) => {
+  try {
+    const { resOpen } = req.body;
+    
+    if (resOpen === undefined) {
+      return res.status(400).json({ message: "resOpen status is required" });
+    }
+
+    logger.info(`PATCH /restaurant/${req.params.id}/status - Updating restaurant open status to: ${resOpen}`);
+    
+    res.restaurant.resOpen = resOpen;
+    res.restaurant.updatedAt = Date.now();
+    
+    const updatedRestaurant = await res.restaurant.save();
+    
+    logger.info(`PATCH /restaurant/${req.params.id}/status - Successfully updated restaurant status`);
+    res.status(200).json(updatedRestaurant);
+  } catch (err) {
+    logger.error(`PATCH /restaurant/${req.params.id}/status - Error: ${err.message}`);
+    res.status(400).json({ message: err.message });
+  }
+});
+
 
 async function getRestaurant(req, res, next) {
   let restaurant;
@@ -165,5 +190,128 @@ async function getRestaurantById(req, res, next) {
   }
   next();
 }
+
+
+//--------------------------------------------------//
+
+// Add these routes to menuq.js
+
+// Update all business hours
+router.put("/:id/hours", getRestaurant, async (req, res) => {
+  try {
+    const { operatingHours } = req.body;
+    
+    if (!operatingHours || !Array.isArray(operatingHours)) {
+      return res.status(400).json({ message: "Valid operating hours array is required" });
+    }
+    
+    // Validate each day entry
+    for (const entry of operatingHours) {
+      if (!entry.day || !entry.hours) {
+        return res.status(400).json({ message: "Each operating hour entry must have day and hours" });
+      }
+      
+      // Validate day is one of the allowed values
+      const allowedDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+      if (!allowedDays.includes(entry.day)) {
+        return res.status(400).json({ message: `Invalid day: ${entry.day}. Must be one of: ${allowedDays.join(", ")}` });
+      }
+    }
+    
+    logger.info(`PUT /restaurant/${req.params.id}/hours - Updating all operating hours`);
+    
+    res.restaurant.operatingHours = operatingHours;
+    res.restaurant.updatedAt = Date.now();
+    
+    const updatedRestaurant = await res.restaurant.save();
+    
+    logger.info(`PUT /restaurant/${req.params.id}/hours - Successfully updated operating hours`);
+    res.status(200).json(updatedRestaurant);
+  } catch (err) {
+    logger.error(`PUT /restaurant/${req.params.id}/hours - Error: ${err.message}`);
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// Update or add single day operating hours
+router.patch("/:id/hours", getRestaurant, async (req, res) => {
+  try {
+    const { day, hours } = req.body;
+    
+    if (!day || !hours) {
+      return res.status(400).json({ message: "Day and hours are required" });
+    }
+    
+    // Validate day is one of the allowed values
+    const allowedDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    if (!allowedDays.includes(day)) {
+      return res.status(400).json({ message: `Invalid day: ${day}. Must be one of: ${allowedDays.join(", ")}` });
+    }
+    
+    logger.info(`PATCH /restaurant/${req.params.id}/hours - Updating operating hours for ${day}`);
+    
+    // Find the index of the day if it exists
+    const dayIndex = res.restaurant.operatingHours.findIndex(
+      entry => entry.day === day
+    );
+    
+    if (dayIndex >= 0) {
+      // Update existing day
+      res.restaurant.operatingHours[dayIndex].hours = hours;
+    } else {
+      // Add new day
+      res.restaurant.operatingHours.push({ day, hours });
+    }
+    
+    res.restaurant.updatedAt = Date.now();
+    const updatedRestaurant = await res.restaurant.save();
+    
+    logger.info(`PATCH /restaurant/${req.params.id}/hours - Successfully updated operating hours for ${day}`);
+    res.status(200).json(updatedRestaurant);
+  } catch (err) {
+    logger.error(`PATCH /restaurant/${req.params.id}/hours - Error: ${err.message}`);
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// Delete operating hours for a specific day
+router.delete("/:id/hours/:day", getRestaurant, async (req, res) => {
+  try {
+    const { day } = req.params;
+    
+    // Validate day is one of the allowed values
+    const allowedDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    if (!allowedDays.includes(day)) {
+      return res.status(400).json({ message: `Invalid day: ${day}. Must be one of: ${allowedDays.join(", ")}` });
+    }
+    
+    logger.info(`DELETE /restaurant/${req.params.id}/hours/${day} - Removing operating hours for ${day}`);
+    
+    // Find the index of the day if it exists
+    const dayIndex = res.restaurant.operatingHours.findIndex(
+      entry => entry.day === day
+    );
+    
+    if (dayIndex >= 0) {
+      // Remove the day
+      res.restaurant.operatingHours.splice(dayIndex, 1);
+      res.restaurant.updatedAt = Date.now();
+      
+      const updatedRestaurant = await res.restaurant.save();
+      
+      logger.info(`DELETE /restaurant/${req.params.id}/hours/${day} - Successfully removed operating hours for ${day}`);
+      res.status(200).json(updatedRestaurant);
+    } else {
+      // Day not found
+      logger.info(`DELETE /restaurant/${req.params.id}/hours/${day} - Day not found in operating hours`);
+      res.status(404).json({ message: `No operating hours found for ${day}` });
+    }
+  } catch (err) {
+    logger.error(`DELETE /restaurant/${req.params.id}/hours/${day} - Error: ${err.message}`);
+    res.status(400).json({ message: err.message });
+  }
+});
+
+
 
 module.exports = router;
