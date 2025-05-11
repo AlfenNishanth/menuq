@@ -9,25 +9,70 @@ import {
 
 const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
   const [restaurant, setRestaurant] = useState(initialRestaurant || {});
-  
-  const [isOpen, setIsOpen] = useState(restaurant?.resOpen || false);
+  const [isOpen, setIsOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [operatingHours, setOperatingHours] = useState(restaurant?.operatingHours || []);
+  const [operatingHours, setOperatingHours] = useState([]);
   const [editingDay, setEditingDay] = useState(null);
   const [newHours, setNewHours] = useState("");
   const [addingNewDay, setAddingNewDay] = useState(false);
   const [newDay, setNewDay] = useState("Monday");
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   
-  // Effect to update local state when restaurant prop changes
+  // Fetch restaurant data on component mount if not provided
   useEffect(() => {
-    if (initialRestaurant) {
+    const fetchRestaurantData = async () => {
+      try {
+        // Try to get user ID from localStorage or some other auth mechanism
+        const firebaseUID = localStorage.getItem('firebaseUID') || 
+                            sessionStorage.getItem('firebaseUID') || 
+                            // You can add other methods to get the current user ID here
+                            null;
+        
+        if (!firebaseUID) {
+          setError("User ID not found. Please login again.");
+          setIsLoading(false);
+          return;
+        }
+        
+        // Assuming your config is imported properly with MENUQ endpoint
+        // You might need to adjust this based on your actual API structure
+        const config = {
+          MENUQ: process.env.REACT_APP_MENUQ_API || '/api/restaurants'
+        };
+        
+        // Fetch restaurant data
+        const response = await axios.get(`${config.MENUQ}/${firebaseUID}`);
+        
+        // Make sure firebaseUID is included in the restaurant data
+        const restaurantData = {
+          ...response.data,
+          firebaseUID: firebaseUID
+        };
+        
+        setRestaurant(restaurantData);
+        setIsOpen(restaurantData.resOpen || false);
+        setOperatingHours(restaurantData.operatingHours || []);
+        setError("");
+      } catch (err) {
+        console.error("Error fetching restaurant data:", err);
+        setError("Failed to load restaurant data. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // If restaurant data is provided through props, use it
+    if (initialRestaurant && initialRestaurant.firebaseUID) {
       setRestaurant(initialRestaurant);
       setIsOpen(initialRestaurant.resOpen || false);
       setOperatingHours(initialRestaurant.operatingHours || []);
+      setIsLoading(false);
+    } else {
+      // Otherwise fetch it
+      fetchRestaurantData();
     }
   }, [initialRestaurant]);
 
@@ -204,7 +249,16 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
     return dayData ? dayData.hours : "Closed";
   };
 
-  // Show loading state if restaurant data is not available yet
+  // Function to handle manual authentication in case of error
+  const handleManualLogin = () => {
+    const firebaseUID = prompt("Please enter your restaurant ID to continue:");
+    if (firebaseUID) {
+      localStorage.setItem('firebaseUID', firebaseUID);
+      window.location.reload();
+    }
+  };
+
+  // Show loading state if restaurant data is still being loaded
   if (isLoading) {
     return (
       <div className="bg-white p-6 rounded-xl shadow-md border border-amber-100 h-full">
@@ -230,221 +284,244 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
         </div>
       )}
       
-      {/* Restaurant Open/Closed Toggle */}
-      <div className="mb-6 bg-amber-50 p-4 rounded-lg border border-amber-200">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="font-medium text-amber-800 mb-1">Current Status</h3>
-            <div className="flex items-center">
-               <div className={`w-3 h-3 rounded-full mr-2 ${isOpen ? 'bg-green-500' : 'bg-red-500'}`}></div>
-               <p className={`text-lg font-semibold ${isOpen ? 'text-green-600' : 'text-red-600'}`}>
-                 {isOpen ? 'OPEN' : 'CLOSED'}
-               </p>
+      {/* If restaurant data is missing, show a different UI */}
+      {(!restaurant || !restaurant.firebaseUID) ? (
+        <div className="bg-amber-50 p-4 rounded-lg border border-amber-200 text-center">
+          <p className="text-amber-800 mb-4">Restaurant data is not available or you're not logged in.</p>
+          <div className="flex justify-center gap-2">
+            <button 
+              className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition duration-150"
+              onClick={() => window.location.reload()}
+            >
+              Refresh Page
+            </button>
+            <button 
+              className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition duration-150"
+              onClick={handleManualLogin}
+            >
+              Enter Restaurant ID
+            </button>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Restaurant Open/Closed Toggle */}
+          <div className="mb-6 bg-amber-50 p-4 rounded-lg border border-amber-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-medium text-amber-800 mb-1">Current Status</h3>
+                <div className="flex items-center">
+                  <div className={`w-3 h-3 rounded-full mr-2 ${isOpen ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                  <p className={`text-lg font-semibold ${isOpen ? 'text-green-600' : 'text-red-600'}`}>
+                    {isOpen ? 'OPEN' : 'CLOSED'}
+                  </p>
+                </div>
+              </div>
+              <button
+                className={`px-4 py-2 rounded-lg transition duration-150 flex items-center ${
+                  isOpen 
+                    ? 'bg-red-600 hover:bg-red-700 text-white' 
+                    : 'bg-amber-600 hover:bg-amber-700 text-white'
+                }`}
+                onClick={handleStatusToggle}
+                disabled={isUpdating}
+              >
+                {isUpdating ? (
+                  <span className="flex items-center">
+                    <div className="animate-spin h-4 w-4 border-2 border-t-transparent border-white rounded-full mr-2"></div>
+                    Updating...
+                  </span>
+                ) : (
+                  <span className="flex items-center">
+                    {isOpen ? <X size={16} className="mr-2" /> : <Check size={16} className="mr-2" />}
+                    {isOpen ? 'Mark as Closed' : 'Mark as Open'}
+                  </span>
+                )}
+              </button>
             </div>
           </div>
-          <button
-            className={`px-4 py-2 rounded-lg transition duration-150 flex items-center ${
-              isOpen 
-                ? 'bg-red-600 hover:bg-red-700 text-white' 
-                : 'bg-amber-600 hover:bg-amber-700 text-white'
-            }`}
-            onClick={handleStatusToggle}
-            disabled={isUpdating}
-          >
-            {isUpdating ? (
-              <span className="flex items-center">
-                <div className="animate-spin h-4 w-4 border-2 border-t-transparent border-white rounded-full mr-2"></div>
-                Updating...
-              </span>
-            ) : (
-              <span className="flex items-center">
-                {isOpen ? <X size={16} className="mr-2" /> : <Check size={16} className="mr-2" />}
-                {isOpen ? 'Mark as Closed' : 'Mark as Open'}
-              </span>
-            )}
-          </button>
-        </div>
-      </div>
-      
-      <hr className="my-6 border-amber-100" />
-      
-      {/* Operating Hours Section */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center">
-            <Calendar size={18} className="text-amber-600 mr-2" />
-            <h3 className="font-medium text-amber-800">Operating Hours</h3>
-          </div>
-          {!addingNewDay && (
-            <button
-              className="px-3 py-1 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition duration-150 flex items-center"
-              onClick={() => setAddingNewDay(true)}
-            >
-              <Plus size={16} className="mr-1" /> Add Day
-            </button>
-          )}
-        </div>
-        
-        {/* Add New Day Form */}
-        {addingNewDay && (
-          <div className="bg-amber-50 p-4 rounded-lg border border-amber-200 mb-4">
-            <h4 className="font-medium mb-2 text-amber-800">Add New Day</h4>
-            <div className="flex flex-col md:flex-row gap-2">
-              <select
-                className="p-2 border border-amber-200 rounded-lg bg-white focus:ring-2 focus:ring-amber-300 focus:border-amber-400 outline-none"
-                value={newDay}
-                onChange={(e) => setNewDay(e.target.value)}
-              >
-                {daysOfWeek.map(day => (
-                  <option key={day} value={day} disabled={isDaySet(day)}>
-                    {day} {isDaySet(day) ? '(Already Set)' : ''}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="text"
-                className="p-2 border border-amber-200 rounded-lg bg-white flex-grow focus:ring-2 focus:ring-amber-300 focus:border-amber-400 outline-none"
-                placeholder="e.g. 10:00 AM - 9:00 PM"
-                value={newHours}
-                onChange={(e) => setNewHours(e.target.value)}
-              />
-              <div className="flex gap-2">
+          
+          <hr className="my-6 border-amber-100" />
+          
+          {/* Operating Hours Section */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <Calendar size={18} className="text-amber-600 mr-2" />
+                <h3 className="font-medium text-amber-800">Operating Hours</h3>
+              </div>
+              {!addingNewDay && (
                 <button
                   className="px-3 py-1 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition duration-150 flex items-center"
-                  onClick={handleAddDay}
-                  disabled={isUpdating || !newHours.trim()}
+                  onClick={() => setAddingNewDay(true)}
                 >
-                  {isUpdating ? (
-                    <span className="flex items-center">
-                      <div className="animate-spin h-4 w-4 border-2 border-t-transparent border-white rounded-full mr-2"></div>
-                      Saving...
-                    </span>
-                  ) : (
-                    <span className="flex items-center">
-                      <Check size={16} className="mr-1" /> Save
-                    </span>
-                  )}
+                  <Plus size={16} className="mr-1" /> Add Day
                 </button>
-                <button
-                  className="px-3 py-1 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition duration-150"
-                  onClick={handleCancelEdit}
-                >
-                  Cancel
-                </button>
-              </div>
+              )}
             </div>
-          </div>
-        )}
-        
-        {/* Hours List */}
-        <div className="bg-amber-50 rounded-lg overflow-hidden border border-amber-200">
-          <table className="w-full">
-            <thead className="bg-amber-100">
-              <tr>
-                <th className="text-left p-3 text-amber-800">Day</th>
-                <th className="text-left p-3 text-amber-800">Hours</th>
-                <th className="text-right p-3 text-amber-800">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {daysOfWeek.map(day => {
-                const hasHours = isDaySet(day);
-                const hours = getHoursForDay(day);
-                const isEditing = editingDay === day;
-                
-                return (
-                  <tr key={day} className="border-t border-amber-200">
-                    <td className="p-3 font-medium text-amber-900">{day}</td>
-                    <td className="p-3">
-                      {isEditing ? (
-                        <input
-                          type="text"
-                          className="w-full p-2 border border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-300 focus:border-amber-400 outline-none"
-                          value={newHours}
-                          onChange={(e) => setNewHours(e.target.value)}
-                          placeholder="e.g. 10:00 AM - 9:00 PM"
-                        />
+            
+            {/* Add New Day Form */}
+            {addingNewDay && (
+              <div className="bg-amber-50 p-4 rounded-lg border border-amber-200 mb-4">
+                <h4 className="font-medium mb-2 text-amber-800">Add New Day</h4>
+                <div className="flex flex-col md:flex-row gap-2">
+                  <select
+                    className="p-2 border border-amber-200 rounded-lg bg-white focus:ring-2 focus:ring-amber-300 focus:border-amber-400 outline-none"
+                    value={newDay}
+                    onChange={(e) => setNewDay(e.target.value)}
+                  >
+                    {daysOfWeek.map(day => (
+                      <option key={day} value={day} disabled={isDaySet(day)}>
+                        {day} {isDaySet(day) ? '(Already Set)' : ''}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    type="text"
+                    className="p-2 border border-amber-200 rounded-lg bg-white flex-grow focus:ring-2 focus:ring-amber-300 focus:border-amber-400 outline-none"
+                    placeholder="e.g. 10:00 AM - 9:00 PM"
+                    value={newHours}
+                    onChange={(e) => setNewHours(e.target.value)}
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      className="px-3 py-1 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition duration-150 flex items-center"
+                      onClick={handleAddDay}
+                      disabled={isUpdating || !newHours.trim()}
+                    >
+                      {isUpdating ? (
+                        <span className="flex items-center">
+                          <div className="animate-spin h-4 w-4 border-2 border-t-transparent border-white rounded-full mr-2"></div>
+                          Saving...
+                        </span>
                       ) : (
-                        <span className={hasHours ? 'text-amber-900' : 'text-amber-600 italic'}>
-                          {hours}
+                        <span className="flex items-center">
+                          <Check size={16} className="mr-1" /> Save
                         </span>
                       )}
-                    </td>
-                    <td className="p-3 text-right">
-                      {isEditing ? (
-                        <div className="flex justify-end gap-2">
-                          <button
-                            className="px-3 py-1 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition duration-150 flex items-center"
-                            onClick={() => handleSaveHours(day)}
-                            disabled={isUpdating}
-                          >
-                            {isUpdating ? (
-                              <span className="flex items-center">
-                                <div className="animate-spin h-4 w-4 border-2 border-t-transparent border-white rounded-full mr-1"></div>
-                                Saving...
-                              </span>
-                            ) : (
-                              <span className="flex items-center">
-                                <Check size={14} className="mr-1" /> Save
-                              </span>
-                            )}
-                          </button>
-                          <button
-                            className="px-3 py-1 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition duration-150"
-                            onClick={handleCancelEdit}
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="flex justify-end gap-2">
-                          {hasHours && (
-                            <>
+                    </button>
+                    <button
+                      className="px-3 py-1 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition duration-150"
+                      onClick={handleCancelEdit}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Hours List */}
+            <div className="bg-amber-50 rounded-lg overflow-hidden border border-amber-200">
+              <table className="w-full">
+                <thead className="bg-amber-100">
+                  <tr>
+                    <th className="text-left p-3 text-amber-800">Day</th>
+                    <th className="text-left p-3 text-amber-800">Hours</th>
+                    <th className="text-right p-3 text-amber-800">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {daysOfWeek.map(day => {
+                    const hasHours = isDaySet(day);
+                    const hours = getHoursForDay(day);
+                    const isEditing = editingDay === day;
+                    
+                    return (
+                      <tr key={day} className="border-t border-amber-200">
+                        <td className="p-3 font-medium text-amber-900">{day}</td>
+                        <td className="p-3">
+                          {isEditing ? (
+                            <input
+                              type="text"
+                              className="w-full p-2 border border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-300 focus:border-amber-400 outline-none"
+                              value={newHours}
+                              onChange={(e) => setNewHours(e.target.value)}
+                              placeholder="e.g. 10:00 AM - 9:00 PM"
+                            />
+                          ) : (
+                            <span className={hasHours ? 'text-amber-900' : 'text-amber-600 italic'}>
+                              {hours}
+                            </span>
+                          )}
+                        </td>
+                        <td className="p-3 text-right">
+                          {isEditing ? (
+                            <div className="flex justify-end gap-2">
                               <button
                                 className="px-3 py-1 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition duration-150 flex items-center"
-                                onClick={() => handleEditHours(day, hours)}
-                              >
-                                <Edit size={14} className="mr-1" /> Edit
-                              </button>
-                              <button
-                                className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-150 flex items-center"
-                                onClick={() => handleDeleteHours(day)}
+                                onClick={() => handleSaveHours(day)}
                                 disabled={isUpdating}
                               >
                                 {isUpdating ? (
                                   <span className="flex items-center">
                                     <div className="animate-spin h-4 w-4 border-2 border-t-transparent border-white rounded-full mr-1"></div>
-                                    <span>Deleting...</span>
+                                    Saving...
                                   </span>
                                 ) : (
                                   <span className="flex items-center">
-                                    <Trash size={14} className="mr-1" /> Delete
+                                    <Check size={14} className="mr-1" /> Save
                                   </span>
                                 )}
                               </button>
-                            </>
+                              <button
+                                className="px-3 py-1 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition duration-150"
+                                onClick={handleCancelEdit}
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex justify-end gap-2">
+                              {hasHours && (
+                                <>
+                                  <button
+                                    className="px-3 py-1 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition duration-150 flex items-center"
+                                    onClick={() => handleEditHours(day, hours)}
+                                  >
+                                    <Edit size={14} className="mr-1" /> Edit
+                                  </button>
+                                  <button
+                                    className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-150 flex items-center"
+                                    onClick={() => handleDeleteHours(day)}
+                                    disabled={isUpdating}
+                                  >
+                                    {isUpdating ? (
+                                      <span className="flex items-center">
+                                        <div className="animate-spin h-4 w-4 border-2 border-t-transparent border-white rounded-full mr-1"></div>
+                                        <span>Deleting...</span>
+                                      </span>
+                                    ) : (
+                                      <span className="flex items-center">
+                                        <Trash size={14} className="mr-1" /> Delete
+                                      </span>
+                                    )}
+                                  </button>
+                                </>
+                              )}
+                              {!hasHours && (
+                                <button
+                                  className="px-3 py-1 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition duration-150 flex items-center"
+                                  onClick={() => {
+                                    setEditingDay(day);
+                                    setNewHours("10:00 AM - 9:00 PM");
+                                  }}
+                                >
+                                  <Plus size={14} className="mr-1" /> Add Hours
+                                </button>
+                              )}
+                            </div>
                           )}
-                          {!hasHours && (
-                            <button
-                              className="px-3 py-1 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition duration-150 flex items-center"
-                              onClick={() => {
-                                setEditingDay(day);
-                                setNewHours("10:00 AM - 9:00 PM");
-                              }}
-                            >
-                              <Plus size={14} className="mr-1" /> Add Hours
-                            </button>
-                          )}
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
