@@ -1,11 +1,58 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, Calendar, Check, X, Edit, Trash, Plus } from 'lucide-react';
-import axios from 'axios'; // Make sure axios is imported
-import { 
-  updateRestaurantStatus, 
-  updateDayOperatingHours, 
-  deleteDayOperatingHours 
-} from '../api/restaurant'; // Update with your actual path
+import axios from 'axios';
+import { useAuth } from '../contexts/AuthContext';
+
+// Define the API endpoint - without using process.env which might not be available
+const config = {
+  MENUQ: window.REACT_APP_MENUQ_API || '/api/restaurants'
+};
+
+// API functions with proper error handling
+const updateRestaurantStatus = async (firebaseUID, isOpen) => {
+  try {
+    console.log(`Updating restaurant status to: ${isOpen ? 'Open' : 'Closed'}`);
+    const response = await axios.patch(
+      `${config.MENUQ}/${firebaseUID}/status`, 
+      { resOpen: isOpen }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating restaurant status:", error);
+    // Extract more detailed error info if available
+    const errorMessage = error.response?.data?.message || error.message || "Unknown error occurred";
+    throw new Error(`Status update failed: ${errorMessage}`);
+  }
+};
+
+const updateDayOperatingHours = async (firebaseUID, day, hours) => {
+  try {
+    console.log(`Updating operating hours for ${day}`);
+    const response = await axios.patch(
+      `${config.MENUQ}/${firebaseUID}/hours`,
+      { day, hours }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Error updating operating hours for ${day}:`, error);
+    const errorMessage = error.response?.data?.message || error.message || "Unknown error occurred";
+    throw new Error(`Hours update failed: ${errorMessage}`);
+  }
+};
+
+const deleteDayOperatingHours = async (firebaseUID, day) => {
+  try {
+    console.log(`Deleting operating hours for ${day}`);
+    const response = await axios.delete(
+      `${config.MENUQ}/${firebaseUID}/hours/${day}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Error deleting operating hours for ${day}:`, error);
+    const errorMessage = error.response?.data?.message || error.message || "Unknown error occurred";
+    throw new Error(`Hours deletion failed: ${errorMessage}`);
+  }
+};
 
 const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
   const [restaurant, setRestaurant] = useState(initialRestaurant || {});
@@ -19,32 +66,42 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
+  // Get auth context
+  const { currentUser, userData } = useAuth();
+
   const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   
   // Fetch restaurant data on component mount if not provided
   useEffect(() => {
     const fetchRestaurantData = async () => {
       try {
-        // Try to get user ID from localStorage or some other auth mechanism
-        const firebaseUID = localStorage.getItem('firebaseUID') || 
-                            sessionStorage.getItem('firebaseUID') || 
-                            // You can add other methods to get the current user ID here
-                            null;
-        
-        if (!firebaseUID) {
-          setError("User ID not found. Please login again.");
+        if (!currentUser || !currentUser.uid) {
+          setError("User not authenticated. Please login again.");
           setIsLoading(false);
           return;
         }
         
-        // Assuming your config is imported properly with MENUQ endpoint
-        // You might need to adjust this based on your actual API structure
-        const config = {
-          MENUQ: process.env.REACT_APP_MENUQ_API || '/api/restaurants'
-        };
+        // Use the userData directly if it contains restaurant info
+        if (userData && Object.keys(userData).length > 0) {
+          console.log("Using userData from context:", userData);
+          setRestaurant({
+            ...userData,
+            firebaseUID: userData.firebaseUid || currentUser.uid
+          });
+          setIsOpen(userData.resOpen || false);
+          setOperatingHours(userData.operatingHours || []);
+          setError("");
+          setIsLoading(false);
+          return;
+        }
+        
+        // If userData doesn't exist or is empty, fetch it from API
+        const firebaseUID = currentUser.uid;
+        console.log("Fetching restaurant data for UID:", firebaseUID);
         
         // Fetch restaurant data
         const response = await axios.get(`${config.MENUQ}/${firebaseUID}`);
+        console.log("API response:", response.data);
         
         // Make sure firebaseUID is included in the restaurant data
         const restaurantData = {
@@ -58,7 +115,7 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
         setError("");
       } catch (err) {
         console.error("Error fetching restaurant data:", err);
-        setError("Failed to load restaurant data. Please try again.");
+        setError("Failed to load restaurant data. " + (err.response?.data?.message || err.message));
       } finally {
         setIsLoading(false);
       }
@@ -66,6 +123,7 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
 
     // If restaurant data is provided through props, use it
     if (initialRestaurant && initialRestaurant.firebaseUID) {
+      console.log("Using initialRestaurant from props:", initialRestaurant);
       setRestaurant(initialRestaurant);
       setIsOpen(initialRestaurant.resOpen || false);
       setOperatingHours(initialRestaurant.operatingHours || []);
@@ -74,7 +132,7 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
       // Otherwise fetch it
       fetchRestaurantData();
     }
-  }, [initialRestaurant]);
+  }, [initialRestaurant, currentUser, userData]);
 
   // Handle toggling restaurant open/closed status
   const handleStatusToggle = async () => {
@@ -88,11 +146,15 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
       setError("");
       const newStatus = !isOpen;
       
+      console.log("Toggling status for restaurant:", restaurant.firebaseUID);
+      console.log("New status will be:", newStatus);
+      
       const updatedRestaurant = await updateRestaurantStatus(
         restaurant.firebaseUID, 
         newStatus
       );
       
+      console.log("Status update successful:", updatedRestaurant);
       setIsOpen(newStatus);
       setRestaurant(updatedRestaurant);
       
@@ -101,8 +163,8 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
         onUpdate(updatedRestaurant);
       }
     } catch (err) {
-      setError("Failed to update restaurant status. Please try again.");
-      console.error("Status update error:", err);
+      console.error("Status update error details:", err);
+      setError(err.message || "Failed to update restaurant status. Please try again.");
     } finally {
       setIsUpdating(false);
     }
@@ -132,11 +194,15 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
       setIsUpdating(true);
       setError("");
       
+      console.log(`Saving hours for ${day}:`, newHours);
+      
       const updatedRestaurant = await updateDayOperatingHours(
         restaurant.firebaseUID,
         day,
         newHours
       );
+      
+      console.log("Hours update successful:", updatedRestaurant);
       
       // Update local state with the new hours
       const updatedHours = updatedRestaurant.operatingHours || [];
@@ -152,8 +218,8 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
       setEditingDay(null);
       setNewHours("");
     } catch (err) {
-      setError(`Failed to update hours for ${day}. Please try again.`);
-      console.error("Hours update error:", err);
+      console.error(`Hours update error for ${day}:`, err);
+      setError(err.message || `Failed to update hours for ${day}. Please try again.`);
     } finally {
       setIsUpdating(false);
     }
@@ -170,10 +236,14 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
       setIsUpdating(true);
       setError("");
       
+      console.log(`Deleting hours for ${day}`);
+      
       const updatedRestaurant = await deleteDayOperatingHours(
         restaurant.firebaseUID,
         day
       );
+      
+      console.log("Hours deletion successful:", updatedRestaurant);
       
       // Update local state with the new hours
       const updatedHours = updatedRestaurant.operatingHours || [];
@@ -185,8 +255,8 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
         onUpdate(updatedRestaurant);
       }
     } catch (err) {
-      setError(`Failed to delete hours for ${day}. Please try again.`);
-      console.error("Hours delete error:", err);
+      console.error(`Hours delete error for ${day}:`, err);
+      setError(err.message || `Failed to delete hours for ${day}. Please try again.`);
     } finally {
       setIsUpdating(false);
     }
@@ -210,11 +280,15 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
       setIsUpdating(true);
       setError("");
       
+      console.log(`Adding hours for ${newDay}:`, newHours);
+      
       const updatedRestaurant = await updateDayOperatingHours(
         restaurant.firebaseUID,
         newDay,
         newHours
       );
+      
+      console.log("Add hours successful:", updatedRestaurant);
       
       // Update local state with the new hours
       const updatedHours = updatedRestaurant.operatingHours || [];
@@ -231,8 +305,8 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
       setNewDay("Monday");
       setNewHours("");
     } catch (err) {
-      setError(`Failed to add hours for ${newDay}. Please try again.`);
-      console.error("Add hours error:", err);
+      console.error(`Add hours error for ${newDay}:`, err);
+      setError(err.message || `Failed to add hours for ${newDay}. Please try again.`);
     } finally {
       setIsUpdating(false);
     }
@@ -247,15 +321,6 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
   const getHoursForDay = (day) => {
     const dayData = operatingHours.find(item => item.day === day);
     return dayData ? dayData.hours : "Closed";
-  };
-
-  // Function to handle manual authentication in case of error
-  const handleManualLogin = () => {
-    const firebaseUID = prompt("Please enter your restaurant ID to continue:");
-    if (firebaseUID) {
-      localStorage.setItem('firebaseUID', firebaseUID);
-      window.location.reload();
-    }
   };
 
   // Show loading state if restaurant data is still being loaded
@@ -294,12 +359,6 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
               onClick={() => window.location.reload()}
             >
               Refresh Page
-            </button>
-            <button 
-              className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition duration-150"
-              onClick={handleManualLogin}
-            >
-              Enter Restaurant ID
             </button>
           </div>
         </div>
