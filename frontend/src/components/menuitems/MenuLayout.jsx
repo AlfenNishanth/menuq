@@ -2,7 +2,14 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import MenuCard from "./MenuCard";
 import { getRestaurantMenu } from "../../api/menuItem";
-import {capitalizeWords} from "../../utils/format";
+import { capitalizeWords } from "../../utils/format";
+import { Clock, Calendar, AlertCircle } from "lucide-react";
+import axios from "axios";
+
+// Config for API endpoints
+const config = {
+  MENUQ: window.REACT_APP_MENUQ_API || '/api/restaurants'
+};
 
 // Comprehensive list of menu categories in logical serving order
 const categoryOrder = [
@@ -55,12 +62,92 @@ const categoryOrder = [
   "Desserts"
 ];
 
+// Component to display restaurant status and hours
+const RestaurantStatusInfo = ({ restaurantData }) => {
+  // If no data is available yet
+  if (!restaurantData) {
+    return null;
+  }
+
+  const { resOpen, operatingHours = [] } = restaurantData;
+  
+  // Get current day of week
+  const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const today = days[new Date().getDay()];
+  
+  // Find today's hours
+  const todayHours = operatingHours.find(item => item.day === today);
+  
+  // Check if currently within operating hours (simplified check)
+  const isWithinHours = () => {
+    if (!todayHours) return false;
+    
+    // This is a simplified check. For a complete check, you would need to parse
+    // the time strings and compare with current time
+    return resOpen;
+  };
+
+  return (
+    <div className="bg-gradient-to-r from-amber-50 to-white border-l-4 border-amber-400 rounded-r-lg shadow-sm mb-8 overflow-hidden">
+      <div className="flex flex-col md:flex-row">
+        {/* Status indicator */}
+        <div className="p-4 md:p-5 flex items-center bg-white/60 backdrop-blur-sm md:w-1/3">
+          <div className={`w-3 h-3 rounded-full mr-3 ${resOpen ? 'bg-green-500' : 'bg-red-500'}`}></div>
+          <div>
+            <h3 className="font-medium text-gray-800">
+              Restaurant is currently{" "}
+              <span className={`font-bold ${resOpen ? 'text-green-600' : 'text-red-600'}`}>
+                {resOpen ? "OPEN" : "CLOSED"}
+              </span>
+            </h3>
+            {todayHours && (
+              <p className="text-sm text-gray-600 mt-1">
+                <Clock size={14} className="inline mr-1" />
+                Today's hours: {todayHours.hours}
+              </p>
+            )}
+          </div>
+        </div>
+        
+        {/* Weekly hours display */}
+        <div className="p-4 md:p-5 md:flex-1 border-t md:border-t-0 md:border-l border-amber-100">
+          <h4 className="flex items-center text-sm font-medium text-amber-800 mb-2">
+            <Calendar size={14} className="mr-1.5" /> 
+            Operating Hours
+          </h4>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-sm">
+            {operatingHours.length > 0 ? (
+              operatingHours.map((item) => (
+                <div 
+                  key={item.day}
+                  className={`flex justify-between ${item.day === today ? 'font-medium' : ''}`}
+                >
+                  <span className={item.day === today ? 'text-amber-800' : 'text-gray-700'}>
+                    {item.day}:
+                  </span>
+                  <span className={item.day === today ? 'text-amber-800' : 'text-gray-600'}>
+                    {item.hours}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500 italic col-span-full">Operating hours not available</p>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const RestaurantMenu = () => {
   const { id } = useParams();
   const [menuItems, setMenuItems] = useState({});
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("");
   const [visibleCategoryGroups, setVisibleCategoryGroups] = useState(false);
+  const [restaurantData, setRestaurantData] = useState(null);
+  const [restaurantLoading, setRestaurantLoading] = useState(true);
   
   const categoryRefs = useRef({});
   const menuContainerRef = useRef(null);
@@ -73,6 +160,19 @@ const RestaurantMenu = () => {
     'Extras': ['Sides', 'Accompaniments', 'Vegetarian', 'Vegan', 'Gluten-Free', 'Kids Menu'],
     'Drinks': ['Beverages', 'Hot Beverages', 'Drinks', 'Cold Beverages', 'Mocktails', 'Cocktails', 'Wine List', 'Beer', 'Spirits'],
     'Desserts': ['Desserts']
+  };
+
+  // Fetch restaurant data including status and hours
+  const fetchRestaurantData = async () => {
+    try {
+      setRestaurantLoading(true);
+      const response = await axios.get(`${config.MENUQ}/${id}`);
+      setRestaurantData(response.data);
+    } catch (error) {
+      console.error("Error fetching restaurant data:", error);
+    } finally {
+      setRestaurantLoading(false);
+    }
   };
 
   const fetchMenuItems = async () => {
@@ -131,6 +231,7 @@ const RestaurantMenu = () => {
 
   useEffect(() => {
     fetchMenuItems();
+    fetchRestaurantData(); // Fetch restaurant status and hours
   }, [id]);
 
   // Sort categories according to predefined order
@@ -251,8 +352,13 @@ const RestaurantMenu = () => {
       )}
 
       <div className="max-w-screen-xl mx-auto px-6 py-10">
+        {/* Restaurant Status Banner */}
+        {!restaurantLoading && restaurantData && (
+          <RestaurantStatusInfo restaurantData={restaurantData} />
+        )}
+        
         {/* Loading State */}
-        {loading && (
+        {(loading || restaurantLoading) && (
           <div className="flex flex-col items-center justify-center py-16">
             <div className="w-16 h-16 relative">
               <div className="absolute inset-0 border-4 border-amber-200 border-t-amber-600 rounded-full animate-spin"></div>
