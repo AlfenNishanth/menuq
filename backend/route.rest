@@ -8,7 +8,7 @@ GET http://localhost:8080/api/health
 GET http://localhost:8080/api/menuq/WMiNOcc6j4aRbAkpD4unBsM7rOG3
 
 ###
-GET http://localhost:8080/api/menuq/
+GET http://menuq.arknishinvent.com/api/menuq/
 
 ###
 GET http://13.234.225.202:8080/api/health
@@ -17,17 +17,13 @@ GET http://13.234.225.202:8080/api/health
 GET http://menuq.arknishinvent.com/api/test
 
 ###
-<<<<<<< HEAD
-GET https://menuq.arknishinvent.com/api/menuq/
-=======
-GET http://localhost:8080/api/menuq/byId/RX00001
->>>>>>> f822496e949358fe38aef5ceeda50488360a3da3
+GET https://menuq.arknishinvent.com/api/menuq/pGx6DnxdBuPIgDS6mAjK11dg0tC2
 
 ###
 GET http://localhost:8080/api/menu/RX00001
 
 ###
-GET http://localhost:8080/api/menu/RX00028
+GET https://menuq.arknishinvent.com/api/menu/RX00002
 
 ###
 GET http://localhost:8080/api/menu/item/67aadaa454641ff4345fb9d6
@@ -68,3 +64,41 @@ Content-Type: application/json
 
 ###
 GET http://localhost:8080/api/menu/RX00045
+
+### Update all operating hours for a restaurant
+PUT https://menuq.arknishinvent.com/api/menuq/b3r6hSN70OXMQkMAHT1h5QeybIk2/hours
+Content-Type: application/json
+
+{
+  "operatingHours": [
+    { "day": "Monday", "hours": "9:00 AM - 5:00 PM" },
+    { "day": "Tuesday", "hours": "9:00 AM - 5:00 PM" },
+    { "day": "Wednesday", "hours": "9:00 AM - 5:00 PM" },
+    { "day": "Thursday", "hours": "9:00 AM - 5:00 PM" },
+    { "day": "Friday", "hours": "9:00 AM - 6:00 PM" },
+    { "day": "Saturday", "hours": "10:00 AM - 4:00 PM" },
+    { "day": "Sunday", "hours": "Closed" }
+  ]
+}
+
+### Update operating hours for a specific day
+PATCH https://menuq.arknishinvent.com/api/menuq/b3r6hSN70OXMQkMAHT1h5QeybIk2/hours
+Content-Type: application/json
+
+{
+  "day": "Tuesday",
+  "hours": "8:00 AM - 6:00 PM"
+}
+
+### Delete operating hours for a specific day
+DELETE https://menuq.arknishinvent.com/api/menuq/b3r6hSN70OXMQkMAHT1h5QeybIk2/hours/
+
+
+### Update restaurant status to open
+PATCH https://menuq.arknishinvent.com/api/menuq/b3r6hSN70OXMQkMAHT1h5QeybIk2/status
+Content-Type: application/json
+
+{
+  "resOpen": false
+}
+

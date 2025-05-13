@@ -2,57 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Clock, Calendar, Check, X, Edit, Trash, Plus } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
-
-// Define the API endpoint - without using process.env which might not be available
-const config = {
-  MENUQ: window.REACT_APP_MENUQ_API || '/api/restaurants'
-};
-
-// API functions with proper error handling
-const updateRestaurantStatus = async (firebaseUID, isOpen) => {
-  try {
-    console.log(`Updating restaurant status to: ${isOpen ? 'Open' : 'Closed'}`);
-    const response = await axios.patch(
-      `${config.MENUQ}/${firebaseUID}/status`, 
-      { resOpen: isOpen }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error updating restaurant status:", error);
-    // Extract more detailed error info if available
-    const errorMessage = error.response?.data?.message || error.message || "Unknown error occurred";
-    throw new Error(`Status update failed: ${errorMessage}`);
-  }
-};
-
-const updateDayOperatingHours = async (firebaseUID, day, hours) => {
-  try {
-    console.log(`Updating operating hours for ${day}`);
-    const response = await axios.patch(
-      `${config.MENUQ}/${firebaseUID}/hours`,
-      { day, hours }
-    );
-    return response.data;
-  } catch (error) {
-    console.error(`Error updating operating hours for ${day}:`, error);
-    const errorMessage = error.response?.data?.message || error.message || "Unknown error occurred";
-    throw new Error(`Hours update failed: ${errorMessage}`);
-  }
-};
-
-const deleteDayOperatingHours = async (firebaseUID, day) => {
-  try {
-    console.log(`Deleting operating hours for ${day}`);
-    const response = await axios.delete(
-      `${config.MENUQ}/${firebaseUID}/hours/${day}`
-    );
-    return response.data;
-  } catch (error) {
-    console.error(`Error deleting operating hours for ${day}:`, error);
-    const errorMessage = error.response?.data?.message || error.message || "Unknown error occurred";
-    throw new Error(`Hours deletion failed: ${errorMessage}`);
-  }
-};
+import { updateRestaurantStatus, updateDayOperatingHours, updateAllOperatingHours, deleteDayOperatingHours } from '../api/restaurant';
 
 const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
   const [restaurant, setRestaurant] = useState(initialRestaurant || {});
@@ -66,8 +16,7 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
-  // Get auth context
-  const { currentUser, userData } = useAuth();
+  const { currentUser, userData, updateUserData } = useAuth();
 
   const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   
@@ -153,6 +102,8 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
         restaurant.firebaseUID, 
         newStatus
       );
+
+      updateUserData();
       
       console.log("Status update successful:", updatedRestaurant);
       setIsOpen(newStatus);
