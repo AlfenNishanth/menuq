@@ -109,19 +109,19 @@ const DashboardHome = () => {
       </div>
       
       {/* Error message */}
-      {error && (
+      {/* {error && (
         <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-md">
           <div className="flex items-center">
             <AlertTriangle className="text-red-500 mr-2" size={20} />
             <p className="text-red-700">{error}</p>
           </div>
         </div>
-      )}
+      )} */}
       
       {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
         {/* Profile Completeness Section - Requires minimal data storage */}
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-md p-6 border border-amber-100">
+        {/* <div className="lg:col-span-2 bg-white rounded-xl shadow-md p-6 border border-amber-100">
           <h2 className="text-xl font-semibold text-amber-800 mb-6">Restaurant Profile</h2>
           
           {loading ? (
@@ -143,9 +143,9 @@ const DashboardHome = () => {
                 </div>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-1 gap-4"> */}
                 {/* Only Restaurant Logo Option */}
-                <div className={`p-4 rounded-lg border ${profileCompleteness.hasLogo ? 'bg-green-50 border-green-200' : 'bg-amber-50 border-amber-200'}`}>
+                {/* <div className={`p-4 rounded-lg border ${profileCompleteness.hasLogo ? 'bg-green-50 border-green-200' : 'bg-amber-50 border-amber-200'}`}>
                   <div className="flex items-center">
                     <div className={`p-2 rounded-full ${profileCompleteness.hasLogo ? 'bg-green-100' : 'bg-amber-100'} mr-3`}>
                       <Settings size={20} className={profileCompleteness.hasLogo ? 'text-green-600' : 'text-amber-600'} />
@@ -158,10 +158,10 @@ const DashboardHome = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> */}
               
               {/* Quick Tips */}
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
+              {/* <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
                 <h3 className="font-medium text-blue-800 mb-2">Quick Tips</h3>
                 <ul className="text-sm text-blue-700 pl-5 list-disc">
                   <li className="mb-1">Complete your profile to make your menu look professional</li>
@@ -171,7 +171,7 @@ const DashboardHome = () => {
               </div>
             </div>
           )}
-        </div>
+        </div> */}
         
         {/* Restaurant Status Panel - Now properly passing props */}
         <div className="lg:col-span-1">

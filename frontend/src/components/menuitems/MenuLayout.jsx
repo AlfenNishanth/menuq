@@ -126,25 +126,26 @@ const RestaurantStatusInfo = ({ restaurantData }) => {
           </div>
         </div>
 
-        {/* Weekly hours display */}
+        {/* Weekly hours display - FIXED LAYOUT */}
         <div className="p-4 md:p-5 md:flex-1 border-t md:border-t-0 md:border-l border-amber-100">
-          <h4 className="flex items-center text-sm font-medium text-amber-800 mb-2">
+          <h4 className="flex items-center text-sm font-medium text-amber-800 mb-3">
             <Calendar size={14} className="mr-1.5" />
             Operating Hours
           </h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-sm">
-            {operatingHours.length > 0 ? (
-              operatingHours.map((item) => (
+          
+          {operatingHours.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2 text-sm">
+              {operatingHours.map((item) => (
                 <div
                   key={item.day}
-                  className={`flex justify-between ${
+                  className={`flex ${
                     item.day === today ? "font-medium" : ""
                   }`}
                 >
                   <span
-                    className={
+                    className={`w-22 ${
                       item.day === today ? "text-amber-800" : "text-gray-700"
-                    }
+                    }`}
                   >
                     {item.day}:
                   </span>
@@ -156,13 +157,13 @@ const RestaurantStatusInfo = ({ restaurantData }) => {
                     {item.hours}
                   </span>
                 </div>
-              ))
-            ) : (
-              <p className="text-gray-500 italic col-span-full">
-                Operating hours not available
-              </p>
-            )}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500 italic col-span-full">
+              Operating hours not available
+            </p>
+          )}
         </div>
       </div>
     </div>
