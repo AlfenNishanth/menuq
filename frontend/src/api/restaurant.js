@@ -19,9 +19,10 @@ export async function fetchRestaurantByUID(firebaseUID) {
 }
 
 export async function fetchRestaurantByID(ResId) {
-  console.log("calling fetRestaurantByUID API");
+  console.log("calling fetRestaurantByID API");
   try {
     const response = await axios.get(`${config.MENUQ}/byId/${ResId}`);
+    // console.log(response.data);
     return response.data;
   } catch (error) {
     throw error;

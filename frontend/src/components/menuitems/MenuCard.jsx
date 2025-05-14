@@ -29,7 +29,9 @@ function MenuCard({ item, onAddToOrder }) {
 
   // Check for the correct property name in your backend
   // Log the item to see the actual structure
-  console.log("Menu item data:", item);
+
+  
+  // console.log("Menu item data:", item);
 
   const {
     name,
