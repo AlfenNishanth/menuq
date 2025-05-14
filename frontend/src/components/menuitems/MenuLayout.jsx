@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import MenuCard from "./MenuCard";
 import { getRestaurantMenu } from "../../api/menuItem";
+import { fetchRestaurantByID } from "../../api/restaurant";
 import { capitalizeWords } from "../../utils/format";
 import { Clock, Calendar, AlertCircle } from "lucide-react";
 import axios from "axios";
@@ -163,17 +164,19 @@ const RestaurantMenu = () => {
   };
 
   // Fetch restaurant data including status and hours
-  const fetchRestaurantData = async () => {
-    try {
-      setRestaurantLoading(true);
-      const response = await axios.get(`${config.MENUQ}/${id}`);
-      setRestaurantData(response.data);
-    } catch (error) {
-      console.error("Error fetching restaurant data:", error);
-    } finally {
-      setRestaurantLoading(false);
-    }
-  };
+  
+  useEffect(async ()=>{
+      try {
+        setRestaurantLoading(true);
+        const data = await fetchRestaurantByID(id)
+        setRestaurantData(response.data);
+      } catch (error) {
+        console.error("Error fetching restaurant data:", error);
+      } finally {
+        setRestaurantLoading(false);
+      }
+    });
+  
 
   const fetchMenuItems = async () => {
     try {
