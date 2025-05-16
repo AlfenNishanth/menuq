@@ -62,16 +62,16 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
         console.log("Fetching restaurant data for UID:", firebaseUID);
 
         // Fetch restaurant data
-        const response = await axios.get(`${config.MENUQ}/${firebaseUID}`);
-        console.log("API response:", response.data);
+        // const response = await axios.get(`${config.MENUQ}/${firebaseUID}`);
+        // console.log("API response:", response.data);
 
         // Make sure firebaseUID is included in the restaurant data
-        const restaurantData = {
-          ...response.data,
-          firebaseUID: firebaseUID,
-        };
+        // const restaurantData = {
+        //   ...response.data,
+        //   firebaseUID: firebaseUID,
+        // };
 
-        setRestaurant(restaurantData);
+        setRestaurant(userData);
         setIsOpen(restaurantData.resOpen || false);
         setOperatingHours(restaurantData.operatingHours || []);
         setError("");
