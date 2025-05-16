@@ -27,7 +27,7 @@ const Signup = () => {
   const [OperatingHours, setOperatingHours] = useState([]);
   const [SocialMedia, setSocialMedia] = useState({});
 
-  const { signUp, socialLogin, currentUser } = useAuth();
+  const { signUp, socialLogin, currentUser,updateUserData } = useAuth();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -85,76 +85,131 @@ const Signup = () => {
     }
   }
 
-  async function handleSubmit(e) {
+async function handleSubmit(e) {
     e.preventDefault();
     setLoading(true);
-
+    
+    // Client-side validations
     if (passwordRef.current.value !== confirmPasswordRef.current.value) {
       setLoading(false);
       toast.error("Passwords do not match");
       return setError("Passwords do not match");
     }
-
+    
     if (passwordRef.current.value.length < 6) {
       setLoading(false);
       toast.error("Password must be at least 6 characters long");
       return setError("Password must be at least 6 characters long");
     }
-
+    
     try {
       setError("");
-      const userCredential = await signUp(
+      
+      // Prepare restaurant data object
+      const restaurantData = {
+        restaurantName: ResNameRef.current.value,
+        restaurantAddress: ResAdrsRef.current.value,
+        restaurantLocation: ResLoc,
+        noOfSeats: NoSeatsRef.current.value,
+        phone: phoneRef.current.value,
+        restaurantCategory: ResCategory,
+        cuisineType: CuisineType,
+        operatingHours: OperatingHours,
+        socialMedia: SocialMedia,
+        imageFile: imageFile
+      };
+      
+      // Call the enhanced signUp function from AuthContext
+      const result = await signUp(
         emailRef.current.value,
-        passwordRef.current.value
+        passwordRef.current.value,
+        restaurantData
       );
-
-      const user = userCredential.user;
-      if (user) {
-        await updateProfile(user, { displayName: ResNameRef.current.value });
-        
-        let imageUrl = null;
-        if (imageFile) {
-          imageUrl = await uploadRestaurantImage(user.uid);
-        }
-        
-        // Prepare restaurant data
-        const data = {
-          firebaseUid: user.uid,
-          email: emailRef.current.value,
-          phone: phoneRef.current.value,
-          restaurantName: ResNameRef.current.value,
-          restaurantAddress: ResAdrsRef.current.value,
-          restaurantLocation: ResLoc,
-          noOfSeats: NoSeatsRef.current.value,
-          restaurantCategory: ResCategory,
-          cuisineType: CuisineType,
-          operatingHours: OperatingHours,
-          socialMedia: SocialMedia,
-          profileImage: imageUrl
-        };
-        
-        // Use your API function to register the restaurant
-        try{
-          await registerRestaurant(data);
-          
-          toast.success("Account created successfully!");
-          navigate("/dashboard");
-        } catch (error) {
-          console.error("Error registering restaurant in database:", error);
-          setError(`Failed to create an account: ${error}`);
-          console.log("deleting firebase user " + user.uid + " " + user.displayName )
-          await user.delete();
-        }
+      
+      if (result.success) {
+        toast.success("Account created successfully!");
+        navigate("/dashboard");
       }
     } catch (err) {
       const errorMessage = err.message.replace("Firebase: ", "");
       setError(`Failed to create an account: ${errorMessage}`);
       toast.error(`Signup failed: ${errorMessage}`);
-      console.error(error);
+      console.error(err);
     }
-
+    
     setLoading(false);
   }
+
+  // async function handleSubmit(e) {
+  //   e.preventDefault();
+  //   setLoading(true);
+
+  //   if (passwordRef.current.value !== confirmPasswordRef.current.value) {
+  //     setLoading(false);
+  //     toast.error("Passwords do not match");
+  //     return setError("Passwords do not match");
+  //   }
+
+  //   if (passwordRef.current.value.length < 6) {
+  //     setLoading(false);
+  //     toast.error("Password must be at least 6 characters long");
+  //     return setError("Password must be at least 6 characters long");
+  //   }
+
+  //   try {
+  //     setError("");
+  //     const userCredential = await signUp(
+  //       emailRef.current.value,
+  //       passwordRef.current.value
+  //     );
+
+  //     const user = userCredential.user;
+  //     if (user) {
+  //       await updateProfile(user, { displayName: ResNameRef.current.value });
+        
+  //       let imageUrl = null;
+  //       if (imageFile) {
+  //         imageUrl = await uploadRestaurantImage(user.uid);
+  //       }
+        
+  //       // Prepare restaurant data
+  //       const data = {
+  //         firebaseUid: user.uid,
+  //         email: emailRef.current.value,
+  //         phone: phoneRef.current.value,
+  //         restaurantName: ResNameRef.current.value,
+  //         restaurantAddress: ResAdrsRef.current.value,
+  //         restaurantLocation: ResLoc,
+  //         noOfSeats: NoSeatsRef.current.value,
+  //         restaurantCategory: ResCategory,
+  //         cuisineType: CuisineType,
+  //         operatingHours: OperatingHours,
+  //         socialMedia: SocialMedia,
+  //         profileImage: imageUrl
+  //       };
+        
+  //       // Use your API function to register the restaurant
+  //       try{
+  //         await registerRestaurant(data);
+  //         // await updateUserData()
+  //         toast.success("Account created successfully!");
+  //         navigate("/dashboard");
+  //       } catch (error) {
+  //         console.error("Error registering restaurant in database:", error);
+  //         setError(`Failed to create an account: ${error}`);
+  //         console.log("deleting firebase user " + user.uid + " " + user.displayName )
+  //         await user.delete();
+  //       }
+  //     }
+  //   } catch (err) {
+  //     const errorMessage = err.message.replace("Firebase: ", "");
+  //     setError(`Failed to create an account: ${errorMessage}`);
+  //     toast.error(`Signup failed: ${errorMessage}`);
+  //     console.error(error);
+  //   }
+
+  //   setLoading(false);
+  // }
 
   async function handleSocialSignup(provider) {
     try {

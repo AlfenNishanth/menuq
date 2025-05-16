@@ -166,8 +166,20 @@ const Sidebar = ({ onLogoutClick }) => {
   const navigate = useNavigate();
   
   // Use your actual authentication context
-  const { currentUser: user, userData, logout } = useAuth();
+  const { currentUser: user, userData, logout, loading:AuthLoading } = useAuth();
   
+  //   if (AuthLoading) {
+  //   return (
+  //     <div className="flex flex-col items-center justify-center py-16">
+  //       <div className="w-16 h-16 relative">
+  //         <div className="absolute inset-0 border-4 border-amber-200 border-t-amber-600 rounded-full animate-spin"></div>
+  //         <div className="absolute inset-3 border-2 border-amber-100 border-b-amber-400 rounded-full animate-spin-slow"></div>
+  //       </div>
+  //       <p className="mt-6 text-amber-800 font-medium">Loading </p>
+  //     </div>
+  //   );
+  // }
+
   // Toggle sidebar animation
   useEffect(() => {
     setAnimate(true);
@@ -251,7 +263,7 @@ const Sidebar = ({ onLogoutClick }) => {
               <SidebarItem
                 icon={<QrCode size={18} />}
                 text="QR Code"
-                to="/dashboard/qr-generator/:id"
+                to={`/dashboard/qr-generator/${userData?.restaurantId}`}
               />
             </ul>
             
