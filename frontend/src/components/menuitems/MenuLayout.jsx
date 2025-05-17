@@ -4,7 +4,7 @@ import MenuCard from "./MenuCard";
 import { getRestaurantMenu } from "../../api/menuItem";
 import { fetchRestaurantByID } from "../../api/restaurant";
 import { capitalizeWords } from "../../utils/format";
-import { Clock, Calendar, AlertCircle } from "lucide-react";
+import { Clock, Calendar, AlertCircle, MapPin, Award, Phone } from "lucide-react";
 import axios from "axios";
 
 // Config for API endpoints
@@ -62,6 +62,56 @@ const categoryOrder = [
   // Sweet endings
   "Desserts",
 ];
+
+// Restaurant Name Display Component
+const RestaurantNameHeader = ({ restaurantData }) => {
+  if (!restaurantData || !restaurantData.restaurantName) {
+    return null;
+  }
+
+  const { restaurantName, restaurantCategory, restaurantAddress } = restaurantData;
+
+  return (
+    <div className="mb-8">
+      <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-amber-800 to-amber-600 shadow-lg">
+        {/* Decorative patterns */}
+        <div className="absolute top-0 left-0 w-full h-full opacity-10">
+          <div className="absolute -right-20 -top-20 w-64 h-64 bg-white rounded-full"></div>
+          <div className="absolute left-1/4 -bottom-24 w-40 h-40 bg-white rounded-full"></div>
+        </div>
+        
+        <div className="relative p-8 md:p-10">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between">
+            <div className="mb-4 md:mb-0">
+              <div className="flex items-center mb-2">
+                <div className="h-1 w-12 bg-amber-300 mr-3"></div>
+                <span className="text-amber-200 text-sm font-medium tracking-wider uppercase">
+                  {restaurantCategory || "Restaurant"}
+                </span>
+              </div>
+              
+              <h1 className="text-4xl md:text-5xl font-serif font-bold text-white leading-tight">
+                {restaurantName}
+              </h1>
+              
+              {restaurantAddress && (
+                <div className="flex items-center mt-3 text-amber-100">
+                  <MapPin size={16} className="mr-2" />
+                  <span className="text-sm md:text-base">{restaurantAddress}</span>
+                </div>
+              )}
+            </div>
+            
+            <div className="flex items-center bg-white/10 backdrop-filter backdrop-blur-sm px-4 py-2 rounded-full border border-white/20">
+              <Award className="text-amber-300 mr-2" size={18} />
+              <span className="text-white text-sm font-medium">Authentic Cuisine</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // Component to display restaurant status and hours
 const RestaurantStatusInfo = ({ restaurantData }) => {
@@ -432,6 +482,11 @@ const RestaurantMenu = () => {
       )}
 
       <div className="max-w-screen-xl mx-auto px-6 py-10">
+        {/* Restaurant Name Header - Added Here */}
+        {!restaurantLoading && restaurantData && (
+          <RestaurantNameHeader restaurantData={restaurantData} />
+        )}
+        
         {/* Restaurant Status Banner */}
         {!restaurantLoading && restaurantData && (
           <RestaurantStatusInfo restaurantData={restaurantData} />
