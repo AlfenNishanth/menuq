@@ -593,7 +593,7 @@ const RestaurantMenu = () => {
               </div>
               <div className="h-px w-12 bg-amber-200"></div>
             </div>
-            <p className="text-amber-800 font-serif italic mt-4">Bon Appétit</p>
+            <p className="text-amber-800 font-serif italic mt-4">Savor each sublime bite</p>
           </div>
         )}
       </div>
