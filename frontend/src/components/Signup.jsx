@@ -20,7 +20,7 @@ const Signup = () => {
 
   // Additional restaurant data
   const [ResLoc, setResLoc] = useState({ type: "Point", coordinates: [0, 0] });
-  const [ResCategory, setResCategory] = useState("Other");
+  const [ResCategory, setResCategory] = useState("");
   const [CuisineType, setCuisineType] = useState([]);
   const [OperatingHours, setOperatingHours] = useState([]);
   const [SocialMedia, setSocialMedia] = useState({});
@@ -314,13 +314,17 @@ const Signup = () => {
               className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900"
               aria-label="Restaurant Category"
             >
-              <option value="Other">Select Category</option>
-              <option value="Fine Dining">Fine Dining</option>
-              <option value="Casual Dining">Casual Dining</option>
-              <option value="Cafe">Cafe</option>
-              <option value="Fast Food">Fast Food</option>
-              <option value="Buffet">Buffet</option>
-              <option value="Food Truck">Food Truck</option>
+              <option value="">Select Category</option>
+              <option value="Restaurant">Restaurant</option>
+              <option value="Quick Service Restaurant">Quick Service Restaurant (QSR)</option>
+              <option value="Cafe & Coffee Shop">Cafe & Coffee Shop</option>
+              <option value="Bar & Pub">Bar & Pub</option>
+              <option value="Bakery & Patisserie">Bakery & Patisserie</option>
+              <option value="Juice & Beverage Shop">Juice & Beverage Shop</option>
+              <option value="Food Court Vendor">Food Court Vendor</option>
+              <option value="Food Stall/Cart/Truck">Food Stall/Cart/Truck</option>
+              <option value="Hotel Restaurant">Hotel Restaurant</option>
+              <option value="Catering Service">Catering Service</option>
               <option value="Other">Other</option>
             </select>
           </div>
