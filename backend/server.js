@@ -87,7 +87,7 @@ const resRouter = require("./routes/menuq");
 app.use("/api/menuq", resRouter);
 
 const menuRouter = require("./routes/menu");
-app.use("//apimenu", menuRouter);
+app.use("/api/menu", menuRouter);
 
 //test
 app.get("/api/health", async (req, res) => {
