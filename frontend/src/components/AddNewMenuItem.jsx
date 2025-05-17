@@ -18,7 +18,7 @@ export default function AddNewMenuItem() {
     setValue,
     formState: { errors },
   } = useForm();
-  
+
   const [variants, setVariants] = useState([]);
   const [addOns, setAddOns] = useState([]);
   const [tags, setTags] = useState([]);
@@ -33,7 +33,7 @@ export default function AddNewMenuItem() {
   const [filteredDishes, setFilteredDishes] = useState([]);
 
   const vegetarianValue = watch("vegetarian");
-  
+
   const fileInputRef = useRef();
   const { currentUser, userData, updateUserData } = useAuth();
 
@@ -43,17 +43,20 @@ export default function AddNewMenuItem() {
       setFilteredDishes(predefinedDishes);
     } else {
       const term = searchTerm.toLowerCase();
-      const filtered = predefinedDishes.map(category => {
-        return {
-          category: category.category,
-          items: category.items.filter(item => 
-            item.name.toLowerCase().includes(term) || 
-            item.description.toLowerCase().includes(term) ||
-            item.tags.some(tag => tag.includes(term))
-          )
-        };
-      }).filter(category => category.items.length > 0);
-      
+      const filtered = predefinedDishes
+        .map((category) => {
+          return {
+            category: category.category,
+            items: category.items.filter(
+              (item) =>
+                item.name.toLowerCase().includes(term) ||
+                item.description.toLowerCase().includes(term)
+              // || item.tags.some(tag => tag.includes(term))
+            ),
+          };
+        })
+        .filter((category) => category.items.length > 0);
+
       setFilteredDishes(filtered);
     }
   }, [searchTerm]);
@@ -82,7 +85,7 @@ export default function AddNewMenuItem() {
         toast.error("Image size should be less than 5MB");
         return;
       }
-      
+
       setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -107,12 +110,12 @@ export default function AddNewMenuItem() {
     setValue("price", dish.price);
     setValue("vegetarian", dish.vegetarian);
     setValue("type", "Main Course"); // Default to Main Course, can be adjusted as needed
-    
+
     // Set variants, addOns, and tags
     setVariants(dish.variants || []);
     setAddOns(dish.addOns || []);
     setTags(dish.tags || []);
-    
+
     // Close the modal
     setShowPredefinedModal(false);
   };
@@ -124,11 +127,12 @@ export default function AddNewMenuItem() {
     }
 
     setLoading(true);
-    if(userData === null) {
+    if (userData === null) {
       await updateUserData();
     }
     const restaurantID = userData.restaurantId;
-    const finalType = data.type === "Custom" ? data.customType.toLowerCase() : data.type;
+    const finalType =
+      data.type === "Custom" ? data.customType.toLowerCase() : data.type;
 
     const formData = new FormData();
     formData.append("restaurantID", restaurantID);
@@ -139,7 +143,8 @@ export default function AddNewMenuItem() {
     formData.append("available", "true");
     formData.append("vegetarian", data.vegetarian);
 
-    if (variants.length !== 0) formData.append("variants", JSON.stringify(variants));
+    if (variants.length !== 0)
+      formData.append("variants", JSON.stringify(variants));
     if (addOns.length !== 0) formData.append("addOns", JSON.stringify(addOns));
     if (tags.length !== 0) formData.append("tags", JSON.stringify(tags));
 
@@ -164,7 +169,7 @@ export default function AddNewMenuItem() {
       console.error("Error adding menu item:", error);
       toast.error(`Error adding menu item: ${error.message}`);
     }
-    
+
     setLoading(false);
   };
 
@@ -176,11 +181,13 @@ export default function AddNewMenuItem() {
         <div className="absolute top-1/3 right-1/4 w-64 h-64 rounded-full bg-amber-200 mix-blend-multiply"></div>
         <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full bg-amber-100 mix-blend-multiply"></div>
       </div>
-      
+
       <div className="p-8 rounded-2xl shadow-xl w-full max-w-lg bg-white relative z-10">
-        <h2 className="text-4xl font-serif font-bold mb-6 text-center text-amber-700">Add New Menu Item</h2>
+        <h2 className="text-4xl font-serif font-bold mb-6 text-center text-amber-700">
+          Add New Menu Item
+        </h2>
         <div className="w-16 h-1 bg-amber-500 mx-auto mb-8"></div>
-        
+
         {/* Quick Add Button */}
         <button
           type="button"
@@ -190,9 +197,9 @@ export default function AddNewMenuItem() {
           <span className="mr-2">🍽️</span>
           Choose from Predefined Dishes
         </button>
-        
-        <form 
-          onSubmit={handleSubmit(onSubmit)} 
+
+        <form
+          onSubmit={handleSubmit(onSubmit)}
           className="space-y-4"
           onKeyDown={(e) => {
             if (e.key === "Enter" && e.target.tagName !== "TEXTAREA") {
@@ -211,7 +218,9 @@ export default function AddNewMenuItem() {
               disabled={loading}
             />
             {errors.name && (
-              <p className="text-red-500 text-sm -mt-3">{errors.name.message}</p>
+              <p className="text-red-500 text-sm -mt-3">
+                {errors.name.message}
+              </p>
             )}
 
             {/* Description */}
@@ -246,7 +255,9 @@ export default function AddNewMenuItem() {
             {/* Custom Type Input (Only when "Custom" is selected) */}
             {watch("type") === "Custom" && (
               <input
-                {...register("customType", { required: "Custom type is required" })}
+                {...register("customType", {
+                  required: "Custom type is required",
+                })}
                 type="text"
                 placeholder="Enter custom category"
                 className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-amber-200 text-gray-900 ${
@@ -256,7 +267,9 @@ export default function AddNewMenuItem() {
               />
             )}
             {errors.customType && (
-              <p className="text-red-500 text-sm -mt-3">{errors.customType.message}</p>
+              <p className="text-red-500 text-sm -mt-3">
+                {errors.customType.message}
+              </p>
             )}
 
             {/* Vegetarian Toggle */}
@@ -269,17 +282,17 @@ export default function AddNewMenuItem() {
                 control={control}
                 defaultValue={false}
                 render={({ field: { onChange, value } }) => (
-                  <button 
+                  <button
                     type="button"
                     onClick={() => onChange(!value)}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      value ? 'bg-amber-600' : 'bg-gray-400'
+                      value ? "bg-amber-600" : "bg-gray-400"
                     }`}
                     disabled={loading}
                   >
-                    <span 
+                    <span
                       className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        value ? 'translate-x-6' : 'translate-x-1'
+                        value ? "translate-x-6" : "translate-x-1"
                       }`}
                     />
                   </button>
@@ -298,11 +311,14 @@ export default function AddNewMenuItem() {
               disabled={loading}
             />
             {errors.price && (
-              <p className="text-red-500 text-sm -mt-3">{errors.price.message}</p>
+              <p className="text-red-500 text-sm -mt-3">
+                {errors.price.message}
+              </p>
             )}
 
             {/* Image Upload */}
-            <div className="border-2 border-dashed rounded-lg p-4 transition border-amber-300 hover:border-amber-400 text-center"
+            <div
+              className="border-2 border-dashed rounded-lg p-4 transition border-amber-300 hover:border-amber-400 text-center"
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => {
                 e.preventDefault();
@@ -317,13 +333,13 @@ export default function AddNewMenuItem() {
               <div className="space-y-2">
                 {imagePreview ? (
                   <div className="relative">
-                    <img 
-                      src={imagePreview} 
-                      alt="Menu Item Preview" 
+                    <img
+                      src={imagePreview}
+                      alt="Menu Item Preview"
                       className="mx-auto h-36 object-cover rounded-lg"
                     />
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       onClick={removeImage}
                       className="absolute -top-2 -right-2 bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 transition"
                     >
@@ -333,11 +349,13 @@ export default function AddNewMenuItem() {
                 ) : (
                   <div className="text-center py-4 text-gray-500">
                     <Upload className="mx-auto text-4xl mb-2 text-amber-600" />
-                    <p className="text-sm font-medium">Upload Menu Item Image</p>
+                    <p className="text-sm font-medium">
+                      Upload Menu Item Image
+                    </p>
                     <p className="text-xs mt-1">JPG, PNG or GIF (Max. 5MB)</p>
                   </div>
                 )}
-                
+
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -346,7 +364,7 @@ export default function AddNewMenuItem() {
                   className="hidden"
                   id="menu-item-image"
                 />
-                
+
                 {!imagePreview && (
                   <button
                     type="button"
@@ -356,7 +374,7 @@ export default function AddNewMenuItem() {
                     Browse Image
                   </button>
                 )}
-                
+
                 {imagePreview && (
                   <button
                     type="button"
@@ -372,7 +390,9 @@ export default function AddNewMenuItem() {
 
           {/* Variants Section */}
           <div className="p-4 rounded-lg shadow-md transition bg-white border border-amber-50">
-            <h3 className="font-serif text-xl font-semibold mb-2 text-amber-700">Variants</h3>
+            <h3 className="font-serif text-xl font-semibold mb-2 text-amber-700">
+              Variants
+            </h3>
             <div className="space-y-2">
               {variants.map((variant, index) => (
                 <div key={index} className="flex space-x-2">
@@ -404,7 +424,9 @@ export default function AddNewMenuItem() {
                   />
                   <button
                     type="button"
-                    onClick={() => setVariants(variants.filter((_, i) => i !== index))}
+                    onClick={() =>
+                      setVariants(variants.filter((_, i) => i !== index))
+                    }
                     className="bg-red-500 text-white px-3 rounded-lg hover:bg-red-600 transition flex items-center justify-center"
                     disabled={loading}
                   >
@@ -414,7 +436,9 @@ export default function AddNewMenuItem() {
               ))}
               <button
                 type="button"
-                onClick={() => setVariants([...variants, { name: "", price: 0 }])}
+                onClick={() =>
+                  setVariants([...variants, { name: "", price: 0 }])
+                }
                 disabled={loading}
                 className="mt-2 w-full px-4 py-2 text-sm font-medium rounded-md transition-colors bg-amber-600 text-white hover:bg-amber-700"
               >
@@ -425,7 +449,9 @@ export default function AddNewMenuItem() {
 
           {/* Add Ons Section */}
           <div className="p-4 rounded-lg shadow-md transition bg-white border border-amber-50">
-            <h3 className="font-serif text-xl font-semibold mb-2 text-amber-700">Add Ons</h3>
+            <h3 className="font-serif text-xl font-semibold mb-2 text-amber-700">
+              Add Ons
+            </h3>
             <div className="space-y-2">
               {addOns.map((addOn, index) => (
                 <div key={index} className="flex space-x-2">
@@ -457,7 +483,9 @@ export default function AddNewMenuItem() {
                   />
                   <button
                     type="button"
-                    onClick={() => setAddOns(addOns.filter((_, i) => i !== index))}
+                    onClick={() =>
+                      setAddOns(addOns.filter((_, i) => i !== index))
+                    }
                     className="bg-red-500 text-white px-3 rounded-lg hover:bg-red-600 transition flex items-center justify-center"
                     disabled={loading}
                   >
@@ -478,7 +506,9 @@ export default function AddNewMenuItem() {
 
           {/* Tags Section */}
           <div className="p-4 rounded-lg shadow-md transition bg-white border border-amber-50">
-            <h3 className="font-serif text-xl font-semibold mb-2 text-amber-700">Tags</h3>
+            <h3 className="font-serif text-xl font-semibold mb-2 text-amber-700">
+              Tags
+            </h3>
             <div className="mb-2 flex flex-wrap gap-2">
               {tags.map((tag, index) => (
                 <span
@@ -526,9 +556,9 @@ export default function AddNewMenuItem() {
             )}
           </div>
 
-          <button 
-            type="submit" 
-            className="w-full bg-amber-600 text-white p-3 rounded-lg font-semibold hover:bg-amber-700 transition duration-300 shadow-lg disabled:opacity-50 flex justify-center items-center group relative overflow-hidden" 
+          <button
+            type="submit"
+            className="w-full bg-amber-600 text-white p-3 rounded-lg font-semibold hover:bg-amber-700 transition duration-300 shadow-lg disabled:opacity-50 flex justify-center items-center group relative overflow-hidden"
             disabled={loading}
           >
             <span className="absolute inset-0 w-full h-full transition-all duration-300 ease-out transform translate-x-full bg-amber-700 group-hover:translate-x-0"></span>
@@ -548,7 +578,9 @@ export default function AddNewMenuItem() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg w-full max-w-3xl max-h-[80vh] overflow-hidden">
             <div className="p-4 bg-amber-50 border-b border-amber-200 flex justify-between items-center">
-              <h3 className="text-xl font-serif font-bold text-amber-800">Choose a Predefined Dish</h3>
+              <h3 className="text-xl font-serif font-bold text-amber-800">
+                Choose a Predefined Dish
+              </h3>
               <button
                 onClick={() => setShowPredefinedModal(false)}
                 className="text-gray-600 hover:text-gray-800 transition"
@@ -556,7 +588,7 @@ export default function AddNewMenuItem() {
                 <XCircleIcon size={24} />
               </button>
             </div>
-            
+
             {/* Search */}
             <div className="p-4 border-b border-gray-200">
               <div className="relative">
@@ -567,10 +599,13 @@ export default function AddNewMenuItem() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full p-3 pl-10 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-amber-200 text-gray-900"
                 />
-                <Search className="absolute left-3 top-3.5 text-gray-400" size={18} />
+                <Search
+                  className="absolute left-3 top-3.5 text-gray-400"
+                  size={18}
+                />
               </div>
             </div>
-            
+
             {/* Dishes List */}
             <div className="p-2 overflow-y-auto max-h-[60vh]">
               {filteredDishes.length === 0 ? (
@@ -585,23 +620,36 @@ export default function AddNewMenuItem() {
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                       {category.items.map((dish, dishIndex) => (
-                        <div 
+                        <div
                           key={dishIndex}
                           onClick={() => selectPredefinedDish(dish)}
                           className="p-3 rounded-lg border border-amber-100 bg-white hover:bg-amber-50 cursor-pointer transition"
                         >
                           <div className="font-medium">{dish.name}</div>
-                          <div className="text-sm text-gray-600 line-clamp-2">{dish.description}</div>
+                          <div className="text-sm text-gray-600 line-clamp-2">
+                            {dish.description}
+                          </div>
                           <div className="mt-1 flex items-center justify-between">
-                            <span className="text-amber-700 font-medium">{dish.price.toFixed(2)}</span>
-                            <span className={`text-xs px-2 py-0.5 rounded-full ${dish.vegetarian ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                              {dish.vegetarian ? 'Vegetarian' : 'Non-veg'}
+                            <span className="text-amber-700 font-medium">
+                              {dish.price.toFixed(2)}
+                            </span>
+                            <span
+                              className={`text-xs px-2 py-0.5 rounded-full ${
+                                dish.vegetarian
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-red-100 text-red-800"
+                              }`}
+                            >
+                              {dish.vegetarian ? "Vegetarian" : "Non-veg"}
                             </span>
                           </div>
                           {dish.tags && dish.tags.length > 0 && (
                             <div className="mt-2 flex flex-wrap gap-1">
                               {dish.tags.slice(0, 3).map((tag, tagIndex) => (
-                                <span key={tagIndex} className="text-xs px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded">
+                                <span
+                                  key={tagIndex}
+                                  className="text-xs px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded"
+                                >
                                   {tag}
                                 </span>
                               ))}
@@ -619,7 +667,7 @@ export default function AddNewMenuItem() {
                 ))
               )}
             </div>
-            
+
             {/* Footer */}
             <div className="p-4 bg-amber-50 border-t border-amber-200 flex justify-end">
               <button

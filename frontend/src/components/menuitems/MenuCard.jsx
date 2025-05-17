@@ -278,12 +278,12 @@ function MenuCard({ item, onAddToOrder }) {
               {available ? (
                 <div className="flex space-x-2">
                   {/* New button that uses the selected variants and add-ons */}
-                  <button 
+                  {/* <button 
                     onClick={handleAddToOrder}
                     className="flex-grow bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 rounded-md transition-colors duration-200"
                   >
                     Add to Order • ₹{calculateTotalPrice()}
-                  </button>
+                  </button> */}
                 </div>
               ) : (
                 <div className="bg-red-100 text-red-600 py-2 text-center text-sm rounded-md">

@@ -8,13 +8,11 @@ import {
   Edit,
   X
 } from 'lucide-react';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'; // Make sure this import is in your file
 import { capitalizeWords } from '../../utils/format';
 import { updateAvailability, updatePrepTime } from '../../api/menuItem';
 
 
-function MenuCardAdmin({ item, onAddToOrder }) {
+function MenuCardAdmin({ item, onAddToOrder, showSuccessToast, showErrorToast }) {
   const [expanded, setExpanded] = useState(false);
   const [isAvailable, setIsAvailable] = useState(item.available);
   const [isEditingPrepTime, setIsEditingPrepTime] = useState(false);
@@ -32,16 +30,10 @@ function MenuCardAdmin({ item, onAddToOrder }) {
       console.log(item._id);
 
       await updateAvailability(item._id, newAvailability)
-      toast.success(`Item ${newAvailability ? 'available' : 'unavailable'} now`, {
-        autoClose: 3000, 
-        closeButton: true
-      });
+      showSuccessToast(`Item ${newAvailability ? 'available' : 'unavailable'} now`);
     } catch(error) {
       console.error("Error updating availability:", error.response?.data || error.message); 
-      toast.error("Error updating availability. Please try again later.", {
-        autoClose: 3000,
-        closeButton: true
-      });
+      showErrorToast("Error updating availability. Please try again later.");
       setIsAvailable(!newAvailability); // Revert the state change
     }
     
@@ -62,10 +54,7 @@ function MenuCardAdmin({ item, onAddToOrder }) {
       
       // Validate that it's a valid number
       if (isNaN(prepTimeNumber)) {
-        toast.error("Prep time must be a valid number", {
-          autoClose: 3000,
-          closeButton: true
-        });
+        showErrorToast("Prep time must be a valid number");
         return;
       }
       
@@ -75,16 +64,10 @@ function MenuCardAdmin({ item, onAddToOrder }) {
       console.log('Update result:', result);
       
       setIsEditingPrepTime(false);
-      toast.success("Prep time updated successfully!", {
-        autoClose: 3000,
-        closeButton: true
-      });
+      showSuccessToast("Prep time updated successfully!");
     } catch (error) {
       console.error("Error updating prep time:", error);
-      toast.error("Error updating prep time. Please try again later.", {
-        autoClose: 3000,
-        closeButton: true
-      });
+      showErrorToast("Error updating prep time. Please try again later.");
       setPrepTimeValue(item.prepTime); // Revert to original value
     }
   };
@@ -273,12 +256,12 @@ function MenuCardAdmin({ item, onAddToOrder }) {
             <div className="mt-4">
               {isAvailable ? (
                 <div className="flex space-x-2">
-                  <button 
+                  {/* <button 
                     onClick={() => onAddToOrder && onAddToOrder(item)}
                     className="flex-grow bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 rounded-md transition-colors duration-200"
                   >
                     Add to Order
-                  </button>
+                  </button> */}
                 </div>
               ) : (
                 <div className="bg-red-100 text-red-600 py-2 text-center text-sm rounded-md">
@@ -289,20 +272,6 @@ function MenuCardAdmin({ item, onAddToOrder }) {
           </div>
         </div>
       )}
-      {/* Toast container with explicit close button configuration */}
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick={true}
-        rtl={false}
-        pauseOnFocusLoss={true}
-        draggable={true}
-        pauseOnHover={true}
-        closeButton={true}
-        theme="light"
-      />
     </div>
   );
 }

@@ -1,22 +1,24 @@
 import { useEffect, useState, useRef, useCallback } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useParams } from "react-router-dom";
 import MenuCardAdmin from "./MenuCardAdmin";
 import { getRestaurantMenu } from "../../api/menuItem";
-import {capitalizeWords} from "../../utils/format";
+import { capitalizeWords } from "../../utils/format";
 import { useAuth } from "../../contexts/AuthContext";
 // Comprehensive list of menu categories in logical serving order
 const categoryOrder = [
   // Meal-specific menus
-  "Breakfast", 
+  "Breakfast",
   "Brunch",
   "Lunch Specials",
-  
+
   // Starters and light options
   "Appetizers",
-  "Starter", 
+  "Starter",
   "Soups",
   "Salads",
-  
+
   // Main dishes
   "Chef's Specials",
   "Signature Dishes",
@@ -29,58 +31,99 @@ const categoryOrder = [
   "Sushi",
   "Tapas",
   "Sharing Platters",
-  
+
   // Supporting items
   "Sides",
   "Accompaniments",
-  
+
   // Special dietary options
   "Vegetarian",
   "Vegan",
   "Gluten-Free",
   "Kids Menu",
-  
+
   // Beverages
   "Beverages",
   "Hot Beverages",
-  "Drinks", 
+  "Drinks",
   "Cold Beverages",
   "Mocktails",
   "Cocktails",
   "Wine List",
   "Beer",
   "Spirits",
-  
+
   // Sweet endings
-  "Desserts"
+  "Desserts",
 ];
 
 const ManageMenu = () => {
+  const { userData } = useAuth();
+  //   const id  = userData.restaurantId;
 
-    const { userData} = useAuth();
-//   const id  = userData.restaurantId;
-
-    console.log("menuLayout userData:", userData); // Logs the entire object
-    console.log(`menuLayout restaurantId - ${userData?.restaurantId}`); // Logs specific property
-
+  console.log("menuLayout userData:", userData); // Logs the entire object
+  console.log(`menuLayout restaurantId - ${userData?.restaurantId}`); // Logs specific property
 
   const id = userData?.restaurantId;
   const [menuItems, setMenuItems] = useState({});
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("");
   const [visibleCategoryGroups, setVisibleCategoryGroups] = useState(false);
-  
+
   const categoryRefs = useRef({});
   const menuContainerRef = useRef(null);
 
   // Group categories by type for better navigation
   const categoryGroups = {
-    'Meal Options': ['Breakfast', 'Brunch', 'Lunch Specials'],
-    'Starters': ['Appetizers', 'Starter', 'Soups', 'Salads'],
-    'Mains': ['Chef\'s Specials', 'Signature Dishes', 'Main Course', 'Pasta', 'Pizza', 'Noodles', 'Rice Dishes', 'Curry', 'Sushi', 'Tapas', 'Sharing Platters'],
-    'Extras': ['Sides', 'Accompaniments', 'Vegetarian', 'Vegan', 'Gluten-Free', 'Kids Menu'],
-    'Drinks': ['Beverages', 'Hot Beverages', 'Drinks', 'Cold Beverages', 'Mocktails', 'Cocktails', 'Wine List', 'Beer', 'Spirits'],
-    'Desserts': ['Desserts']
+    "Meal Options": ["Breakfast", "Brunch", "Lunch Specials"],
+    Starters: ["Appetizers", "Starter", "Soups", "Salads"],
+    Mains: [
+      "Chef's Specials",
+      "Signature Dishes",
+      "Main Course",
+      "Pasta",
+      "Pizza",
+      "Noodles",
+      "Rice Dishes",
+      "Curry",
+      "Sushi",
+      "Tapas",
+      "Sharing Platters",
+    ],
+    Extras: [
+      "Sides",
+      "Accompaniments",
+      "Vegetarian",
+      "Vegan",
+      "Gluten-Free",
+      "Kids Menu",
+    ],
+    Drinks: [
+      "Beverages",
+      "Hot Beverages",
+      "Drinks",
+      "Cold Beverages",
+      "Mocktails",
+      "Cocktails",
+      "Wine List",
+      "Beer",
+      "Spirits",
+    ],
+    Desserts: ["Desserts"],
+  };
+
+  const showSuccessToast = (message) => {
+    toast.success(message, {
+      autoClose: 3000,
+      closeButton: true,
+    });
+  };
+
+  const showErrorToast = (message) => {
+    toast.error(message, {
+      autoClose: 3000,
+      closeButton: true,
+    });
   };
 
   const fetchMenuItems = async () => {
@@ -90,7 +133,7 @@ const ManageMenu = () => {
 
       // Group items by category
       const groupedItems = {};
-      items.forEach(item => {
+      items.forEach((item) => {
         if (!groupedItems[item.type]) {
           groupedItems[item.type] = [];
         }
@@ -98,7 +141,7 @@ const ManageMenu = () => {
       });
 
       setMenuItems(groupedItems);
-      
+
       // Set the first category as active
       const categories = getSortedCategories(groupedItems);
       if (categories.length > 0) {
@@ -116,19 +159,22 @@ const ManageMenu = () => {
     const observerOptions = {
       root: null,
       rootMargin: "-100px 0px -80% 0px",
-      threshold: 0
+      threshold: 0,
     };
 
     const observerCallback = (entries) => {
-      entries.forEach(entry => {
+      entries.forEach((entry) => {
         if (entry.isIntersecting) {
           setActiveCategory(entry.target.dataset.category);
         }
       });
     };
 
-    const observer = new IntersectionObserver(observerCallback, observerOptions);
-    
+    const observer = new IntersectionObserver(
+      observerCallback,
+      observerOptions
+    );
+
     // Observe all category sections
     Object.entries(categoryRefs.current).forEach(([category, ref]) => {
       if (ref) observer.observe(ref);
@@ -156,9 +202,9 @@ const ManageMenu = () => {
 
   const scrollToCategory = (category) => {
     setActiveCategory(category);
-    categoryRefs.current[category]?.scrollIntoView({ 
-      behavior: 'smooth', 
-      block: 'start' 
+    categoryRefs.current[category]?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
     });
   };
 
@@ -181,7 +227,9 @@ const ManageMenu = () => {
   // Get only the categories that actually have menu items
   const availableCategoryGroups = {};
   Object.entries(categoryGroups).forEach(([group, categories]) => {
-    const availableCategories = categories.filter(cat => sortedCategories.includes(cat));
+    const availableCategories = categories.filter((cat) =>
+      sortedCategories.includes(cat)
+    );
     if (availableCategories.length > 0) {
       availableCategoryGroups[group] = availableCategories;
     }
@@ -194,21 +242,28 @@ const ManageMenu = () => {
         <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-amber-100 shadow-sm py-3">
           <div className="max-w-screen-xl mx-auto px-4">
             <div className="flex items-center mb-2">
-              <button 
+              <button
                 onClick={toggleCategoryGroups}
                 className="text-amber-700 hover:text-amber-900 font-medium flex items-center mr-4"
               >
                 <span className="mr-1">Categories</span>
-                <svg 
-                  className={`w-4 h-4 transition-transform ${visibleCategoryGroups ? 'rotate-180' : ''}`} 
-                  fill="none" 
-                  stroke="currentColor" 
+                <svg
+                  className={`w-4 h-4 transition-transform ${
+                    visibleCategoryGroups ? "rotate-180" : ""
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </button>
-              
+
               <div className="overflow-x-auto hide-scrollbar">
                 <div className="flex gap-2">
                   {sortedCategories.map((category) => (
@@ -216,9 +271,11 @@ const ManageMenu = () => {
                       key={category}
                       onClick={() => scrollToCategory(category)}
                       className={`px-4 py-1.5 text-sm font-medium transition-all duration-300 whitespace-nowrap rounded-full
-                        ${activeCategory === category 
-                          ? "bg-amber-600 text-white shadow-md" 
-                          : "bg-amber-50 text-amber-900 hover:bg-amber-100"}`}
+                        ${
+                          activeCategory === category
+                            ? "bg-amber-600 text-white shadow-md"
+                            : "bg-amber-50 text-amber-900 hover:bg-amber-100"
+                        }`}
                     >
                       {capitalizeWords(category)}
                     </button>
@@ -226,32 +283,38 @@ const ManageMenu = () => {
                 </div>
               </div>
             </div>
-            
+
             {/* Expanded Category Groups */}
             {visibleCategoryGroups && (
               <div className="pt-2 pb-1 border-t border-amber-100 animate-fadeIn">
-                {Object.entries(availableCategoryGroups).map(([group, categories]) => (
-                  <div key={group} className="mb-3 last:mb-0">
-                    <h3 className="text-xs uppercase tracking-wider text-amber-800 font-semibold mb-1.5">{group}</h3>
-                    <div className="flex flex-wrap gap-1.5">
-                      {categories.map((category) => (
-                        <button
-                          key={category}
-                          onClick={() => {
-                            scrollToCategory(category);
-                            setVisibleCategoryGroups(false);
-                          }}
-                          className={`px-3 py-1 text-xs transition-all whitespace-nowrap rounded
-                            ${activeCategory === category 
-                              ? "bg-amber-500 text-white" 
-                              : "bg-amber-50 text-amber-800 hover:bg-amber-100"}`}
-                        >
-                          {category}
-                        </button>
-                      ))}
+                {Object.entries(availableCategoryGroups).map(
+                  ([group, categories]) => (
+                    <div key={group} className="mb-3 last:mb-0">
+                      <h3 className="text-xs uppercase tracking-wider text-amber-800 font-semibold mb-1.5">
+                        {group}
+                      </h3>
+                      <div className="flex flex-wrap gap-1.5">
+                        {categories.map((category) => (
+                          <button
+                            key={category}
+                            onClick={() => {
+                              scrollToCategory(category);
+                              setVisibleCategoryGroups(false);
+                            }}
+                            className={`px-3 py-1 text-xs transition-all whitespace-nowrap rounded
+                            ${
+                              activeCategory === category
+                                ? "bg-amber-500 text-white"
+                                : "bg-amber-50 text-amber-800 hover:bg-amber-100"
+                            }`}
+                          >
+                            {category}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                )}
               </div>
             )}
           </div>
@@ -266,7 +329,9 @@ const ManageMenu = () => {
               <div className="absolute inset-0 border-4 border-amber-200 border-t-amber-600 rounded-full animate-spin"></div>
               <div className="absolute inset-3 border-2 border-amber-100 border-b-amber-400 rounded-full animate-spin-slow"></div>
             </div>
-            <p className="mt-6 text-amber-800 font-medium">Curating the menu...</p>
+            <p className="mt-6 text-amber-800 font-medium">
+              Curating the menu...
+            </p>
           </div>
         )}
 
@@ -274,12 +339,28 @@ const ManageMenu = () => {
         {sortedCategories.length === 0 && !loading && (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <div className="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center mb-6">
-              <svg className="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+              <svg
+                className="w-10 h-10 text-amber-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                ></path>
               </svg>
             </div>
-            <h3 className="text-2xl font-serif text-gray-800 mb-2">Menu Coming Soon</h3>
-            <p className="text-gray-500 max-w-md">Our chefs are carefully crafting a delightful menu experience for you.</p>
+            <h3 className="text-2xl font-serif text-gray-800 mb-2">
+              Menu Coming Soon
+            </h3>
+            <p className="text-gray-500 max-w-md">
+              Our chefs are carefully crafting a delightful menu experience for
+              you.
+            </p>
           </div>
         )}
 
@@ -287,11 +368,11 @@ const ManageMenu = () => {
         <div className="space-y-16">
           {sortedCategories.map((category, categoryIndex) => {
             const categoryGroup = findCategoryGroup(category);
-            
+
             return (
-              <div 
-                key={category} 
-                ref={el => categoryRefs.current[category] = el}
+              <div
+                key={category}
+                ref={(el) => (categoryRefs.current[category] = el)}
                 data-category={category}
                 className="scroll-mt-28"
               >
@@ -303,11 +384,13 @@ const ManageMenu = () => {
                   )}
                   <div className="flex items-center">
                     <div className="w-2 h-2 bg-amber-500 rounded-full mr-3"></div>
-                    <h2 className="text-2xl font-serif text-gray-800">{category}</h2>
+                    <h2 className="text-2xl font-serif text-gray-800">
+                      {category}
+                    </h2>
                     <div className="flex-grow h-px bg-gradient-to-r from-amber-300 to-transparent ml-4"></div>
                   </div>
                 </div>
-                
+
                 {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"> */}
                 {/* <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
                 {menuItems[category].map((item) => (
@@ -324,18 +407,21 @@ const ManageMenu = () => {
           })}
         </div> */}
 
-
-<div className="flex flex-wrap gap-8">
-                {menuItems[category].map((item) => (
-                    <div 
+                <div className="flex flex-wrap gap-8">
+                  {menuItems[category].map((item) => (
+                    <div
                       key={item._id}
                       className="flex basis-[calc(100%-2rem)] 
                       md:basis-[calc(50%-1rem)] lg:basis-[calc(33.333%-1.5rem)] 
                       transform transition-all duration-500 hover:-translate-y-1"
 
-                    // className="grid"
+                      // className="grid"
                     >
-                      <MenuCardAdmin item={item} />
+                      <MenuCardAdmin
+                        item={item}
+                        showSuccessToast={showSuccessToast}
+                        showErrorToast={showErrorToast}
+                      />
                     </div>
                   ))}
                 </div>
@@ -350,7 +436,12 @@ const ManageMenu = () => {
             <div className="inline-flex items-center">
               <div className="h-px w-12 bg-amber-200"></div>
               <div className="mx-4">
-                <svg className="w-6 h-6 text-amber-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <svg
+                  className="w-6 h-6 text-amber-400"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
                 </svg>
               </div>
@@ -360,6 +451,19 @@ const ManageMenu = () => {
           </div>
         )}
       </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={true}
+        rtl={false}
+        pauseOnFocusLoss={true}
+        draggable={true}
+        pauseOnHover={true}
+        closeButton={true}
+        theme="light"
+      />
     </div>
   );
 };
