@@ -37,6 +37,13 @@ const Signup = () => {
     emailRef.current?.focus();
   }, []);
 
+  useEffect(() => {
+  if (currentUser) {
+    alert("You are already signed in. Please logout first to signup with a new user.");
+    navigate("/dashboard"); // or wherever you want
+  }
+}, [currentUser]);
+
   // Handler for location selection
   const handleLocationSelect = (locationData) => {
     setResLoc({
