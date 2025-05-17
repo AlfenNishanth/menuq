@@ -263,7 +263,7 @@ const Sidebar = ({ onLogoutClick }) => {
               <SidebarItem
                 icon={<QrCode size={18} />}
                 text="QR Code"
-                to={`/dashboard/qr-generator/${userData?.restaurantId}`}
+                to={`/dashboard/qr-generator`}
               />
             </ul>
             

@@ -4,7 +4,14 @@ import MenuCard from "./MenuCard";
 import { getRestaurantMenu } from "../../api/menuItem";
 import { fetchRestaurantByID } from "../../api/restaurant";
 import { capitalizeWords } from "../../utils/format";
-import { Clock, Calendar, AlertCircle, MapPin, Award, Phone } from "lucide-react";
+import {
+  Clock,
+  Calendar,
+  AlertCircle,
+  MapPin,
+  Award,
+  Phone,
+} from "lucide-react";
 import axios from "axios";
 
 // Config for API endpoints
@@ -69,17 +76,19 @@ const RestaurantNameHeader = ({ restaurantData }) => {
     return null;
   }
 
-  const { restaurantName, restaurantCategory, restaurantAddress } = restaurantData;
+  const { restaurantName, restaurantCategory, restaurantAddress } =
+    restaurantData;
 
   return (
     <div className="mb-8">
-      <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-amber-800 to-amber-600 shadow-lg">
+      {/* <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-amber-800 to-amber-600 shadow-lg"> */}
+      <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#de7002] to-amber-500 shadow-lg">
         {/* Decorative patterns */}
         <div className="absolute top-0 left-0 w-full h-full opacity-10">
           <div className="absolute -right-20 -top-20 w-64 h-64 bg-white rounded-full"></div>
           <div className="absolute left-1/4 -bottom-24 w-40 h-40 bg-white rounded-full"></div>
         </div>
-        
+
         <div className="relative p-8 md:p-10">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between">
             <div className="mb-4 md:mb-0">
@@ -89,22 +98,26 @@ const RestaurantNameHeader = ({ restaurantData }) => {
                   {restaurantCategory || "Restaurant"}
                 </span>
               </div>
-              
+
               <h1 className="text-4xl md:text-5xl font-serif font-bold text-white leading-tight">
                 {restaurantName}
               </h1>
-              
+
               {restaurantAddress && (
                 <div className="flex items-center mt-3 text-amber-100">
                   <MapPin size={16} className="mr-2" />
-                  <span className="text-sm md:text-base">{restaurantAddress}</span>
+                  <span className="text-sm md:text-base">
+                    {restaurantAddress}
+                  </span>
                 </div>
               )}
             </div>
-            
+
             <div className="flex items-center bg-white/10 backdrop-filter backdrop-blur-sm px-4 py-2 rounded-full border border-white/20">
               <Award className="text-amber-300 mr-2" size={18} />
-              <span className="text-white text-sm font-medium">Authentic Cuisine</span>
+              <span className="text-white text-sm font-medium">
+                Authentic Cuisine
+              </span>
             </div>
           </div>
         </div>
@@ -182,15 +195,13 @@ const RestaurantStatusInfo = ({ restaurantData }) => {
             <Calendar size={14} className="mr-1.5" />
             Operating Hours
           </h4>
-          
+
           {operatingHours.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2 text-sm">
               {operatingHours.map((item) => (
                 <div
                   key={item.day}
-                  className={`flex ${
-                    item.day === today ? "font-medium" : ""
-                  }`}
+                  className={`flex ${item.day === today ? "font-medium" : ""}`}
                 >
                   <span
                     className={`w-22 ${
@@ -275,7 +286,7 @@ const RestaurantMenu = () => {
   const fetchRestaurantData = async (id) => {
     try {
       setRestaurantLoading(true);
-      console.log("ID: " + id)
+      console.log("ID: " + id);
       const data = await fetchRestaurantByID(id);
       setRestaurantData(data);
     } catch (error) {
@@ -486,7 +497,7 @@ const RestaurantMenu = () => {
         {!restaurantLoading && restaurantData && (
           <RestaurantNameHeader restaurantData={restaurantData} />
         )}
-        
+
         {/* Restaurant Status Banner */}
         {!restaurantLoading && restaurantData && (
           <RestaurantStatusInfo restaurantData={restaurantData} />
@@ -593,7 +604,7 @@ const RestaurantMenu = () => {
               </div>
               <div className="h-px w-12 bg-amber-200"></div>
             </div>
-            <p className="text-amber-800 font-serif italic mt-4">Savor each sublime bite</p>
+            <p className="text-amber-800 font-serif italic mt-4">Bon Appétit</p>
           </div>
         )}
       </div>
