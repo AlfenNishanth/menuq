@@ -76,13 +76,11 @@ const RestaurantNameHeader = ({ restaurantData }) => {
     return null;
   }
 
-  const { restaurantName, restaurantCategory, restaurantAddress } =
-    restaurantData;
+  const { restaurantName, restaurantCategory, restaurantAddress } = restaurantData;
 
   return (
     <div className="mb-8">
-      {/* <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-amber-800 to-amber-600 shadow-lg"> */}
-      <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#de7002] to-amber-500 shadow-lg">
+      <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-amber-800 to-amber-600 shadow-lg">
         {/* Decorative patterns */}
         <div className="absolute top-0 left-0 w-full h-full opacity-10">
           <div className="absolute -right-20 -top-20 w-64 h-64 bg-white rounded-full"></div>
@@ -106,18 +104,14 @@ const RestaurantNameHeader = ({ restaurantData }) => {
               {restaurantAddress && (
                 <div className="flex items-center mt-3 text-amber-100">
                   <MapPin size={16} className="mr-2" />
-                  <span className="text-sm md:text-base">
-                    {restaurantAddress}
-                  </span>
+                  <span className="text-sm md:text-base">{restaurantAddress}</span>
                 </div>
               )}
             </div>
 
             <div className="flex items-center bg-white/10 backdrop-filter backdrop-blur-sm px-4 py-2 rounded-full border border-white/20">
               <Award className="text-amber-300 mr-2" size={18} />
-              <span className="text-white text-sm font-medium">
-                Authentic Cuisine
-              </span>
+              <span className="text-white text-sm font-medium">Authentic Cuisine</span>
             </div>
           </div>
         </div>
