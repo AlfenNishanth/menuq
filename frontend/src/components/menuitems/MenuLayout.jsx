@@ -82,7 +82,7 @@ const RestaurantNameHeader = ({ restaurantData }) => {
   return (
     <div className="mb-8">
       {/* <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-amber-800 to-amber-600 shadow-lg"> */}
-      <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#de7002] to-amber-500 shadow-lg">
+      <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#c56300] to-amber-500 shadow-lg">
         {/* Decorative patterns */}
         <div className="absolute top-0 left-0 w-full h-full opacity-10">
           <div className="absolute -right-20 -top-20 w-64 h-64 bg-white rounded-full"></div>

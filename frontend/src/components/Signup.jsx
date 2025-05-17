@@ -25,7 +25,7 @@ const Signup = () => {
   const [OperatingHours, setOperatingHours] = useState([]);
   const [SocialMedia, setSocialMedia] = useState({});
 
-  const { signUp, socialLogin, currentUser, updateUserData } = useAuth();
+  const { signUp, socialLogin, currentUser, userData, isSigningUp } = useAuth();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -38,9 +38,9 @@ const Signup = () => {
   }, []);
 
   useEffect(() => {
-  if (currentUser) {
+  if (currentUser && !isSigningUp && userData ) {
     alert("You are already signed in. Please logout first to signup with a new user.");
-    navigate("/dashboard"); // or wherever you want
+    navigate("/dashboard/"); // or wherever you want
   }
 }, [currentUser]);
 

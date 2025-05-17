@@ -248,7 +248,7 @@ const UpdateProfile = () => {
               </button>
 
               <Link
-                to="/dashboard"
+                to="/dashboard/"
                 className="flex-1 bg-gray-300 text-gray-800 p-3 rounded-lg font-semibold hover:bg-gray-400 transition duration-300 shadow-lg flex justify-center items-center"
               >
                 Cancel
