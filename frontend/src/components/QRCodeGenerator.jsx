@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 
 const QRCodeGenerator = () => {
+
   const { loading: AuthLoading, userData } = useAuth();
 
   if (AuthLoading) {
@@ -32,7 +33,7 @@ const QRCodeGenerator = () => {
     );
   }
 
-  const { id } = useParams();
+  const id = userData.restaurantId;
   const qrRef = useRef(null);
   // const baseUrl = window.location.origin;
   // console.log(currentUser);

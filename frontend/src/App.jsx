@@ -47,7 +47,7 @@ function App() {
             <Route path="add-new-menu-item" element={<AddNewMenuItem/>}/>
             <Route path="manage-menu" element={<ManageMenu/>}/>
             <Route path="edit-menu-item/:id" element={<UpdateMenuItem/>}/>
-            <Route path="qr-generator/:id" element={<QRCodeGenerator/>}/>
+            <Route path="qr-generator" element={<QRCodeGenerator/>}/>
 
             {/* <Route path="add-new-item" element={<AddNewItem />} /> */}
           </Route>
@@ -86,7 +86,7 @@ function App() {
 
 //       {/* <div className="parent-div flex flex-col h-screen w-screen">
 //       <div className="flex h-screen ">
-//         <Sidebar
+//         <
 //           userName="Alfen Nishanth S"
 //           selectedItem={selectedItem}
 //           setSelectedItem={setSelectedItem}

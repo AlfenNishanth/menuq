@@ -404,14 +404,14 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
                 <Calendar size={18} className="text-amber-600 mr-2" />
                 <h3 className="font-medium text-amber-800">Operating Hours</h3>
               </div>
-              {!addingNewDay && (
+              {/* {!addingNewDay && (
                 <button
                   className="px-3 py-1 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition duration-150 flex items-center"
                   onClick={() => setAddingNewDay(true)}
                 >
                   <Plus size={16} className="mr-1" /> Add Day
                 </button>
-              )}
+              )} */}
             </div>
 
             {/* Add New Day Form */}
@@ -433,7 +433,7 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
                   <input
                     type="text"
                     className="p-2 border border-amber-200 rounded-lg bg-white focus:ring-2 focus:ring-amber-300 focus:border-amber-400 outline-none"
-                    placeholder="e.g. 10:00 AM - 9:00 PM"
+                    placeholder="e.g. 10:00 AM - 10:00 PM"
                     value={newHours}
                     onChange={(e) => setNewHours(e.target.value)}
                   />
@@ -498,7 +498,7 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
                                 className="w-full p-2 border border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-300 focus:border-amber-400 outline-none"
                                 value={newHours}
                                 onChange={(e) => setNewHours(e.target.value)}
-                                placeholder="e.g. 10:00 AM - 9:00 PM"
+                                placeholder="e.g. 10:00 AM - 10:00 PM"
                               />
                             ) : (
                               <span
@@ -574,7 +574,7 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
                                     className="px-2 py-1 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition duration-150 flex items-center text-xs"
                                     onClick={() => {
                                       setEditingDay(day);
-                                      setNewHours("10:00 AM - 9:00 PM");
+                                      setNewHours("10:00 AM - 10:00 PM");
                                     }}
                                   >
                                     <Plus size={12} className="mr-1" /> Add
