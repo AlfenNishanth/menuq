@@ -1,58 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { Clock, Calendar, Check, X, Edit, Trash, Plus } from 'lucide-react';
-import axios from 'axios';
-import { useAuth } from '../contexts/AuthContext';
-
-// Define the API endpoint - without using process.env which might not be available
-const config = {
-  MENUQ: window.REACT_APP_MENUQ_API || '/api/restaurants'
-};
-
-// API functions with proper error handling
-const updateRestaurantStatus = async (firebaseUID, isOpen) => {
-  try {
-    console.log(`Updating restaurant status to: ${isOpen ? 'Open' : 'Closed'}`);
-    const response = await axios.patch(
-      `${config.MENUQ}/${firebaseUID}/status`, 
-      { resOpen: isOpen }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error updating restaurant status:", error);
-    // Extract more detailed error info if available
-    const errorMessage = error.response?.data?.message || error.message || "Unknown error occurred";
-    throw new Error(`Status update failed: ${errorMessage}`);
-  }
-};
-
-const updateDayOperatingHours = async (firebaseUID, day, hours) => {
-  try {
-    console.log(`Updating operating hours for ${day}`);
-    const response = await axios.patch(
-      `${config.MENUQ}/${firebaseUID}/hours`,
-      { day, hours }
-    );
-    return response.data;
-  } catch (error) {
-    console.error(`Error updating operating hours for ${day}:`, error);
-    const errorMessage = error.response?.data?.message || error.message || "Unknown error occurred";
-    throw new Error(`Hours update failed: ${errorMessage}`);
-  }
-};
-
-const deleteDayOperatingHours = async (firebaseUID, day) => {
-  try {
-    console.log(`Deleting operating hours for ${day}`);
-    const response = await axios.delete(
-      `${config.MENUQ}/${firebaseUID}/hours/${day}`
-    );
-    return response.data;
-  } catch (error) {
-    console.error(`Error deleting operating hours for ${day}:`, error);
-    const errorMessage = error.response?.data?.message || error.message || "Unknown error occurred";
-    throw new Error(`Hours deletion failed: ${errorMessage}`);
-  }
-};
+import React, { useState, useEffect } from "react";
+import { Clock, Calendar, Check, X, Edit, Trash, Plus } from "lucide-react";
+import axios from "axios";
+import { useAuth } from "../contexts/AuthContext";
+import {
+  updateRestaurantStatus,
+  updateDayOperatingHours,
+  updateAllOperatingHours,
+  deleteDayOperatingHours,
+} from "../api/restaurant";
 
 const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
   const [restaurant, setRestaurant] = useState(initialRestaurant || {});
@@ -66,11 +21,18 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
-  // Get auth context
-  const { currentUser, userData } = useAuth();
+  const { currentUser, userData, updateUserData } = useAuth();
 
-  const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-  
+  const daysOfWeek = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
+
   // Fetch restaurant data on component mount if not provided
   useEffect(() => {
     const fetchRestaurantData = async () => {
@@ -80,13 +42,13 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
           setIsLoading(false);
           return;
         }
-        
+
         // Use the userData directly if it contains restaurant info
         if (userData && Object.keys(userData).length > 0) {
           console.log("Using userData from context:", userData);
           setRestaurant({
             ...userData,
-            firebaseUID: userData.firebaseUid || currentUser.uid
+            firebaseUID: userData.firebaseUid || currentUser.uid,
           });
           setIsOpen(userData.resOpen || false);
           setOperatingHours(userData.operatingHours || []);
@@ -94,28 +56,31 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
           setIsLoading(false);
           return;
         }
-        
+
         // If userData doesn't exist or is empty, fetch it from API
         const firebaseUID = currentUser.uid;
         console.log("Fetching restaurant data for UID:", firebaseUID);
-        
+
         // Fetch restaurant data
-        const response = await axios.get(`${config.MENUQ}/${firebaseUID}`);
-        console.log("API response:", response.data);
-        
+        // const response = await axios.get(`${config.MENUQ}/${firebaseUID}`);
+        // console.log("API response:", response.data);
+
         // Make sure firebaseUID is included in the restaurant data
-        const restaurantData = {
-          ...response.data,
-          firebaseUID: firebaseUID
-        };
-        
-        setRestaurant(restaurantData);
+        // const restaurantData = {
+        //   ...response.data,
+        //   firebaseUID: firebaseUID,
+        // };
+
+        setRestaurant(userData);
         setIsOpen(restaurantData.resOpen || false);
         setOperatingHours(restaurantData.operatingHours || []);
         setError("");
       } catch (err) {
         console.error("Error fetching restaurant data:", err);
-        setError("Failed to load restaurant data. " + (err.response?.data?.message || err.message));
+        setError(
+          "Failed to load restaurant data. " +
+            (err.response?.data?.message || err.message)
+        );
       } finally {
         setIsLoading(false);
       }
@@ -145,26 +110,30 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
       setIsUpdating(true);
       setError("");
       const newStatus = !isOpen;
-      
+
       console.log("Toggling status for restaurant:", restaurant.firebaseUID);
       console.log("New status will be:", newStatus);
-      
+
       const updatedRestaurant = await updateRestaurantStatus(
-        restaurant.firebaseUID, 
+        restaurant.firebaseUID,
         newStatus
       );
-      
+
+      updateUserData();
+
       console.log("Status update successful:", updatedRestaurant);
       setIsOpen(newStatus);
       setRestaurant(updatedRestaurant);
-      
+
       // If there's an onUpdate callback, call it with the updated restaurant
       if (onUpdate) {
         onUpdate(updatedRestaurant);
       }
     } catch (err) {
       console.error("Status update error details:", err);
-      setError(err.message || "Failed to update restaurant status. Please try again.");
+      setError(
+        err.message || "Failed to update restaurant status. Please try again."
+      );
     } finally {
       setIsUpdating(false);
     }
@@ -193,33 +162,35 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
     try {
       setIsUpdating(true);
       setError("");
-      
+
       console.log(`Saving hours for ${day}:`, newHours);
-      
+
       const updatedRestaurant = await updateDayOperatingHours(
         restaurant.firebaseUID,
         day,
         newHours
       );
-      
+
       console.log("Hours update successful:", updatedRestaurant);
-      
+      updateUserData();
       // Update local state with the new hours
       const updatedHours = updatedRestaurant.operatingHours || [];
       setOperatingHours(updatedHours);
       setRestaurant(updatedRestaurant);
-      
+
       // If there's an onUpdate callback, call it with the updated restaurant
       if (onUpdate) {
         onUpdate(updatedRestaurant);
       }
-      
+
       // Reset form
       setEditingDay(null);
       setNewHours("");
     } catch (err) {
       console.error(`Hours update error for ${day}:`, err);
-      setError(err.message || `Failed to update hours for ${day}. Please try again.`);
+      setError(
+        err.message || `Failed to update hours for ${day}. Please try again.`
+      );
     } finally {
       setIsUpdating(false);
     }
@@ -235,28 +206,30 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
     try {
       setIsUpdating(true);
       setError("");
-      
+
       console.log(`Deleting hours for ${day}`);
-      
+
       const updatedRestaurant = await deleteDayOperatingHours(
         restaurant.firebaseUID,
         day
       );
-      
+      updateUserData();
       console.log("Hours deletion successful:", updatedRestaurant);
-      
+
       // Update local state with the new hours
       const updatedHours = updatedRestaurant.operatingHours || [];
       setOperatingHours(updatedHours);
       setRestaurant(updatedRestaurant);
-      
+
       // If there's an onUpdate callback, call it with the updated restaurant
       if (onUpdate) {
         onUpdate(updatedRestaurant);
       }
     } catch (err) {
       console.error(`Hours delete error for ${day}:`, err);
-      setError(err.message || `Failed to delete hours for ${day}. Please try again.`);
+      setError(
+        err.message || `Failed to delete hours for ${day}. Please try again.`
+      );
     } finally {
       setIsUpdating(false);
     }
@@ -271,42 +244,46 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
 
     try {
       // Check if day already exists
-      const existingDay = operatingHours.find(item => item.day === newDay);
+      const existingDay = operatingHours.find((item) => item.day === newDay);
       if (existingDay) {
-        setError(`Hours for ${newDay} already exist. Please edit them instead.`);
+        setError(
+          `Hours for ${newDay} already exist. Please edit them instead.`
+        );
         return;
       }
-      
+
       setIsUpdating(true);
       setError("");
-      
+
       console.log(`Adding hours for ${newDay}:`, newHours);
-      
+
       const updatedRestaurant = await updateDayOperatingHours(
         restaurant.firebaseUID,
         newDay,
         newHours
       );
-      
+
       console.log("Add hours successful:", updatedRestaurant);
-      
+
       // Update local state with the new hours
       const updatedHours = updatedRestaurant.operatingHours || [];
       setOperatingHours(updatedHours);
       setRestaurant(updatedRestaurant);
-      
+
       // If there's an onUpdate callback, call it with the updated restaurant
       if (onUpdate) {
         onUpdate(updatedRestaurant);
       }
-      
+
       // Reset form
       setAddingNewDay(false);
       setNewDay("Monday");
       setNewHours("");
     } catch (err) {
       console.error(`Add hours error for ${newDay}:`, err);
-      setError(err.message || `Failed to add hours for ${newDay}. Please try again.`);
+      setError(
+        err.message || `Failed to add hours for ${newDay}. Please try again.`
+      );
     } finally {
       setIsUpdating(false);
     }
@@ -314,12 +291,12 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
 
   // Check if a day already has hours set
   const isDaySet = (day) => {
-    return operatingHours.some(item => item.day === day);
+    return operatingHours.some((item) => item.day === day);
   };
 
   // Get hours for a specific day
   const getHoursForDay = (day) => {
-    const dayData = operatingHours.find(item => item.day === day);
+    const dayData = operatingHours.find((item) => item.day === day);
     return dayData ? dayData.hours : "Closed";
   };
 
@@ -327,7 +304,9 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
   if (isLoading) {
     return (
       <div className="bg-white p-6 rounded-xl shadow-md border border-amber-100 h-full">
-        <h2 className="text-xl font-semibold text-amber-800 mb-6">Restaurant Status & Hours</h2>
+        <h2 className="text-xl font-semibold text-amber-800 mb-6">
+          Restaurant Status & Hours
+        </h2>
         <div className="flex justify-center items-center h-40">
           <div className="animate-spin h-8 w-8 border-4 border-t-transparent border-amber-600 rounded-full"></div>
         </div>
@@ -337,8 +316,10 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-md border border-amber-100 h-full">
-      <h2 className="text-xl font-semibold text-amber-800 mb-6">Restaurant Status & Hours</h2>
-      
+      <h2 className="text-xl font-semibold text-amber-800 mb-6">
+        Restaurant Status & Hours
+      </h2>
+
       {/* Error message display */}
       {error && (
         <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md mb-4">
@@ -348,13 +329,15 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
           </div>
         </div>
       )}
-      
+
       {/* If restaurant data is missing, show a different UI */}
-      {(!restaurant || !restaurant.firebaseUID) ? (
+      {!restaurant || !restaurant.firebaseUID ? (
         <div className="bg-amber-50 p-4 rounded-lg border border-amber-200 text-center">
-          <p className="text-amber-800 mb-4">Restaurant data is not available or you're not logged in.</p>
+          <p className="text-amber-800 mb-4">
+            Restaurant data is not available or you're not logged in.
+          </p>
           <div className="flex justify-center gap-2">
-            <button 
+            <button
               className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition duration-150"
               onClick={() => window.location.reload()}
             >
@@ -368,19 +351,29 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
           <div className="mb-4 bg-amber-50 p-4 rounded-lg border border-amber-200">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
-                <h3 className="font-medium text-amber-800 mb-1">Current Status</h3>
+                <h3 className="font-medium text-amber-800 mb-1">
+                  Current Status
+                </h3>
                 <div className="flex items-center">
-                  <div className={`w-3 h-3 rounded-full mr-2 ${isOpen ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                  <p className={`text-lg font-semibold ${isOpen ? 'text-green-600' : 'text-red-600'}`}>
-                    {isOpen ? 'OPEN' : 'CLOSED'}
+                  <div
+                    className={`w-3 h-3 rounded-full mr-2 ${
+                      isOpen ? "bg-green-500" : "bg-red-500"
+                    }`}
+                  ></div>
+                  <p
+                    className={`text-lg font-semibold ${
+                      isOpen ? "text-green-600" : "text-red-600"
+                    }`}
+                  >
+                    {isOpen ? "OPEN" : "CLOSED"}
                   </p>
                 </div>
               </div>
               <button
                 className={`px-4 py-2 rounded-lg transition duration-150 flex items-center w-full sm:w-auto justify-center ${
-                  isOpen 
-                    ? 'bg-red-600 hover:bg-red-700 text-white' 
-                    : 'bg-amber-600 hover:bg-amber-700 text-white'
+                  isOpen
+                    ? "bg-red-600 hover:bg-red-700 text-white"
+                    : "bg-amber-600 hover:bg-amber-700 text-white"
                 }`}
                 onClick={handleStatusToggle}
                 disabled={isUpdating}
@@ -392,14 +385,18 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
                   </span>
                 ) : (
                   <span className="flex items-center">
-                    {isOpen ? <X size={16} className="mr-2" /> : <Check size={16} className="mr-2" />}
-                    {isOpen ? 'Mark as Closed' : 'Mark as Open'}
+                    {isOpen ? (
+                      <X size={16} className="mr-2" />
+                    ) : (
+                      <Check size={16} className="mr-2" />
+                    )}
+                    {isOpen ? "Mark as Closed" : "Mark as Open"}
                   </span>
                 )}
               </button>
             </div>
           </div>
-          
+
           {/* Operating Hours Section */}
           <div>
             <div className="flex items-center justify-between mb-4">
@@ -416,7 +413,7 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
                 </button>
               )}
             </div>
-            
+
             {/* Add New Day Form */}
             {addingNewDay && (
               <div className="bg-amber-50 p-4 rounded-lg border border-amber-200 mb-4">
@@ -427,9 +424,9 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
                     value={newDay}
                     onChange={(e) => setNewDay(e.target.value)}
                   >
-                    {daysOfWeek.map(day => (
+                    {daysOfWeek.map((day) => (
                       <option key={day} value={day} disabled={isDaySet(day)}>
-                        {day} {isDaySet(day) ? '(Already Set)' : ''}
+                        {day} {isDaySet(day) ? "(Already Set)" : ""}
                       </option>
                     ))}
                   </select>
@@ -467,27 +464,33 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
                 </div>
               </div>
             )}
-            
+
             {/* Hours List - Simplified for mobile */}
             <div className="bg-amber-50 rounded-lg overflow-hidden border border-amber-200">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-amber-100">
                     <tr>
-                      <th className="text-left p-3 text-amber-800 w-1/4">Day</th>
+                      <th className="text-left p-3 text-amber-800 w-1/4">
+                        Day
+                      </th>
                       <th className="text-left p-3 text-amber-800">Hours</th>
-                      <th className="text-right p-3 text-amber-800 w-2/5">Actions</th>
+                      <th className="text-right p-3 text-amber-800 w-2/5">
+                        Actions
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {daysOfWeek.map(day => {
+                    {daysOfWeek.map((day) => {
                       const hasHours = isDaySet(day);
                       const hours = getHoursForDay(day);
                       const isEditing = editingDay === day;
-                      
+
                       return (
                         <tr key={day} className="border-t border-amber-200">
-                          <td className="p-2 pl-3 font-medium text-amber-900">{day}</td>
+                          <td className="p-2 pl-3 font-medium text-amber-900">
+                            {day}
+                          </td>
                           <td className="p-2">
                             {isEditing ? (
                               <input
@@ -498,7 +501,13 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
                                 placeholder="e.g. 10:00 AM - 9:00 PM"
                               />
                             ) : (
-                              <span className={hasHours ? 'text-amber-900' : 'text-amber-600 italic'}>
+                              <span
+                                className={
+                                  hasHours
+                                    ? "text-amber-900"
+                                    : "text-amber-600 italic"
+                                }
+                              >
                                 {hours}
                               </span>
                             )}
@@ -535,7 +544,9 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
                                   <>
                                     <button
                                       className="px-2 py-1 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition duration-150 flex items-center text-xs"
-                                      onClick={() => handleEditHours(day, hours)}
+                                      onClick={() =>
+                                        handleEditHours(day, hours)
+                                      }
                                     >
                                       <Edit size={12} className="mr-1" /> Edit
                                     </button>
@@ -551,7 +562,8 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
                                         </span>
                                       ) : (
                                         <span className="flex items-center">
-                                          <Trash size={12} className="mr-1" /> Del
+                                          <Trash size={12} className="mr-1" />{" "}
+                                          Del
                                         </span>
                                       )}
                                     </button>

@@ -77,7 +77,7 @@ export async function getRestaurantMenu(id) {
   console.log("Calling getRestaurantMenu API");
   try {
     const response = await axios.get(`${config.MENU}/${id}`);
-    console.log(`${config.MENUQ}/${id}`);
+    // console.log(`${config.MENUQ}/${id}`);
     return response.data;
   } catch (error) {
     throw error;
