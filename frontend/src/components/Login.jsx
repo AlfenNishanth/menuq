@@ -19,6 +19,12 @@ const Login = () => {
     emailRef.current?.focus();
   }, []);
 
+    useEffect(() => {
+    if (currentUser) {
+      navigate("/dashboard"); 
+    }
+  }, [currentUser]);
+
   async function handleSubmit(e) {
     e.preventDefault();
     try {
