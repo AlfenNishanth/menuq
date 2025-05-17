@@ -3,7 +3,8 @@ import { useAuth } from "../contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { updateRestaurant } from "../api/restaurant"
+import { updateRestaurant } from "../api/restaurant";
+import LocationSelector from "./LocationSelector"; // Import the LocationSelector component
 
 const UpdateProfile = () => {
   const { currentUser, userData, updateUserData } = useAuth();
@@ -17,9 +18,17 @@ const UpdateProfile = () => {
   const [restaurantName, setRestaurantName] = useState("");
   const [restaurantAddress, setRestaurantAddress] = useState("");
   const [noOfSeats, setNoOfSeats] = useState("");
+  // Add restaurant category state
+  const [restaurantCategory, setRestaurantCategory] = useState("");
+  
+  // New state for location data
+  const [locationData, setLocationData] = useState({
+    address: "",
+    coordinates: [null, null],
+    placeId: ""
+  });
 
   useEffect(() => {
-    
     console.log("in component - userData:", userData);
 
     if (userData) {
@@ -27,6 +36,22 @@ const UpdateProfile = () => {
       setRestaurantName(userData.restaurantName || "");
       setRestaurantAddress(userData.restaurantAddress || "");
       setNoOfSeats(userData.noOfSeats || "");
+      
+      // Add debugging to check what category data we have
+      console.log("Restaurant Category from userData:", userData.restaurantCategory);
+      
+      // Initialize restaurant category - try both possible property names
+      if (userData.restaurantCategory) {
+        setRestaurantCategory(userData.restaurantCategory);
+      } else if (userData.category) {
+        setRestaurantCategory(userData.category);
+      }
+      
+      // Initialize location data if it exists in userData
+      if (userData.location) {
+        setLocationData(userData.location);
+      }
+      
       setInitialLoading(false);
     }
   }, [userData]);
@@ -36,6 +61,12 @@ const UpdateProfile = () => {
     setIsChanged(true);
   };
 
+  // Handler for location selection
+  const handleLocationSelect = (selectedLocation) => {
+    setLocationData(selectedLocation);
+    setRestaurantAddress(selectedLocation.address); // Update the address field
+    setIsChanged(true);
+  };
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -53,13 +84,15 @@ const UpdateProfile = () => {
         restaurantName,
         restaurantAddress,
         noOfSeats,
+        restaurantCategory, // Include restaurant category in update data
+        location: locationData, // Include the location data
         updatedAt: new Date(),
       };
   
+      console.log("Updating profile with data:", updatedData);
       await updateRestaurant(currentUser.uid, updatedData); 
       toast.success("Profile updated successfully!");
       updateUserData();
-      // setTimeout(() => navigate("/dashboard"), 2000);
       setIsChanged(false);
     } catch (err) {
       toast.error("Failed to update profile: " + err.message);
@@ -129,15 +162,53 @@ const UpdateProfile = () => {
                 />
               </div>
 
-              {/* Restaurant Address */}
+              {/* Restaurant Category Dropdown */}
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700">
-                  Restaurant Address
+                  Restaurant Category
+                </label>
+                <select
+                  value={restaurantCategory}
+                  onChange={(e) => handleInputChange(e, setRestaurantCategory)}
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-gray-300 text-gray-900"
+                  disabled={loading}
+                  aria-label="Restaurant Category"
+                >
+                  <option value="">Select Category</option>
+                  <option value="Restaurant">Restaurant</option>
+                  <option value="Quick Service Restaurant">Quick Service Restaurant (QSR)</option>
+                  <option value="Cafe & Coffee Shop">Cafe & Coffee Shop</option>
+                  <option value="Bar & Pub">Bar & Pub</option>
+                  <option value="Bakery & Patisserie">Bakery & Patisserie</option>
+                  <option value="Juice & Beverage Shop">Juice & Beverage Shop</option>
+                  <option value="Food Court Vendor">Food Court Vendor</option>
+                  <option value="Food Stall/Cart/Truck">Food Stall/Cart/Truck</option>
+                  <option value="Hotel Restaurant">Hotel Restaurant</option>
+                  <option value="Catering Service">Catering Service</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              {/* Location Selector */}
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700">
+                  Restaurant Location
+                </label>
+                <LocationSelector 
+                  onLocationSelect={handleLocationSelect}
+                  initialLocation={locationData} 
+                />
+              </div>
+
+              {/* Restaurant Address (now auto-filled by LocationSelector but can be edited) */}
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700">
+                  Restaurant Address (Detailed)
                 </label>
                 <textarea
                   value={restaurantAddress}
                   onChange={(e) => handleInputChange(e, setRestaurantAddress)}
-                  placeholder="Restaurant Address"
+                  placeholder="Additional Address Details"
                   className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-gray-300 text-gray-900"
                   disabled={loading}
                   rows={3}

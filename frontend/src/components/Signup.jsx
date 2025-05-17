@@ -1,14 +1,13 @@
 import { useRef, useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
-import { FaEye, FaEyeSlash, FaGoogle, FaFacebook, FaApple, FaCloudUploadAlt, FaTrash } from "react-icons/fa";
+import { FaEye, FaEyeSlash, FaGoogle, FaApple } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { db, storage } from "../fireabse/firebase"; // Fixed typo in import path
 import { doc, getDoc, setDoc, updateDoc, collection } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { updateProfile } from "firebase/auth";
 import { registerRestaurant } from "../api/restaurant";
+import LocationSelector from "./LocationSelector"; // Import the LocationSelector component
 
 const Signup = () => {
   const emailRef = useRef();
@@ -18,23 +17,19 @@ const Signup = () => {
   const ResAdrsRef = useRef();
   const NoSeatsRef = useRef();
   const phoneRef = useRef();
-  const fileInputRef = useRef();
 
   // Additional restaurant data
   const [ResLoc, setResLoc] = useState({ type: "Point", coordinates: [0, 0] });
-  const [ResCategory, setResCategory] = useState("Other");
+  const [ResCategory, setResCategory] = useState("");
   const [CuisineType, setCuisineType] = useState([]);
   const [OperatingHours, setOperatingHours] = useState([]);
   const [SocialMedia, setSocialMedia] = useState({});
 
-  const { signUp, socialLogin, currentUser,updateUserData } = useAuth();
+  const { signUp, socialLogin, currentUser, updateUserData } = useAuth();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [uploadingImage, setUploadingImage] = useState(false);
 
   const navigate = useNavigate();
 
@@ -42,50 +37,29 @@ const Signup = () => {
     emailRef.current?.focus();
   }, []);
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("Image size should be less than 5MB");
-        return;
-      }
-      
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const removeImage = () => {
-    setImageFile(null);
-    setImagePreview(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-
-  async function uploadRestaurantImage(userId) {
-    if (!imageFile) return null;
-    
-    setUploadingImage(true);
-    try {
-      const storageRef = ref(storage, `restaurant_images/${userId}/${Date.now()}_${imageFile.name}`);
-      await uploadBytes(storageRef, imageFile);
-      const downloadURL = await getDownloadURL(storageRef);
-      setUploadingImage(false);
-      return downloadURL;
-    } catch (error) {
-      console.error("Error uploading image:", error);
-      toast.error("Failed to upload image");
-      setUploadingImage(false);
-      return null;
-    }
+  useEffect(() => {
+  if (currentUser) {
+    alert("You are already signed in. Please logout first to signup with a new user.");
+    navigate("/dashboard"); // or wherever you want
   }
+}, [currentUser]);
 
-async function handleSubmit(e) {
+  // Handler for location selection
+  const handleLocationSelect = (locationData) => {
+    setResLoc({
+      type: "Point",
+      coordinates: locationData.coordinates, // [longitude, latitude]
+      address: locationData.address,
+      placeId: locationData.placeId
+    });
+    
+    // Auto-fill address field with the selected location's address
+    if (ResAdrsRef.current) {
+      ResAdrsRef.current.value = locationData.address;
+    }
+  };
+
+  async function handleSubmit(e) {
     e.preventDefault();
     setLoading(true);
     
@@ -102,6 +76,13 @@ async function handleSubmit(e) {
       return setError("Password must be at least 6 characters long");
     }
     
+    // Check if location is selected
+    if (ResLoc.coordinates[0] === 0 && ResLoc.coordinates[1] === 0) {
+      setLoading(false);
+      toast.error("Please select a restaurant location");
+      return setError("Please select a restaurant location");
+    }
+    
     try {
       setError("");
       
@@ -115,8 +96,7 @@ async function handleSubmit(e) {
         restaurantCategory: ResCategory,
         cuisineType: CuisineType,
         operatingHours: OperatingHours,
-        socialMedia: SocialMedia,
-        imageFile: imageFile
+        socialMedia: SocialMedia
       };
       
       // Call the enhanced signUp function from AuthContext
@@ -155,6 +135,13 @@ async function handleSubmit(e) {
   //     toast.error("Password must be at least 6 characters long");
   //     return setError("Password must be at least 6 characters long");
   //   }
+  //   
+  //   // Check if location is selected
+  //   if (ResLoc.coordinates[0] === 0 && ResLoc.coordinates[1] === 0) {
+  //     setLoading(false);
+  //     toast.error("Please select a restaurant location");
+  //     return setError("Please select a restaurant location");
+  //   }
 
   //   try {
   //     setError("");
@@ -166,11 +153,6 @@ async function handleSubmit(e) {
   //     const user = userCredential.user;
   //     if (user) {
   //       await updateProfile(user, { displayName: ResNameRef.current.value });
-        
-  //       let imageUrl = null;
-  //       if (imageFile) {
-  //         imageUrl = await uploadRestaurantImage(user.uid);
-  //       }
         
   //       // Prepare restaurant data
   //       const data = {
@@ -184,8 +166,7 @@ async function handleSubmit(e) {
   //         restaurantCategory: ResCategory,
   //         cuisineType: CuisineType,
   //         operatingHours: OperatingHours,
-  //         socialMedia: SocialMedia,
-  //         profileImage: imageUrl
+  //         socialMedia: SocialMedia
   //       };
         
   //       // Use your API function to register the restaurant
@@ -225,7 +206,7 @@ async function handleSubmit(e) {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen transition-colors duration-500 bg-gradient-to-b from-gray-50 to-white">
+    <div className="flex items-center justify-center min-h-screen transition-colors duration-500 bg-gradient-to-b from-amber-50 to-white">
       {/* Decorative Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-10 pointer-events-none">
         <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-amber-300 mix-blend-multiply"></div>
@@ -233,7 +214,7 @@ async function handleSubmit(e) {
         <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full bg-amber-100 mix-blend-multiply"></div>
       </div>
 
-      <div className="p-8 rounded-2xl shadow-xl w-full max-w-md transform transition-transform duration-300 backdrop-blur-lg bg-white/80">
+      <div className="p-8 rounded-2xl shadow-xl w-full max-w-md transform transition-transform duration-300 backdrop-blur-lg bg-white/90 border border-amber-100">
         <h2 className="text-3xl font-extrabold mb-6 text-center text-gray-900">Create Your MenuQ Account</h2>
         {error && <div className="text-red-500 text-center mb-4 animate-shake">{error}</div>}
         
@@ -307,13 +288,20 @@ async function handleSubmit(e) {
               aria-label="Restaurant Name" 
             />
             
+            {/* New Location Selector Component */}
+            <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
+              <h3 className="text-sm font-bold text-amber-800 mb-2">Restaurant Location</h3>
+              <LocationSelector onLocationSelect={handleLocationSelect} />
+            </div>
+            
             <input 
               type="text" 
               ref={ResAdrsRef} 
-              placeholder="Restaurant Address" 
+              placeholder="Restaurant Address (auto-filled from location)" 
               className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900" 
               required
               aria-label="Restaurant Address" 
+              readOnly
             />
             
             <input 
@@ -333,85 +321,28 @@ async function handleSubmit(e) {
               className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900"
               aria-label="Restaurant Category"
             >
-              <option value="Other">Select Category</option>
-              <option value="Fine Dining">Fine Dining</option>
-              <option value="Casual Dining">Casual Dining</option>
-              <option value="Cafe">Cafe</option>
-              <option value="Fast Food">Fast Food</option>
-              <option value="Buffet">Buffet</option>
-              <option value="Food Truck">Food Truck</option>
+              <option value="">Select Category</option>
+              <option value="Restaurant">Restaurant</option>
+              <option value="Quick Service Restaurant">Quick Service Restaurant (QSR)</option>
+              <option value="Cafe & Coffee Shop">Cafe & Coffee Shop</option>
+              <option value="Bar & Pub">Bar & Pub</option>
+              <option value="Bakery & Patisserie">Bakery & Patisserie</option>
+              <option value="Juice & Beverage Shop">Juice & Beverage Shop</option>
+              <option value="Food Court Vendor">Food Court Vendor</option>
+              <option value="Food Stall/Cart/Truck">Food Stall/Cart/Truck</option>
+              <option value="Hotel Restaurant">Hotel Restaurant</option>
+              <option value="Catering Service">Catering Service</option>
               <option value="Other">Other</option>
             </select>
-
-            {/* Restaurant Image Upload */}
-            <div className="border-2 border-dashed rounded-lg p-4 transition border-gray-300 hover:border-amber-400 text-center">
-              <div className="space-y-2">
-                {imagePreview ? (
-                  <div className="relative">
-                    <img 
-                      src={imagePreview} 
-                      alt="Restaurant Preview" 
-                      className="mx-auto h-36 object-cover rounded-lg"
-                    />
-                    <button 
-                      type="button" 
-                      onClick={removeImage}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 transition"
-                      aria-label="Remove image"
-                    >
-                      <FaTrash size={12} />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="text-center py-4 text-gray-500">
-                    <FaCloudUploadAlt className="mx-auto text-4xl mb-2" />
-                    <p className="text-sm font-medium">Upload Restaurant Image</p>
-                    <p className="text-xs mt-1">JPG, PNG or GIF (Max. 5MB)</p>
-                  </div>
-                )}
-                
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
-                  id="restaurant-image"
-                  aria-label="Upload restaurant image"
-                />
-                
-                {!imagePreview && (
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current.click()}
-                    className="mt-2 inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-amber-600 text-white hover:bg-amber-700 transition-colors"
-                    aria-label="Browse for restaurant image"
-                  >
-                    Browse Image
-                  </button>
-                )}
-                
-                {imagePreview && (
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current.click()}
-                    className="mt-2 inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300 transition-colors"
-                    aria-label="Change restaurant image"
-                  >
-                    Change Image
-                  </button>
-                )}
-              </div>
-            </div>
           </div>
 
           <button 
             type="submit" 
             className="w-full bg-amber-600 text-white p-3 rounded-lg font-semibold hover:bg-amber-700 transition duration-300 shadow-lg disabled:opacity-50 flex justify-center items-center" 
-            disabled={loading || uploadingImage}
+            disabled={loading}
             aria-label="Create account"
           >
-            {loading || uploadingImage ? (
+            {loading ? (
               <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
             ) : (
               "Create Account"
@@ -419,7 +350,8 @@ async function handleSubmit(e) {
           </button>
         </form>
 
-        <div className="mt-6 text-center">
+            {/* future we have to implement this */}
+        {/* <div className="mt-6 text-center">
           <p className="text-sm text-gray-500 mb-2">Or sign up with</p>
           <div className="flex justify-center space-x-3">
             <button 
@@ -437,7 +369,7 @@ async function handleSubmit(e) {
               <FaApple />
             </button>
           </div>
-        </div>
+        </div> */}
 
         <div className="flex justify-center mt-4 text-gray-500">
           Already have an account?
