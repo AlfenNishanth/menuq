@@ -91,23 +91,23 @@ function LandingPage() {
     <div className="absolute inset-0 w-full h-full bg-gradient-to-tr from-amber-100 to-amber-50 rounded-2xl blur-2xl opacity-60 -z-10 transform rotate-6"></div>
     
     {/* Main Image */}
-    <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/50">
+    {/* <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/50">
       <img 
         src="/8-removebg.png"
         alt="Sophisticated dining experience" 
         className="w-full h-auto relative z-10 transition-all duration-700 hover:scale-105 transform-gpu"
-      />
+      /> */}
       
       {/* Overlay Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-t from-amber-900/30 to-transparent"></div>
-    </div>
+      {/* <div className="absolute inset-0 bg-gradient-to-t from-amber-900/30 to-transparent"></div>
+    </div> */}
     
     {/* Floating QR Code Element */}
-    <div className="absolute -right-4 lg:-right-12 bottom-4 lg:-bottom-8 bg-white shadow-xl rounded-xl p-3 lg:p-5 z-20 transform hover:scale-105 transition-transform duration-300">
-      <div className="flex items-center gap-2 lg:gap-4">
+    <div className="absolute -right-4 lg:-right-12 bottom-4 lg:-bottom-30 bg-white shadow-xl rounded-xl p-3 lg:p-5 z-20 transform hover:scale-105 transition-transform duration-300 border-2 border-amber-300">
+      <div className="flex items-center gap-2 lg:gap-6">
         <div className="relative">
           <div className="absolute inset-0 bg-amber-100 rounded-md rotate-45 transform -translate-x-1 translate-y-1"></div>
-          <img src="/menu q website link.png" alt="QR code" className="w-16 h-16 lg:w-20 lg:h-20 relative z-10" />
+          <img src="/8-removebg.png" alt="QR code" className="w-16 h-16 lg:w-22 lg:h-22 relative z-10" />
         </div>
         <div className="text-xs lg:text-sm font-medium">
           <span className="block text-amber-700 font-serif text-sm lg:text-base">Experience MenuQ</span>
