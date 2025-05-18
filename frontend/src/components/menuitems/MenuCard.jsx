@@ -3,7 +3,6 @@ import {
   ChevronDown, 
   ChevronUp, 
   Clock, 
-  Star,
   Plus,
   Minus
 } from 'lucide-react';
@@ -40,8 +39,6 @@ function MenuCard({ item, onAddToOrder }) {
     imageUrl,
     tags,
     prepTime,
-    rating,
-    ratingCount,
     available,
     spiceLevel,
     // Try different possible property names that might be used in your backend
@@ -105,10 +102,10 @@ function MenuCard({ item, onAddToOrder }) {
     <div 
       className={`relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 bg-white border-0 flex flex-col max-w-4xl mx-auto ${!available ? 'opacity-60' : ''}`}
     >
-      <div className="flex">
-        <div className="w-42 flex-shrink-0 relative group">
+      <div className="flex flex-col md:flex-row">
+        <div className="w-full md:w-42 flex-shrink-0 relative group">
           <img 
-            className="w-full h-46 object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-48 md:h-46 object-cover transition-transform duration-300 group-hover:scale-105"
             src={item.imageUrl !== "" ? item.imageUrl : 
               "https://t3.ftcdn.net/jpg/02/68/55/60/360_F_268556012_c1WBaKFN5rjRxR2eyV33znK4qnYeKZjm.jpg"}
             alt={name} 
@@ -123,31 +120,26 @@ function MenuCard({ item, onAddToOrder }) {
           
           {/* Simplified Veg/Non-Veg indicator */}
           <div className="absolute top-2 right-2">
-  <div 
-    className={`w-4 h-4 flex items-center justify-center ${isVegItem ? 'border-2 border-green-600' : 'border-2 border-red-600'}`}
-  >
-    {isVegItem ? (
-      <div className="w-2 h-2 rounded-full bg-green-600"></div>
-    ) : (
-      <svg width="12" height="12" viewBox="0 0 12 12" className="fill-red-600">
-        <polygon points="6,2 10,10 2,10" />
-      </svg>
-    )}
-  </div>
-</div>
+            <div 
+              className={`w-4 h-4 flex items-center justify-center ${isVegItem ? 'border-2 border-green-600' : 'border-2 border-red-600'}`}
+            >
+              {isVegItem ? (
+                <div className="w-2 h-2 rounded-full bg-green-600"></div>
+              ) : (
+                <svg width="12" height="12" viewBox="0 0 12 12" className="fill-red-600">
+                  <polygon points="6,2 10,10 2,10" />
+                </svg>
+              )}
+            </div>
+          </div>
         </div>
 
         <div className="flex-grow flex flex-col">
-          <div className="p-6 pb-0">
+          <div className="p-4 md:p-6 pb-0">
             <div className="flex justify-between items-start mb-4">
               <div className="flex-grow pr-4">
                 <h2 className="text-xl font-serif tracking-wide">{capitalizeWords(name)}</h2>
-                <div className="flex items-center mt-1">
-                  <Star className="w-4 h-4 text-amber-500 mr-1" />
-                  <span className="text-sm text-gray-600">
-                    {rating} ({ratingCount} reviews)
-                  </span>
-                </div>
+                {/* Rating section removed */}
               </div>
               <div className="text-right">
                 <span className="text-lg font-medium text-amber-700 block">₹{price}</span>
@@ -189,7 +181,7 @@ function MenuCard({ item, onAddToOrder }) {
       </div>
       
       {expanded && (
-        <div className="w-full p-6 pt-0">
+        <div className="w-full p-4 md:p-6 pt-0">
           <div className="border-t border-gray-100 pt-4 space-y-4">
             <div>
               <h3 className="text-sm font-medium text-gray-700 mb-2">About the Dish</h3>

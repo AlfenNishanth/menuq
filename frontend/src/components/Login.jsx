@@ -19,11 +19,11 @@ const Login = () => {
     emailRef.current?.focus();
   }, []);
 
-    useEffect(() => {
+  useEffect(() => {
     if (currentUser) {
       navigate("/dashboard/"); 
     }
-  }, [currentUser]);
+  }, [currentUser, navigate]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -50,12 +50,12 @@ const Login = () => {
       toast.success("Password reset email sent!");
     } catch (err) {
       toast.error("Failed to send reset email");
-      console.log(err)
+      console.log(err);
     }
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen transition-colors duration-500 bg-gradient-to-b from-gray-50 to-white">
+    <div className="flex items-center justify-center min-h-screen transition-colors duration-500 bg-gradient-to-b from-gray-50 to-white px-4 py-6">
       {/* Decorative Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-10 pointer-events-none">
         <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-amber-300 mix-blend-multiply"></div>
@@ -63,37 +63,41 @@ const Login = () => {
         <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full bg-amber-100 mix-blend-multiply"></div>
       </div>
 
-      <div className="p-8 rounded-2xl shadow-xl w-96 transform transition-transform duration-300 backdrop-blur-lg bg-white/80">
-        <h2 className="text-3xl font-extrabold mb-6 text-center text-gray-900">Log In</h2>
+      <div className="p-6 md:p-8 rounded-2xl shadow-xl w-full max-w-md transform transition-transform duration-300 backdrop-blur-lg bg-white/80">
+        <h2 className="text-2xl md:text-3xl font-extrabold mb-6 text-center text-gray-900">Log In</h2>
         {error && <div className="text-red-500 text-center mb-4 animate-shake">{error}</div>}
         
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <input 
-            type="email" 
-            ref={emailRef} 
-            placeholder="Email Address" 
-            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900" 
-            required 
-            autoFocus 
-          />
+        <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
+          <div className="relative">
+            <input 
+              type="email" 
+              ref={emailRef} 
+              placeholder="Email Address" 
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900" 
+              required 
+              autoFocus 
+            />
+          </div>
+          
           <div className="relative">
             <input 
               type={showPassword ? "text" : "password"} 
               ref={passwordRef} 
               placeholder="Password" 
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900" 
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900 pr-10" 
               required 
             />
             <button
               type="button"
-              className="absolute right-3 top-3 text-gray-700 hover:text-gray-900"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-700 hover:text-gray-900"
               onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
             >
-              {showPassword ? <FaEyeSlash className="mt-1.5"/> : <FaEye className="mt-1.5"/>}
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
             </button>
           </div>
 
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
             <label className="flex items-center cursor-pointer">
               <input 
                 type="checkbox" 
@@ -130,15 +134,33 @@ const Login = () => {
             </div>
 
             <div className="flex justify-center mt-4 space-x-3">
-              <button className="p-3 bg-red-600 text-white rounded-full hover:bg-red-700" onClick={() => socialLogin('google')}><FaGoogle /></button>
-              <button className="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-700" onClick={() => socialLogin('facebook')}><FaFacebook /></button>
-              <button className="p-3 bg-black text-white rounded-full hover:bg-gray-800" onClick={() => socialLogin('apple')}><FaApple /></button>
+              <button 
+                className="p-3 bg-red-600 text-white rounded-full hover:bg-red-700" 
+                onClick={() => socialLogin('google')}
+                aria-label="Sign in with Google"
+              >
+                <FaGoogle />
+              </button>
+              <button 
+                className="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-700" 
+                onClick={() => socialLogin('facebook')}
+                aria-label="Sign in with Facebook"
+              >
+                <FaFacebook />
+              </button>
+              <button 
+                className="p-3 bg-black text-white rounded-full hover:bg-gray-800" 
+                onClick={() => socialLogin('apple')}
+                aria-label="Sign in with Apple"
+              >
+                <FaApple />
+              </button>
             </div>
           </>
         )}
 
         <div className="flex justify-center mt-4 text-gray-500">
-          New User?
+          <span>New User?</span>
           <Link to="/signup" className="text-amber-600 underline ml-2 hover:text-amber-700 transition">
             Sign Up
           </Link>

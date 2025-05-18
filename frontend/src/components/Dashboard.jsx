@@ -129,15 +129,15 @@ const DashboardHome = () => {
   };
 
   return (
-    <div className="px-6 py-8 bg-gradient-to-br from-amber-50 to-white min-h-screen">
+    <div className="px-4 sm:px-6 py-6 sm:py-8 bg-gradient-to-br from-amber-50 to-white min-h-screen">
       {/* Dashboard Header */}
-      <div className="bg-white rounded-xl shadow-md p-6 mb-8 border border-amber-200">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-amber-800 mb-2">
+      <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 mb-6 sm:mb-8 border border-amber-200">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
+          <div className="mb-4 sm:mb-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-amber-800 mb-2">
               MenuQ Dashboard
             </h1>
-            <p className="text-amber-700 flex items-center">
+            <p className="text-sm sm:text-base text-amber-700 flex flex-wrap items-center">
               <span className="mr-3">{userData.restaurantId} </span>
               <Clock size={16} className="mr-0.5 mt-0.25" />
               <span>Last updated: {getCurrentTime()}</span>
@@ -147,7 +147,7 @@ const DashboardHome = () => {
           {/* View Menu Button */}
           <button
             onClick={handleViewMenuClick}
-            className="flex items-center px-5 py-3 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-medium rounded-lg shadow-md transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
+            className="w-full sm:w-auto flex justify-center items-center px-4 sm:px-5 py-2 sm:py-3 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-medium rounded-lg shadow-md transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
           >
             <span className="mr-2">View Menu</span>
             <ExternalLink size={18} />
@@ -166,10 +166,10 @@ const DashboardHome = () => {
       )} */}
 
       {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         {/* Profile Completeness Section - Requires minimal data storage */}
-        {/* <div className="lg:col-span-2 bg-white rounded-xl shadow-md p-6 border border-amber-100">
-          <h2 className="text-xl font-semibold text-amber-800 mb-6">Restaurant Profile</h2>
+        {/* <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-amber-100">
+          <h2 className="text-lg sm:text-xl font-semibold text-amber-800 mb-4 sm:mb-6">Restaurant Profile</h2>
           
           {loading ? (
             <div className="flex justify-center items-center h-40">
@@ -190,7 +190,7 @@ const DashboardHome = () => {
                 </div>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-1 gap-4"> */}
+              <div className="grid grid-cols-1 gap-4"> */}
         {/* Only Restaurant Logo Option */}
         {/* <div className={`p-4 rounded-lg border ${profileCompleteness.hasLogo ? 'bg-green-50 border-green-200' : 'bg-amber-50 border-amber-200'}`}>
                   <div className="flex items-center">
@@ -221,7 +221,7 @@ const DashboardHome = () => {
         </div> */}
 
         {/* Restaurant Status Panel - Now properly passing props */}
-        <div className="lg:col-span-1">
+        <div className="w-full">
           <RestaurantStatusPanel
             restaurant={restaurant}
             onUpdate={handleRestaurantUpdate}
