@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Clock, AlertTriangle, Settings, ExternalLink } from "lucide-react";
-import axios from "axios";
 import RestaurantStatusPanel from "./RestaurantStatusPanel"; // Importing the RestaurantStatusPanel
 import { useAuth } from "../contexts/AuthContext";
+import config from "../../config";
 
 // Main Dashboard Component
 const DashboardHome = () => {
@@ -60,8 +60,7 @@ const DashboardHome = () => {
   });
 
   // Using Vite's environment variable format instead of process.env
-  const API_BASE_URL = import.meta.env.VITE_API_URL || "https://api.menuq.app";
-  const QR_URL = import.meta.env.VITE_QR_URL || "https://menuq.app/menu";
+  
 
   // Fetch restaurant data from backend API
   useEffect(() => {
@@ -72,15 +71,15 @@ const DashboardHome = () => {
 
       setRestaurant(restaurantData);
       setRestaurantName(restaurantData.name);
-      setQrURL(`${QR_URL}/${restaurantData.restaurantId}`);
+      setQrURL(`${config.QR_URL}/${restaurantData.restaurantId}`);
 
       // Calculate profile completeness (minimal data needed)
-      setProfileCompleteness({
-        hasLogo: !!restaurantData.logoUrl,
-        hasHours:
-          restaurantData.operatingHours &&
-          restaurantData.operatingHours.length > 0,
-      });
+      // setProfileCompleteness({
+      //   hasLogo: !!restaurantData.logoUrl,
+      //   hasHours:
+      //     restaurantData.operatingHours &&
+      //     restaurantData.operatingHours.length > 0,
+      // });
     } catch (err) {
       console.error("Error fetching restaurant data:", err);
       setError(
@@ -89,7 +88,7 @@ const DashboardHome = () => {
     } finally {
       setLoading(false);
     }
-  }, [API_BASE_URL, QR_URL, userData]);
+  }, [userData]);
 
   // Handle updates from RestaurantStatusPanel
   const handleRestaurantUpdate = (updatedRestaurant) => {
