@@ -84,57 +84,56 @@ function LandingPage() {
         </div>
       </div>
       
-      {/* Right Side - Image and Description */}
-      <div className="lg:w-1/2 flex flex-col items-center lg:items-end relative">
+{/* Right Side - Image and Description */}
+<div className="lg:w-1/2 flex flex-col items-center relative px-4 lg:px-0">
+  <div className="relative w-full max-w-sm mx-auto lg:mx-0">
+    {/* Ambient Glow */}
+    <div className="absolute inset-0 w-full h-full bg-gradient-to-tr from-amber-100 to-amber-50 rounded-2xl blur-2xl opacity-60 -z-10 transform rotate-6"></div>
+    
+    {/* Main Image */}
+    <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/50">
+      <img 
+        src="/8-removebg.png"
+        alt="Sophisticated dining experience" 
+        className="w-full h-auto relative z-10 transition-all duration-700 hover:scale-105 transform-gpu"
+      />
+      
+      {/* Overlay Gradient */}
+      <div className="absolute inset-0 bg-gradient-to-t from-amber-900/30 to-transparent"></div>
+    </div>
+    
+    {/* Floating QR Code Element */}
+    <div className="absolute -right-4 lg:-right-12 bottom-4 lg:-bottom-8 bg-white shadow-xl rounded-xl p-3 lg:p-5 z-20 transform hover:scale-105 transition-transform duration-300">
+      <div className="flex items-center gap-2 lg:gap-4">
         <div className="relative">
-          {/* Ambient Glow */}
-          <div className="absolute inset-0 w-full h-full bg-gradient-to-tr from-amber-100 to-amber-50 rounded-2xl blur-2xl opacity-60 -z-10 transform rotate-6"></div>
-          
-          {/* Main Image */}
-          <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/50">
-          <img 
-            src="/menu q website link.png"
-            alt="Sophisticated dining experience" 
-            className="w-55 h-auto relative z-10 transition-all duration-700 hover:scale-105 transform-gpu"
-          />
-
-            
-            {/* Overlay Gradient */}
-            <div className="absolute inset-0 bg-gradient-to-t from-amber-900/30 to-transparent"></div>
-          </div>
-          
-          {/* Floating QR Code Element */}
-          <div className="absolute -right-12 -bottom-8 bg-white shadow-xl rounded-xl p-5 z-20 transform hover:scale-105 transition-transform duration-300">
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <div className="absolute inset-0 bg-amber-100 rounded-md rotate-45 transform -translate-x-1 translate-y-1"></div>
-                <img src="/8-removebg.png" alt="QR code" className="w-20 h-20 relative z-10" />
-              </div>
-              <div className="text-sm font-medium">
-                <span className="block text-amber-700 font-serif text-base">Experience MenuQ</span>
-                <span className="text-gray-600">Scan to preview</span>
-              </div>
-            </div>
-          </div>
+          <div className="absolute inset-0 bg-amber-100 rounded-md rotate-45 transform -translate-x-1 translate-y-1"></div>
+          <img src="/menu q website link.png" alt="QR code" className="w-16 h-16 lg:w-20 lg:h-20 relative z-10" />
         </div>
-        
-        {/* Description Card */}
-        <div className="mt-20 p-8 bg-white/80 backdrop-blur-md rounded-xl shadow-lg border border-amber-50 max-w-md transform hover:-translate-y-2 transition-all duration-300">
-          <h2 className="text-2xl font-serif font-bold text-amber-700 mb-3">MenuQ</h2>
-          <p className="text-gray-700 leading-relaxed">
-            "Where artistry meets technology. MenuQ crafts a dining narrative that honors the chef's vision while empowering guests to explore culinary landscapes at their own pace. Not merely a tool, but a canvas for gastronomic expression."
-          </p>
-          <div className="mt-6 border-t border-amber-100 pt-4 flex justify-between items-center">
-            <span className="text-amber-600 font-medium">Redefining Hospitality</span>
-            <a href="#Reach Us" className="group text-amber-700 font-medium flex items-center gap-2 hover:gap-3 transition-all duration-300">
-              Our Philosophy
-              <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
-              </svg>
-            </a>
-          </div>
+        <div className="text-xs lg:text-sm font-medium">
+          <span className="block text-amber-700 font-serif text-sm lg:text-base">Experience MenuQ</span>
+          <span className="text-gray-600">Scan to preview</span>
         </div>
       </div>
+    </div>
+  </div>
+  
+  {/* Description Card */}
+  <div className="mt-12 lg:mt-20 p-6 lg:p-8 bg-white/80 backdrop-blur-md rounded-xl shadow-lg border border-amber-50 max-w-md transform hover:-translate-y-2 transition-all duration-300">
+    <h2 className="text-xl lg:text-2xl font-serif font-bold text-amber-700 mb-3">MenuQ</h2>
+    <p className="text-gray-700 leading-relaxed">
+      "Where artistry meets technology. MenuQ crafts a dining narrative that honors the chef's vision while empowering guests to explore culinary landscapes at their own pace. Not merely a tool, but a canvas for gastronomic expression."
+    </p>
+    <div className="mt-6 border-t border-amber-100 pt-4 flex justify-between items-center">
+      <span className="text-amber-600 font-medium">Redefining Hospitality</span>
+      <a href="#Reach Us" className="group text-amber-700 font-medium flex items-center gap-2 hover:gap-3 transition-all duration-300">
+        Our Philosophy
+        <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+</div>
     </div>
   </div>
 </section>
@@ -1178,7 +1177,7 @@ function LandingPage() {
         </div>
         <div>
           <p className="text-sm font-medium text-amber-200">Email</p>
-          <p className="mt-1 text-amber-100">info@menuq.com</p>
+          <p className="mt-1 text-amber-100">info@menuq.in</p>
         </div>
       </div>
       
@@ -1191,7 +1190,7 @@ function LandingPage() {
         </div>
         <div>
           <p className="text-sm font-medium text-amber-200">Location</p>
-          <p className="mt-1 text-amber-100">Mysore, Karnataka</p>
+          <p className="mt-1 text-amber-100">Karnataka</p>
         </div>
       </div>
     </div>
