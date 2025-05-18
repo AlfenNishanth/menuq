@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Clock, AlertTriangle, Settings } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { Clock, AlertTriangle, Settings, ExternalLink } from "lucide-react";
 import axios from "axios";
 import RestaurantStatusPanel from "./RestaurantStatusPanel"; // Importing the RestaurantStatusPanel
 import { useAuth } from "../contexts/AuthContext";
@@ -25,6 +25,7 @@ const DashboardHome = () => {
 
   // QR code state
   const [qrURL, setQrURL] = useState("https://menuq.app/your-restaurant");
+  const qrRef = useRef(null);
 
   // Profile completeness state - very minimal storage impact
   const [profileCompleteness, setProfileCompleteness] = useState({
@@ -36,8 +37,31 @@ const DashboardHome = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // QR code options state
+  const [qrOptions, setQrOptions] = useState({
+    bgColor: "#FFFFFF",
+    fgColor: "#B45309", // amber-700
+    shape: "square",
+    size: 256,
+    logoImage: null,
+    logoSize: 60,
+    includeLogo: false,
+    includeCustomLogo: false,
+    selectedPresetLogo: "food",
+    restaurantName: "",
+    downloadFormat: "png",
+    errorCorrectionLevel: "H",
+    logoBackgroundColor: "#FFFFFF",
+    logoPosition: "center",
+    borderColor: "#B45309",
+    borderSize: 0,
+    shapeType: "basic", // basic, food, drink, or restaurant
+    customShape: "square", // Name of the selected shape
+  });
+
   // Using Vite's environment variable format instead of process.env
   const API_BASE_URL = import.meta.env.VITE_API_URL || "https://api.menuq.app";
+  const QR_URL = import.meta.env.VITE_QR_URL || "https://menuq.app/menu";
 
   // Fetch restaurant data from backend API
   useEffect(() => {
@@ -48,7 +72,7 @@ const DashboardHome = () => {
 
       setRestaurant(restaurantData);
       setRestaurantName(restaurantData.name);
-      setQrURL(`https://menuq.app/menu/${restaurantData.slug}`);
+      setQrURL(`${QR_URL}/${restaurantData.restaurantId}`);
 
       // Calculate profile completeness (minimal data needed)
       setProfileCompleteness({
@@ -65,7 +89,7 @@ const DashboardHome = () => {
     } finally {
       setLoading(false);
     }
-  }, [API_BASE_URL]);
+  }, [API_BASE_URL, QR_URL, userData]);
 
   // Handle updates from RestaurantStatusPanel
   const handleRestaurantUpdate = (updatedRestaurant) => {
@@ -100,11 +124,16 @@ const DashboardHome = () => {
     });
   };
 
+  // Handle view menu click
+  const handleViewMenuClick = () => {
+    window.open(qrURL, '_blank');
+  };
+
   return (
     <div className="px-6 py-8 bg-gradient-to-br from-amber-50 to-white min-h-screen">
       {/* Dashboard Header */}
       <div className="bg-white rounded-xl shadow-md p-6 mb-8 border border-amber-200">
-        <div className="flex items-center">
+        <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-amber-800 mb-2">
               MenuQ Dashboard
@@ -112,9 +141,18 @@ const DashboardHome = () => {
             <p className="text-amber-700 flex items-center">
               <span className="mr-3">{userData.restaurantId} </span>
               <Clock size={16} className="mr-0.5 mt-0.25" />
-              <span >Last updated: {getCurrentTime()}</span>
+              <span>Last updated: {getCurrentTime()}</span>
             </p>
           </div>
+          
+          {/* View Menu Button */}
+          <button
+            onClick={handleViewMenuClick}
+            className="flex items-center px-5 py-3 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-medium rounded-lg shadow-md transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
+          >
+            <span className="mr-2">View Menu</span>
+            <ExternalLink size={18} />
+          </button>
         </div>
       </div>
 
