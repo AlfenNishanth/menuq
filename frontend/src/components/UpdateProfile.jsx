@@ -102,7 +102,7 @@ const UpdateProfile = () => {
   }
   
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-gray-50 to-white text-gray-900">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-gray-50 to-white text-gray-900 px-4 py-6">
       {/* Decorative Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-10 pointer-events-none">
         <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-amber-300 mix-blend-multiply"></div>
@@ -110,8 +110,8 @@ const UpdateProfile = () => {
         <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full bg-amber-100 mix-blend-multiply"></div>
       </div>
       
-      <div className="p-8 rounded-2xl shadow-xl w-full max-w-md bg-white/80 backdrop-blur-sm relative z-10 border border-amber-50">
-        <h2 className="text-3xl font-serif font-bold mb-6 text-center text-amber-700">
+      <div className="p-4 sm:p-8 rounded-2xl shadow-xl w-full max-w-md bg-white/80 backdrop-blur-sm relative z-10 border border-amber-50">
+        <h2 className="text-2xl sm:text-3xl font-serif font-bold mb-4 sm:mb-6 text-center text-amber-700">
           Update Profile
         </h2>
 
@@ -122,14 +122,14 @@ const UpdateProfile = () => {
         ) : (
           <form
             onSubmit={handleSubmit}
-            className="space-y-4"
+            className="space-y-3 sm:space-y-4"
             onKeyDown={(e) => {
               if (e.key === "Enter" && e.target.type !== "textarea") {
                 e.preventDefault();
               }
             }}
           >
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-3 sm:gap-4">
               {/* Phone Number */}
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700">
@@ -140,7 +140,7 @@ const UpdateProfile = () => {
                   value={phone}
                   onChange={(e) => handleInputChange(e, setPhone)}
                   placeholder="Phone Number"
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-gray-300 text-gray-900"
+                  className="w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-gray-300 text-gray-900"
                   disabled={loading}
                   required
                 />
@@ -156,7 +156,7 @@ const UpdateProfile = () => {
                   value={restaurantName}
                   onChange={(e) => handleInputChange(e, setRestaurantName)}
                   placeholder="Restaurant Name"
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-gray-300 text-gray-900"
+                  className="w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-gray-300 text-gray-900"
                   disabled={loading}
                   required
                 />
@@ -170,7 +170,7 @@ const UpdateProfile = () => {
                 <select
                   value={restaurantCategory}
                   onChange={(e) => handleInputChange(e, setRestaurantCategory)}
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-gray-300 text-gray-900"
+                  className="w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-gray-300 text-gray-900"
                   disabled={loading}
                   aria-label="Restaurant Category"
                 >
@@ -209,7 +209,7 @@ const UpdateProfile = () => {
                   value={restaurantAddress}
                   onChange={(e) => handleInputChange(e, setRestaurantAddress)}
                   placeholder="Additional Address Details"
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-gray-300 text-gray-900"
+                  className="w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-gray-300 text-gray-900"
                   disabled={loading}
                   rows={3}
                   required
@@ -226,7 +226,7 @@ const UpdateProfile = () => {
                   value={noOfSeats}
                   onChange={(e) => handleInputChange(e, setNoOfSeats)}
                   placeholder="Number of Seats"
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-gray-300 text-gray-900"
+                  className="w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-gray-300 text-gray-900"
                   disabled={loading}
                   min="1"
                   required
@@ -234,10 +234,10 @@ const UpdateProfile = () => {
               </div>
             </div>
 
-            <div className="flex space-x-4 pt-4">
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 pt-4">
               <button
                 type="submit"
-                className="flex-1 bg-amber-600 text-white p-3 rounded-lg font-semibold hover:bg-amber-700 transition duration-300 shadow-lg disabled:opacity-50 flex justify-center items-center"
+                className="w-full bg-amber-600 text-white p-2 sm:p-3 rounded-lg font-semibold hover:bg-amber-700 transition duration-300 shadow-lg disabled:opacity-50 flex justify-center items-center"
                 disabled={loading || !isChanged}
               >
                 {loading ? (
@@ -249,7 +249,7 @@ const UpdateProfile = () => {
 
               <Link
                 to="/dashboard/"
-                className="flex-1 bg-gray-300 text-gray-800 p-3 rounded-lg font-semibold hover:bg-gray-400 transition duration-300 shadow-lg flex justify-center items-center"
+                className="w-full text-center bg-gray-300 text-gray-800 p-2 sm:p-3 rounded-lg font-semibold hover:bg-gray-400 transition duration-300 shadow-lg flex justify-center items-center"
               >
                 Cancel
               </Link>

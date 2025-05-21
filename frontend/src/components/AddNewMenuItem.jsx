@@ -174,7 +174,7 @@ export default function AddNewMenuItem() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-gray-50 to-white text-gray-900">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-gray-50 to-white text-gray-900 px-4 py-8">
       {/* Decorative Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-10 pointer-events-none">
         <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-amber-300 mix-blend-multiply"></div>
@@ -182,11 +182,11 @@ export default function AddNewMenuItem() {
         <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full bg-amber-100 mix-blend-multiply"></div>
       </div>
 
-      <div className="p-8 rounded-2xl shadow-xl w-full max-w-lg bg-white relative z-10">
-        <h2 className="text-4xl font-serif font-bold mb-6 text-center text-amber-700">
+      <div className="p-4 sm:p-8 rounded-2xl shadow-xl w-full max-w-lg bg-white relative z-10">
+        <h2 className="text-3xl sm:text-4xl font-serif font-bold mb-4 sm:mb-6 text-center text-amber-700">
           Add New Menu Item
         </h2>
-        <div className="w-16 h-1 bg-amber-500 mx-auto mb-8"></div>
+        <div className="w-16 h-1 bg-amber-500 mx-auto mb-6 sm:mb-8"></div>
 
         {/* Quick Add Button */}
         <button
@@ -348,7 +348,7 @@ export default function AddNewMenuItem() {
                   </div>
                 ) : (
                   <div className="text-center py-4 text-gray-500">
-                    <Upload className="mx-auto text-4xl mb-2 text-amber-600" />
+                    <Upload className="mx-auto h-12 w-12 mb-2 text-amber-600" />
                     <p className="text-sm font-medium">
                       Upload Menu Item Image
                     </p>
@@ -395,7 +395,7 @@ export default function AddNewMenuItem() {
             </h3>
             <div className="space-y-2">
               {variants.map((variant, index) => (
-                <div key={index} className="flex space-x-2">
+                <div key={index} className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                   <input
                     type="text"
                     placeholder="Variant Name"
@@ -408,30 +408,32 @@ export default function AddNewMenuItem() {
                     className="p-3 border rounded-lg transition flex-1 bg-gray-50 border-amber-200 text-gray-900"
                     disabled={loading}
                   />
-                  <input
-                    type="number"
-                    step="1"
-                    min="0"
-                    placeholder="Price"
-                    value={variant.price}
-                    onChange={(e) => {
-                      const newVariants = [...variants];
-                      newVariants[index].price = parseFloat(e.target.value);
-                      setVariants(newVariants);
-                    }}
-                    className="p-3 border rounded-lg transition w-24 bg-gray-50 border-amber-200 text-gray-900"
-                    disabled={loading}
-                  />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setVariants(variants.filter((_, i) => i !== index))
-                    }
-                    className="bg-red-500 text-white px-3 rounded-lg hover:bg-red-600 transition flex items-center justify-center"
-                    disabled={loading}
-                  >
-                    <XIcon size={18} />
-                  </button>
+                  <div className="flex w-full sm:w-auto">
+                    <input
+                      type="number"
+                      step="1"
+                      min="0"
+                      placeholder="Price"
+                      value={variant.price}
+                      onChange={(e) => {
+                        const newVariants = [...variants];
+                        newVariants[index].price = parseFloat(e.target.value);
+                        setVariants(newVariants);
+                      }}
+                      className="p-3 border rounded-lg transition flex-1 sm:w-24 bg-gray-50 border-amber-200 text-gray-900"
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setVariants(variants.filter((_, i) => i !== index))
+                      }
+                      className="bg-red-500 text-white px-3 ml-2 rounded-lg hover:bg-red-600 transition flex items-center justify-center"
+                      disabled={loading}
+                    >
+                      <XIcon size={18} />
+                    </button>
+                  </div>
                 </div>
               ))}
               <button
@@ -454,7 +456,7 @@ export default function AddNewMenuItem() {
             </h3>
             <div className="space-y-2">
               {addOns.map((addOn, index) => (
-                <div key={index} className="flex space-x-2">
+                <div key={index} className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                   <input
                     type="text"
                     placeholder="Add On Name"
@@ -467,30 +469,32 @@ export default function AddNewMenuItem() {
                     className="p-3 border rounded-lg transition flex-1 bg-gray-50 border-amber-200 text-gray-900"
                     disabled={loading}
                   />
-                  <input
-                    type="number"
-                    step="1"
-                    min="0"
-                    placeholder="Price"
-                    value={addOn.price}
-                    onChange={(e) => {
-                      const newAddOns = [...addOns];
-                      newAddOns[index].price = parseFloat(e.target.value);
-                      setAddOns(newAddOns);
-                    }}
-                    className="p-3 border rounded-lg transition w-24 bg-gray-50 border-amber-200 text-gray-900"
-                    disabled={loading}
-                  />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setAddOns(addOns.filter((_, i) => i !== index))
-                    }
-                    className="bg-red-500 text-white px-3 rounded-lg hover:bg-red-600 transition flex items-center justify-center"
-                    disabled={loading}
-                  >
-                    <XIcon size={18} />
-                  </button>
+                  <div className="flex w-full sm:w-auto">
+                    <input
+                      type="number"
+                      step="1"
+                      min="0"
+                      placeholder="Price"
+                      value={addOn.price}
+                      onChange={(e) => {
+                        const newAddOns = [...addOns];
+                        newAddOns[index].price = parseFloat(e.target.value);
+                        setAddOns(newAddOns);
+                      }}
+                      className="p-3 border rounded-lg transition flex-1 sm:w-24 bg-gray-50 border-amber-200 text-gray-900"
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setAddOns(addOns.filter((_, i) => i !== index))
+                      }
+                      className="bg-red-500 text-white px-3 ml-2 rounded-lg hover:bg-red-600 transition flex items-center justify-center"
+                      disabled={loading}
+                    >
+                      <XIcon size={18} />
+                    </button>
+                  </div>
                 </div>
               ))}
               <button
@@ -527,7 +531,7 @@ export default function AddNewMenuItem() {
                 </span>
               ))}
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <input
                 type="text"
                 placeholder="Add tag"
@@ -575,10 +579,10 @@ export default function AddNewMenuItem() {
 
       {/* Predefined Dishes Modal */}
       {showPredefinedModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg w-full max-w-3xl max-h-[80vh] overflow-hidden">
-            <div className="p-4 bg-amber-50 border-b border-amber-200 flex justify-between items-center">
-              <h3 className="text-xl font-serif font-bold text-amber-800">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-3xl max-h-[90vh] sm:max-h-[80vh] overflow-hidden">
+            <div className="p-3 sm:p-4 bg-amber-50 border-b border-amber-200 flex justify-between items-center">
+              <h3 className="text-lg sm:text-xl font-serif font-bold text-amber-800">
                 Choose a Predefined Dish
               </h3>
               <button
@@ -590,7 +594,7 @@ export default function AddNewMenuItem() {
             </div>
 
             {/* Search */}
-            <div className="p-4 border-b border-gray-200">
+            <div className="p-3 sm:p-4 border-b border-gray-200">
               <div className="relative">
                 <input
                   type="text"
@@ -607,7 +611,7 @@ export default function AddNewMenuItem() {
             </div>
 
             {/* Dishes List */}
-            <div className="p-2 overflow-y-auto max-h-[60vh]">
+            <div className="p-2 overflow-y-auto max-h-[50vh] sm:max-h-[60vh]">
               {filteredDishes.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   No dishes found matching your search.
@@ -618,7 +622,7 @@ export default function AddNewMenuItem() {
                     <h4 className="text-lg font-medium text-amber-800 px-2 py-1 mb-2 border-b border-amber-200">
                       {category.category}
                     </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {category.items.map((dish, dishIndex) => (
                         <div
                           key={dishIndex}
@@ -669,7 +673,7 @@ export default function AddNewMenuItem() {
             </div>
 
             {/* Footer */}
-            <div className="p-4 bg-amber-50 border-t border-amber-200 flex justify-end">
+            <div className="p-3 sm:p-4 bg-amber-50 border-t border-amber-200 flex justify-end">
               <button
                 onClick={() => setShowPredefinedModal(false)}
                 className="px-4 py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300 transition-colors"

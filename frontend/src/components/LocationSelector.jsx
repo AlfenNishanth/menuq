@@ -187,9 +187,10 @@ const LocationSelector = ({ onLocationSelect }) => {
   };
 
   return (
-    <div className="relative">
-      <div className="flex items-center">
-        <div className="relative flex-grow">
+    <div className="relative w-full">
+      {/* Responsive layout with flex-wrap for small screens */}
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="relative flex-grow min-w-[200px] w-full sm:w-auto">
           <div className="absolute left-3 top-3 text-gray-500">
             <FaMapMarkerAlt />
           </div>
@@ -199,7 +200,7 @@ const LocationSelector = ({ onLocationSelect }) => {
             value={address}
             onChange={handleInputChange}
             placeholder="Restaurant Location"
-            className="w-full p-3 pl-10 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900"
+            className="w-full p-3 pl-10 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900 text-sm md:text-base"
             required
             aria-label="Restaurant Location"
           />
@@ -212,18 +213,18 @@ const LocationSelector = ({ onLocationSelect }) => {
         <button
           type="button"
           onClick={getCurrentLocation}
-          className="ml-2 p-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition"
+          className="p-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition flex-shrink-0"
           aria-label="Use Current Location"
         >
           <FaCrosshairs />
         </button>
       </div>
 
-      {/* Suggestions dropdown */}
+      {/* Suggestions dropdown - mobile friendly with max height and better scrolling */}
       {showSuggestions && suggestions.length > 0 && (
         <div 
           ref={suggestionsRef}
-          className="absolute z-10 mt-1 w-full bg-white rounded-lg shadow-lg border border-gray-300 max-h-60 overflow-y-auto"
+          className="absolute z-10 mt-1 w-full bg-white rounded-lg shadow-lg border border-gray-300 max-h-60 overflow-y-auto left-0 right-0"
         >
           {suggestions.map((suggestion) => (
             <div
@@ -233,9 +234,9 @@ const LocationSelector = ({ onLocationSelect }) => {
             >
               <div className="flex items-start">
                 <FaMapMarkerAlt className="text-amber-500 mt-1 mr-2 flex-shrink-0" />
-                <div>
-                  <div className="font-medium">{suggestion.structured_formatting.main_text}</div>
-                  <div className="text-sm text-gray-500">{suggestion.structured_formatting.secondary_text}</div>
+                <div className="w-full overflow-hidden">
+                  <div className="font-medium text-sm md:text-base truncate">{suggestion.structured_formatting.main_text}</div>
+                  <div className="text-xs md:text-sm text-gray-500 truncate">{suggestion.structured_formatting.secondary_text}</div>
                 </div>
               </div>
             </div>
@@ -243,9 +244,9 @@ const LocationSelector = ({ onLocationSelect }) => {
         </div>
       )}
       
-      {/* Display selected location details */}
+      {/* Display selected location details - improved for mobile */}
       {location.lat && location.lng && (
-        <div className="mt-2 text-xs text-gray-700 bg-amber-50 p-2 rounded-lg border border-amber-100">
+        <div className="mt-2 text-xs md:text-sm text-gray-700 bg-amber-50 p-2 rounded-lg border border-amber-100 break-words">
           <p className="font-medium">Selected Location:</p>
           <p className="truncate">{address}</p>
           <p className="mt-1">

@@ -15,9 +15,20 @@ const RestaurantMenu = () => {
   const [lastVisible, setLastVisible] = useState(null);
   const [hasMore, setHasMore] = useState(true);
   const [activeCategory, setActiveCategory] = useState(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   const observer = useRef();
   const menuRef = useRef(null);
+
+  // Handle responsive layout detection
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const fetchMenuItems = async (initial = false) => {
     try {
@@ -88,7 +99,10 @@ const RestaurantMenu = () => {
     setActiveCategory(category);
     const element = document.getElementById(`category-${category}`);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Adjust scroll position for mobile to account for sticky category navigation
+      const yOffset = isMobile ? -80 : -32;
+      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
     }
   };
 
@@ -115,18 +129,43 @@ const RestaurantMenu = () => {
     visible: { opacity: 1, transition: { duration: 0.6 } }
   };
 
+  // Track current visible category for mobile navigation highlighting
+  useEffect(() => {
+    if (!menuRef.current || sortedCategories.length === 0) return;
+
+    const handleScroll = () => {
+      // Find which category is currently most visible
+      for (const category of sortedCategories) {
+        const element = document.getElementById(`category-${category}`);
+        if (!element) continue;
+        
+        const rect = element.getBoundingClientRect();
+        // If the element is in view (with some buffer for the sticky header)
+        if (rect.top <= 100 && rect.bottom >= 100) {
+          if (activeCategory !== category) {
+            setActiveCategory(category);
+          }
+          break;
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [sortedCategories, activeCategory]);
+
   return (
-    <div className="max-w-screen-xl mx-auto px-4 py-16">
-      {/* Category Navigation */}
+    <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-8 sm:py-16">
+      {/* Category Navigation - Sticky on mobile */}
       {sortedCategories.length > 0 && (
-        <div className="mb-12">
-          <div className="flex overflow-x-auto pb-4 hide-scrollbar snap-x">
+        <div className={`mb-6 sm:mb-12 ${isMobile ? "sticky top-0 z-10 bg-white py-3 shadow-md" : ""}`}>
+          <div className="flex overflow-x-auto pb-2 hide-scrollbar snap-x">
             <div className="flex space-x-2 mx-auto">
               {sortedCategories.map((category) => (
                 <button
                   key={category}
                   onClick={() => scrollToCategory(category)}
-                  className={`px-6 py-2 text-sm font-medium rounded-full whitespace-nowrap transition-all snap-start ${
+                  className={`px-4 sm:px-6 py-2 text-xs sm:text-sm font-medium rounded-full whitespace-nowrap transition-all snap-start ${
                     activeCategory === category
                       ? "bg-amber-500 text-white shadow-md"
                       : "bg-amber-50 text-amber-900 hover:bg-amber-100"
@@ -146,7 +185,7 @@ const RestaurantMenu = () => {
           initial="hidden"
           animate="visible"
           variants={fadeIn}
-          className="text-center py-16"
+          className="text-center py-8 sm:py-16"
         >
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-amber-50 flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -159,7 +198,7 @@ const RestaurantMenu = () => {
       )}
 
       {/* Menu Categories */}
-      <div className="space-y-16" ref={menuRef}>
+      <div className="space-y-12 sm:space-y-16" ref={menuRef}>
         {sortedCategories.map((category) => (
           <motion.div
             initial="hidden"
@@ -168,14 +207,14 @@ const RestaurantMenu = () => {
             variants={fadeIn}
             key={category}
             id={`category-${category}`}
-            className="scroll-mt-32"
+            className="scroll-mt-24 sm:scroll-mt-32"
           >
-            <div className="flex items-center mb-8">
-              <h2 className="text-2xl font-serif text-gray-800">{category}</h2>
+            <div className="flex items-center mb-4 sm:mb-8">
+              <h2 className="text-xl sm:text-2xl font-serif text-gray-800">{category}</h2>
               <div className="ml-4 h-px bg-amber-200 flex-grow"></div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
               {menuItems[category].map((item, idx) => (
                 <MenuCard
                   key={item._id}
@@ -190,13 +229,13 @@ const RestaurantMenu = () => {
 
       {/* Loading & No more items indicators */}
       {loading && (
-        <div className="flex justify-center mt-10">
-          <div className="w-12 h-12 rounded-full border-2 border-amber-500 border-t-transparent animate-spin"></div>
+        <div className="flex justify-center mt-6 sm:mt-10">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-amber-500 border-t-transparent animate-spin"></div>
         </div>
       )}
       
       {!hasMore && !loading && sortedCategories.length > 0 && (
-        <div className="text-center mt-12 text-gray-500 italic font-serif">
+        <div className="text-center mt-8 sm:mt-12 text-gray-500 italic font-serif">
           <p>Bon Appétit</p>
         </div>
       )}

@@ -526,7 +526,7 @@ const QRCodeGenerator = () => {
     });
   };
 
-  // Render color picker component
+// Render color picker component
   const renderColorPicker = (label, colorValue, pickerName, onChange) => {
     return (
       <div className="mb-4">
@@ -681,7 +681,7 @@ const QRCodeGenerator = () => {
   // Render shape template buttons
   const renderShapeButtons = (category) => {
     return (
-      <div className="grid grid-cols-4 gap-2 mb-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
         {shapeTemplates[category].map((shape) => (
           <button
             key={shape.id}
@@ -720,24 +720,24 @@ const QRCodeGenerator = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="container mx-auto px-4 py-6 sm:py-12">
       <div className="max-w-5xl mx-auto">
-        <h1 className="text-4xl font-serif font-bold text-amber-700 mb-6 text-center">
+        <h1 className="text-3xl sm:text-4xl font-serif font-bold text-amber-700 mb-4 sm:mb-6 text-center">
           Customize Your Menu QR Code
         </h1>
-        <p className="text-xl text-gray-600 mb-12 text-center max-w-2xl mx-auto">
+        <p className="text-lg sm:text-xl text-gray-600 mb-8 sm:mb-12 text-center max-w-2xl mx-auto">
           Create a unique QR code that reflects your brand and style. Customers
           will scan this to view your digital menu.
         </p>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
           {/* Preview Panel */}
-          <div className="bg-white rounded-2xl p-8 shadow-lg border border-amber-100">
-            <h2 className="text-2xl font-serif font-bold text-gray-800 mb-6">
+          <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg border border-amber-100 order-2 lg:order-1">
+            <h2 className="text-xl sm:text-2xl font-serif font-bold text-gray-800 mb-4 sm:mb-6">
               Preview
             </h2>
             <div className="flex flex-col items-center">
-              <div className="p-6 bg-white shadow-md">{renderQRCode()}</div>
+              <div className="p-4 sm:p-6 bg-white shadow-md">{renderQRCode()}</div>
               {qrOptions.restaurantName && (
                 <p className="mt-4 text-lg font-bold text-gray-800">
                   {qrOptions.restaurantName}
@@ -755,7 +755,7 @@ const QRCodeGenerator = () => {
               <button
                 onClick={downloadQRCode}
                 type="button"
-                className="mt-8 px-6 py-3 bg-amber-600 text-white rounded-md hover:bg-amber-700 transition-colors flex items-center"
+                className="mt-6 sm:mt-8 px-4 sm:px-6 py-2 sm:py-3 bg-amber-600 text-white rounded-md hover:bg-amber-700 transition-colors flex items-center w-full sm:w-auto justify-center"
               >
                 Download QR Code
                 <svg
@@ -776,8 +776,8 @@ const QRCodeGenerator = () => {
           </div>
 
           {/* Customization Panel */}
-          <div className="bg-white rounded-2xl p-8 shadow-lg border border-amber-100 overflow-y-auto max-h-screen">
-            <h2 className="text-2xl font-serif font-bold text-gray-800 mb-6">
+          <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg border border-amber-100 overflow-y-auto max-h-[80vh] sm:max-h-screen order-1 lg:order-2">
+            <h2 className="text-xl sm:text-2xl font-serif font-bold text-gray-800 mb-4 sm:mb-6">
               Customize
             </h2>
 
@@ -788,12 +788,12 @@ const QRCodeGenerator = () => {
               </h3>
 
               {/* Shape Category Tabs */}
-              <div className="flex border-b border-gray-200 mb-4">
+              <div className="flex flex-wrap border-b border-gray-200 mb-4">
                 {Object.keys(shapeTemplates).map((category) => (
                   <button
                     key={category}
                     type="button"
-                    className={`py-2 px-4 font-medium text-sm capitalize
+                    className={`py-2 px-3 sm:px-4 font-medium text-sm capitalize
                       ${
                         qrOptions.shapeType === category
                           ? "border-b-2 border-amber-600 text-amber-700"
@@ -965,7 +965,7 @@ const QRCodeGenerator = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Choose Logo
                   </label>
-                  <div className="grid grid-cols-5 gap-2">
+                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                     {Object.entries(presetLogos).map(([key, logo]) => (
                       <button
                         key={key}
@@ -1077,7 +1077,7 @@ const QRCodeGenerator = () => {
                       <button
                         key={position}
                         type="button"
-                        className={`p-2 border rounded-md capitalize flex items-center justify-center
+                        className={`p-2 border rounded-md capitalize flex items-center justify-center text-xs sm:text-sm
                           ${
                             qrOptions.logoPosition === position
                               ? "border-amber-600 bg-amber-50"
@@ -1168,12 +1168,12 @@ const QRCodeGenerator = () => {
         </div>
 
         {/* Instructions Section */}
-        <div className="mt-16 max-w-3xl mx-auto">
-          <h2 className="text-2xl font-serif font-bold text-amber-700 mb-4">
+        <div className="mt-10 sm:mt-16 max-w-3xl mx-auto">
+          <h2 className="text-xl sm:text-2xl font-serif font-bold text-amber-700 mb-4">
             Using Your QR Code
           </h2>
-          <div className="bg-amber-50 p-6 rounded-lg border border-amber-100">
-            <ol className="list-decimal list-inside space-y-3 text-gray-700">
+          <div className="bg-amber-50 p-4 sm:p-6 rounded-lg border border-amber-100">
+            <ol className="list-decimal list-inside space-y-2 sm:space-y-3 text-gray-700">
               <li>
                 Customize your QR code using the options above to match your
                 restaurant's style

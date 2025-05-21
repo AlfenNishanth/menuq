@@ -301,9 +301,9 @@ export default function UpdateMenuItem() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 text-gray-900">
-      <div className="p-8 rounded-2xl shadow-xl w-full max-w-lg bg-white">
-        <h2 className="text-3xl font-extrabold mb-6 text-center text-amber-700">
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 text-gray-900 px-4 py-8 md:px-0">
+      <div className="p-4 md:p-8 rounded-2xl shadow-xl w-full max-w-lg bg-white">
+        <h2 className="text-2xl md:text-3xl font-extrabold mb-4 md:mb-6 text-center text-amber-700">
           Update Menu Item
         </h2>
 
@@ -455,7 +455,7 @@ export default function UpdateMenuItem() {
                     <img
                       src={imagePreview}
                       alt="Menu Item Preview"
-                      className="mx-auto h-36 object-cover rounded-lg"
+                      className="mx-auto h-28 md:h-36 object-cover rounded-lg"
                     />
                     <button
                       type="button"
@@ -467,7 +467,7 @@ export default function UpdateMenuItem() {
                   </div>
                 ) : (
                   <div className="text-center py-4 text-gray-500">
-                    <Upload className="mx-auto text-4xl mb-2" />
+                    <Upload className="mx-auto text-3xl md:text-4xl mb-2" />
                     <p className="text-sm font-medium">
                       Upload Menu Item Image
                     </p>
@@ -488,7 +488,7 @@ export default function UpdateMenuItem() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current.click()}
-                    className="mt-2 inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-amber-600 text-white hover:bg-amber-700 transition-colors"
+                    className="mt-2 inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 text-sm font-medium rounded-md bg-amber-600 text-white hover:bg-amber-700 transition-colors"
                   >
                     Browse Image
                   </button>
@@ -498,7 +498,7 @@ export default function UpdateMenuItem() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current.click()}
-                    className="mt-2 inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300 transition-colors"
+                    className="mt-2 inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300 transition-colors"
                   >
                     Change Image
                   </button>
@@ -508,11 +508,11 @@ export default function UpdateMenuItem() {
           </div>
 
           {/* Variants Section */}
-          <div className="p-4 rounded-lg shadow-md transition bg-amber-50">
+          <div className="p-3 md:p-4 rounded-lg shadow-md transition bg-amber-50">
             <h3 className="font-semibold mb-2 text-amber-800">Variants</h3>
             <div className="space-y-2">
               {variants.map((variant, index) => (
-                <div key={index} className="flex space-x-2">
+                <div key={index} className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-2 md:mb-0">
                   <input
                     type="text"
                     placeholder="Variant Name"
@@ -522,33 +522,35 @@ export default function UpdateMenuItem() {
                       newVariants[index].name = e.target.value;
                       setVariants(newVariants);
                     }}
-                    className="p-3 border rounded-lg transition flex-1 bg-gray-200 border-gray-300 text-gray-900"
+                    className="p-2.5 md:p-3 border rounded-lg transition flex-1 bg-gray-200 border-gray-300 text-gray-900"
                     disabled={loading}
                   />
-                  <input
-                    type="number"
-                    step="1"
-                    min="0"
-                    placeholder="Price"
-                    value={variant.price}
-                    onChange={(e) => {
-                      const newVariants = [...variants];
-                      newVariants[index].price = parseFloat(e.target.value);
-                      setVariants(newVariants);
-                    }}
-                    className="p-3 border rounded-lg transition w-24 bg-gray-200 border-gray-300 text-gray-900"
-                    disabled={loading}
-                  />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setVariants(variants.filter((_, i) => i !== index))
-                    }
-                    className="bg-red-500 text-white px-3 rounded-lg hover:bg-red-600 transition flex items-center justify-center"
-                    disabled={loading}
-                  >
-                    <XIcon size={18} />
-                  </button>
+                  <div className="flex space-x-2">
+                    <input
+                      type="number"
+                      step="1"
+                      min="0"
+                      placeholder="Price"
+                      value={variant.price}
+                      onChange={(e) => {
+                        const newVariants = [...variants];
+                        newVariants[index].price = parseFloat(e.target.value);
+                        setVariants(newVariants);
+                      }}
+                      className="p-2.5 md:p-3 border rounded-lg transition w-24 flex-1 md:flex-none bg-gray-200 border-gray-300 text-gray-900"
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setVariants(variants.filter((_, i) => i !== index))
+                      }
+                      className="bg-red-500 text-white px-3 rounded-lg hover:bg-red-600 transition flex items-center justify-center"
+                      disabled={loading}
+                    >
+                      <XIcon size={18} />
+                    </button>
+                  </div>
                 </div>
               ))}
               <button
@@ -565,11 +567,11 @@ export default function UpdateMenuItem() {
           </div>
 
           {/* Add Ons Section */}
-          <div className="p-4 rounded-lg shadow-md transition bg-amber-50">
+          <div className="p-3 md:p-4 rounded-lg shadow-md transition bg-amber-50">
             <h3 className="font-semibold mb-2 text-amber-800">Add Ons</h3>
             <div className="space-y-2">
               {addOns.map((addOn, index) => (
-                <div key={index} className="flex space-x-2">
+                <div key={index} className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-2 md:mb-0">
                   <input
                     type="text"
                     placeholder="Add On Name"
@@ -579,33 +581,35 @@ export default function UpdateMenuItem() {
                       newAddOns[index].name = e.target.value;
                       setAddOns(newAddOns);
                     }}
-                    className="p-3 border rounded-lg transition flex-1 bg-gray-200 border-gray-300 text-gray-900"
+                    className="p-2.5 md:p-3 border rounded-lg transition flex-1 bg-gray-200 border-gray-300 text-gray-900"
                     disabled={loading}
                   />
-                  <input
-                    type="number"
-                    step="1"
-                    min="0"
-                    placeholder="Price"
-                    value={addOn.price}
-                    onChange={(e) => {
-                      const newAddOns = [...addOns];
-                      newAddOns[index].price = parseFloat(e.target.value);
-                      setAddOns(newAddOns);
-                    }}
-                    className="p-3 border rounded-lg transition w-24 bg-gray-200 border-gray-300 text-gray-900"
-                    disabled={loading}
-                  />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setAddOns(addOns.filter((_, i) => i !== index))
-                    }
-                    className="bg-red-500 text-white px-3 rounded-lg hover:bg-red-600 transition flex items-center justify-center"
-                    disabled={loading}
-                  >
-                    <XIcon size={18} />
-                  </button>
+                  <div className="flex space-x-2">
+                    <input
+                      type="number"
+                      step="1"
+                      min="0"
+                      placeholder="Price"
+                      value={addOn.price}
+                      onChange={(e) => {
+                        const newAddOns = [...addOns];
+                        newAddOns[index].price = parseFloat(e.target.value);
+                        setAddOns(newAddOns);
+                      }}
+                      className="p-2.5 md:p-3 border rounded-lg transition w-24 flex-1 md:flex-none bg-gray-200 border-gray-300 text-gray-900"
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setAddOns(addOns.filter((_, i) => i !== index))
+                      }
+                      className="bg-red-500 text-white px-3 rounded-lg hover:bg-red-600 transition flex items-center justify-center"
+                      disabled={loading}
+                    >
+                      <XIcon size={18} />
+                    </button>
+                  </div>
                 </div>
               ))}
               <button
@@ -620,19 +624,19 @@ export default function UpdateMenuItem() {
           </div>
 
           {/* Tags Section */}
-          <div className="p-4 rounded-lg shadow-md transition bg-amber-50">
+          <div className="p-3 md:p-4 rounded-lg shadow-md transition bg-amber-50">
             <h3 className="font-semibold mb-2 text-amber-800">Tags</h3>
             <div className="mb-2 flex flex-wrap gap-2">
               {tags.map((tag, index) => (
                 <span
                   key={index}
-                  className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-800"
+                  className="inline-flex items-center px-2.5 md:px-3 py-1 rounded-full text-xs md:text-sm font-medium bg-amber-100 text-amber-800"
                 >
                   {tag}
                   <button
                     type="button"
                     onClick={() => setTags(tags.filter((_, i) => i !== index))}
-                    className="ml-2 -mr-1 h-4 w-4 rounded-full inline-flex items-center justify-center transition bg-amber-200 text-amber-600 hover:bg-amber-300"
+                    className="ml-1.5 -mr-1 h-4 w-4 rounded-full inline-flex items-center justify-center transition bg-amber-200 text-amber-600 hover:bg-amber-300"
                     disabled={loading}
                   >
                     <span className="text-xs">×</span>
@@ -640,7 +644,7 @@ export default function UpdateMenuItem() {
                 </span>
               ))}
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-col md:flex-row gap-2">
               <input
                 type="text"
                 placeholder="Add tag"
@@ -652,7 +656,7 @@ export default function UpdateMenuItem() {
                     addTag();
                   }
                 }}
-                className="flex-1 p-3 border rounded-lg transition bg-gray-200 border-gray-300 text-gray-900"
+                className="flex-1 p-2.5 md:p-3 border rounded-lg transition bg-gray-200 border-gray-300 text-gray-900"
                 disabled={loading}
               />
               <button
@@ -680,7 +684,7 @@ export default function UpdateMenuItem() {
 
           <button
             type="submit"
-            className={`w-full text-white p-3 rounded-lg font-semibold transition duration-300 shadow-lg flex justify-center items-center ${
+            className={`w-full text-white p-2.5 md:p-3 rounded-lg font-semibold transition duration-300 shadow-lg flex justify-center items-center ${
               hasChanges 
                 ? "bg-amber-600 hover:bg-amber-700" 
                 : "bg-gray-400 cursor-not-allowed"

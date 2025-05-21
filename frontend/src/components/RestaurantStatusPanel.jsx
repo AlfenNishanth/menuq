@@ -303,8 +303,8 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
   // Show loading state if restaurant data is still being loaded
   if (isLoading) {
     return (
-      <div className="bg-white p-6 rounded-xl shadow-md border border-amber-100 h-full">
-        <h2 className="text-xl font-semibold text-amber-800 mb-6">
+      <div className="bg-white p-4 sm:p-6 rounded-xl shadow-md border border-amber-100 h-full">
+        <h2 className="text-lg sm:text-xl font-semibold text-amber-800 mb-4 sm:mb-6">
           Restaurant Status & Hours
         </h2>
         <div className="flex justify-center items-center h-40">
@@ -315,30 +315,30 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
   }
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-md border border-amber-100 h-full">
-      <h2 className="text-xl font-semibold text-amber-800 mb-6">
+    <div className="bg-white p-4 sm:p-6 rounded-xl shadow-md border border-amber-100 h-full">
+      <h2 className="text-lg sm:text-xl font-semibold text-amber-800 mb-4 sm:mb-6">
         Restaurant Status & Hours
       </h2>
 
       {/* Error message display */}
       {error && (
-        <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md mb-4">
+        <div className="bg-red-50 border-l-4 border-red-500 p-3 sm:p-4 rounded-md mb-4">
           <div className="flex items-center">
             <X className="text-red-500 mr-2" size={20} />
-            <p className="text-red-700 text-sm">{error}</p>
+            <p className="text-red-700 text-xs sm:text-sm">{error}</p>
           </div>
         </div>
       )}
 
       {/* If restaurant data is missing, show a different UI */}
       {!restaurant || !restaurant.firebaseUID ? (
-        <div className="bg-amber-50 p-4 rounded-lg border border-amber-200 text-center">
-          <p className="text-amber-800 mb-4">
+        <div className="bg-amber-50 p-3 sm:p-4 rounded-lg border border-amber-200 text-center">
+          <p className="text-amber-800 mb-3 sm:mb-4 text-sm sm:text-base">
             Restaurant data is not available or you're not logged in.
           </p>
           <div className="flex justify-center gap-2">
             <button
-              className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition duration-150"
+              className="px-3 py-1.5 sm:px-4 sm:py-2 bg-amber-600 text-white text-sm rounded-lg hover:bg-amber-700 transition duration-150"
               onClick={() => window.location.reload()}
             >
               Refresh Page
@@ -348,20 +348,20 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
       ) : (
         <>
           {/* Restaurant Open/Closed Toggle */}
-          <div className="mb-4 bg-amber-50 p-4 rounded-lg border border-amber-200">
+          <div className="mb-4 bg-amber-50 p-3 sm:p-4 rounded-lg border border-amber-200">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
-                <h3 className="font-medium text-amber-800 mb-1">
+                <h3 className="font-medium text-amber-800 mb-1 text-sm sm:text-base">
                   Current Status
                 </h3>
                 <div className="flex items-center">
                   <div
-                    className={`w-3 h-3 rounded-full mr-2 ${
+                    className={`w-2.5 sm:w-3 h-2.5 sm:h-3 rounded-full mr-2 ${
                       isOpen ? "bg-green-500" : "bg-red-500"
                     }`}
                   ></div>
                   <p
-                    className={`text-lg font-semibold ${
+                    className={`text-base sm:text-lg font-semibold ${
                       isOpen ? "text-green-600" : "text-red-600"
                     }`}
                   >
@@ -370,7 +370,7 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
                 </div>
               </div>
               <button
-                className={`px-4 py-2 rounded-lg transition duration-150 flex items-center w-full sm:w-auto justify-center ${
+                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg transition duration-150 flex items-center w-full sm:w-auto justify-center text-sm ${
                   isOpen
                     ? "bg-red-600 hover:bg-red-700 text-white"
                     : "bg-amber-600 hover:bg-amber-700 text-white"
@@ -380,15 +380,15 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
               >
                 {isUpdating ? (
                   <span className="flex items-center">
-                    <div className="animate-spin h-4 w-4 border-2 border-t-transparent border-white rounded-full mr-2"></div>
+                    <div className="animate-spin h-3 w-3 sm:h-4 sm:w-4 border-2 border-t-transparent border-white rounded-full mr-2"></div>
                     Updating...
                   </span>
                 ) : (
                   <span className="flex items-center">
                     {isOpen ? (
-                      <X size={16} className="mr-2" />
+                      <X size={16} className="mr-1.5" />
                     ) : (
-                      <Check size={16} className="mr-2" />
+                      <Check size={16} className="mr-1.5" />
                     )}
                     {isOpen ? "Mark as Closed" : "Mark as Open"}
                   </span>
@@ -399,28 +399,28 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
 
           {/* Operating Hours Section */}
           <div>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
               <div className="flex items-center">
-                <Calendar size={18} className="text-amber-600 mr-2" />
-                <h3 className="font-medium text-amber-800">Operating Hours</h3>
+                <Calendar size={16} className="text-amber-600 mr-1.5 sm:mr-2" />
+                <h3 className="font-medium text-amber-800 text-sm sm:text-base">Operating Hours</h3>
               </div>
               {/* {!addingNewDay && (
                 <button
-                  className="px-3 py-1 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition duration-150 flex items-center"
+                  className="px-2 py-1 sm:px-3 sm:py-1 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition duration-150 flex items-center text-xs sm:text-sm"
                   onClick={() => setAddingNewDay(true)}
                 >
-                  <Plus size={16} className="mr-1" /> Add Day
+                  <Plus size={14} className="mr-1" /> Add Day
                 </button>
               )} */}
             </div>
 
             {/* Add New Day Form */}
             {addingNewDay && (
-              <div className="bg-amber-50 p-4 rounded-lg border border-amber-200 mb-4">
-                <h4 className="font-medium mb-2 text-amber-800">Add New Day</h4>
+              <div className="bg-amber-50 p-3 sm:p-4 rounded-lg border border-amber-200 mb-4">
+                <h4 className="font-medium mb-2 text-amber-800 text-sm sm:text-base">Add New Day</h4>
                 <div className="flex flex-col gap-2">
                   <select
-                    className="p-2 border border-amber-200 rounded-lg bg-white focus:ring-2 focus:ring-amber-300 focus:border-amber-400 outline-none"
+                    className="p-2 border border-amber-200 rounded-lg bg-white focus:ring-2 focus:ring-amber-300 focus:border-amber-400 outline-none text-sm"
                     value={newDay}
                     onChange={(e) => setNewDay(e.target.value)}
                   >
@@ -432,30 +432,30 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
                   </select>
                   <input
                     type="text"
-                    className="p-2 border border-amber-200 rounded-lg bg-white focus:ring-2 focus:ring-amber-300 focus:border-amber-400 outline-none"
+                    className="p-2 border border-amber-200 rounded-lg bg-white focus:ring-2 focus:ring-amber-300 focus:border-amber-400 outline-none text-sm"
                     placeholder="e.g. 10:00 AM - 10:00 PM"
                     value={newHours}
                     onChange={(e) => setNewHours(e.target.value)}
                   />
                   <div className="flex gap-2">
                     <button
-                      className="px-3 py-1 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition duration-150 flex items-center"
+                      className="px-2 py-1 sm:px-3 sm:py-1 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition duration-150 flex items-center text-xs sm:text-sm"
                       onClick={handleAddDay}
                       disabled={isUpdating || !newHours.trim()}
                     >
                       {isUpdating ? (
                         <span className="flex items-center">
-                          <div className="animate-spin h-4 w-4 border-2 border-t-transparent border-white rounded-full mr-2"></div>
+                          <div className="animate-spin h-3 w-3 sm:h-4 sm:w-4 border-2 border-t-transparent border-white rounded-full mr-1 sm:mr-2"></div>
                           Saving...
                         </span>
                       ) : (
                         <span className="flex items-center">
-                          <Check size={16} className="mr-1" /> Save
+                          <Check size={14} className="mr-1" /> Save
                         </span>
                       )}
                     </button>
                     <button
-                      className="px-3 py-1 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition duration-150"
+                      className="px-2 py-1 sm:px-3 sm:py-1 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition duration-150 text-xs sm:text-sm"
                       onClick={handleCancelEdit}
                     >
                       Cancel
@@ -465,17 +465,18 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
               </div>
             )}
 
-            {/* Hours List - Simplified for mobile */}
+            {/* Hours List - Mobile Responsive */}
             <div className="bg-amber-50 rounded-lg overflow-hidden border border-amber-200">
               <div className="overflow-x-auto">
-                <table className="w-full">
+                {/* Desktop and Tablet View */}
+                <table className="w-full hidden sm:table">
                   <thead className="bg-amber-100">
                     <tr>
-                      <th className="text-left p-3 text-amber-800 w-1/4">
+                      <th className="text-left p-3 text-amber-800 w-1/4 text-sm">
                         Day
                       </th>
-                      <th className="text-left p-3 text-amber-800">Hours</th>
-                      <th className="text-right p-3 text-amber-800 w-2/5">
+                      <th className="text-left p-3 text-amber-800 text-sm">Hours</th>
+                      <th className="text-right p-3 text-amber-800 w-2/5 text-sm">
                         Actions
                       </th>
                     </tr>
@@ -488,14 +489,14 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
 
                       return (
                         <tr key={day} className="border-t border-amber-200">
-                          <td className="p-2 pl-3 font-medium text-amber-900">
+                          <td className="p-2 pl-3 font-medium text-amber-900 text-sm">
                             {day}
                           </td>
-                          <td className="p-2">
+                          <td className="p-2 text-sm">
                             {isEditing ? (
                               <input
                                 type="text"
-                                className="w-full p-2 border border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-300 focus:border-amber-400 outline-none"
+                                className="w-full p-2 border border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-300 focus:border-amber-400 outline-none text-sm"
                                 value={newHours}
                                 onChange={(e) => setNewHours(e.target.value)}
                                 placeholder="e.g. 10:00 AM - 10:00 PM"
@@ -588,6 +589,108 @@ const RestaurantStatusPanel = ({ restaurant: initialRestaurant, onUpdate }) => {
                     })}
                   </tbody>
                 </table>
+
+                {/* Mobile View */}
+                <div className="sm:hidden">
+                  {daysOfWeek.map((day) => {
+                    const hasHours = isDaySet(day);
+                    const hours = getHoursForDay(day);
+                    const isEditing = editingDay === day;
+
+                    return (
+                      <div 
+                        key={day} 
+                        className="border-t border-amber-200 p-3 flex flex-col gap-2"
+                      >
+                        <div className="flex justify-between items-center">
+                          <div className="font-medium text-amber-900 text-sm">{day}</div>
+                          
+                          {!isEditing && (
+                            <div className="flex gap-1">
+                              {hasHours && (
+                                <>
+                                  <button
+                                    className="px-2 py-1 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition duration-150 flex items-center text-xs"
+                                    onClick={() => handleEditHours(day, hours)}
+                                  >
+                                    <Edit size={12} className="mr-1" /> Edit
+                                  </button>
+                                  <button
+                                    className="px-2 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-150 flex items-center text-xs"
+                                    onClick={() => handleDeleteHours(day)}
+                                    disabled={isUpdating}
+                                  >
+                                    {isUpdating ? (
+                                      <span className="flex items-center">
+                                        <div className="animate-spin h-3 w-3 border-2 border-t-transparent border-white rounded-full mr-1"></div>
+                                        Delete
+                                      </span>
+                                    ) : (
+                                      <span className="flex items-center">
+                                        <Trash size={12} className="mr-1" /> Delete
+                                      </span>
+                                    )}
+                                  </button>
+                                </>
+                              )}
+                              {!hasHours && (
+                                <button
+                                  className="px-2 py-1 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition duration-150 flex items-center text-xs"
+                                  onClick={() => {
+                                    setEditingDay(day);
+                                    setNewHours("10:00 AM - 10:00 PM");
+                                  }}
+                                >
+                                  <Plus size={12} className="mr-1" /> Add
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                          
+                        {isEditing ? (
+                          <div className="flex flex-col gap-2">
+                            <input
+                              type="text"
+                              className="w-full p-2 border border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-300 focus:border-amber-400 outline-none text-sm"
+                              value={newHours}
+                              onChange={(e) => setNewHours(e.target.value)}
+                              placeholder="e.g. 10:00 AM - 10:00 PM"
+                            />
+                            <div className="flex justify-end gap-1 mt-1">
+                              <button
+                                className="px-2 py-1 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition duration-150 flex items-center text-xs"
+                                onClick={() => handleSaveHours(day)}
+                                disabled={isUpdating}
+                              >
+                                {isUpdating ? (
+                                  <span className="flex items-center">
+                                    <div className="animate-spin h-3 w-3 border-2 border-t-transparent border-white rounded-full mr-1"></div>
+                                    Save
+                                  </span>
+                                ) : (
+                                  <span className="flex items-center">
+                                    <Check size={12} className="mr-1" /> Save
+                                  </span>
+                                )}
+                              </button>
+                              <button
+                                className="px-2 py-1 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition duration-150 text-xs"
+                                onClick={handleCancelEdit}
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className={`text-sm ${hasHours ? "text-amber-900" : "text-amber-600 italic"}`}>
+                            {hours}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>

@@ -11,6 +11,8 @@ import {
   MapPin,
   Award,
   Phone,
+  Menu as MenuIcon,
+  X,
 } from "lucide-react";
 import axios from "axios";
 
@@ -88,31 +90,31 @@ const RestaurantNameHeader = ({ restaurantData }) => {
           <div className="absolute left-1/4 -bottom-24 w-40 h-40 bg-white rounded-full"></div>
         </div>
 
-        <div className="relative p-8 md:p-10">
+        <div className="relative p-6 md:p-8 lg:p-10">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between">
             <div className="mb-4 md:mb-0">
               <div className="flex items-center mb-2">
-                <div className="h-1 w-12 bg-amber-300 mr-3"></div>
-                <span className="text-amber-200 text-sm font-medium tracking-wider uppercase">
+                <div className="h-1 w-10 md:w-12 bg-amber-300 mr-2 md:mr-3"></div>
+                <span className="text-amber-200 text-xs md:text-sm font-medium tracking-wider uppercase">
                   {restaurantCategory || "Restaurant"}
                 </span>
               </div>
 
-              <h1 className="text-4xl md:text-5xl font-serif font-bold text-white leading-tight">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-white leading-tight">
                 {restaurantName}
               </h1>
 
               {restaurantAddress && (
-                <div className="flex items-center mt-3 text-amber-100">
-                  <MapPin size={16} className="mr-2" />
-                  <span className="text-sm md:text-base">{restaurantAddress}</span>
+                <div className="flex items-center mt-2 md:mt-3 text-amber-100">
+                  <MapPin size={14} className="mr-1.5 md:mr-2" />
+                  <span className="text-xs md:text-sm lg:text-base">{restaurantAddress}</span>
                 </div>
               )}
             </div>
 
-            <div className="flex items-center bg-white/10 backdrop-filter backdrop-blur-sm px-4 py-2 rounded-full border border-white/20">
-              <Award className="text-amber-300 mr-2" size={18} />
-              <span className="text-white text-sm font-medium">Authentic Cuisine</span>
+            <div className="flex items-center bg-white/10 backdrop-filter backdrop-blur-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-white/20">
+              <Award className="text-amber-300 mr-1.5 md:mr-2" size={16} />
+              <span className="text-white text-xs md:text-sm font-medium">Authentic Cuisine</span>
             </div>
           </div>
         </div>
@@ -154,8 +156,15 @@ const RestaurantStatusInfo = ({ restaurantData }) => {
     return resOpen;
   };
 
+  const [showAllHours, setShowAllHours] = useState(false);
+
+  // Show limited hours on mobile by default
+  const displayedHours = showAllHours 
+    ? operatingHours 
+    : operatingHours.filter(item => item.day === today);
+
   return (
-    <div className="bg-gradient-to-r from-amber-50 to-white border-l-4 border-amber-400 rounded-r-lg shadow-sm mb-8 overflow-hidden">
+    <div className="bg-gradient-to-r from-amber-50 to-white border-l-4 border-amber-400 rounded-r-lg shadow-sm mb-6 md:mb-8 overflow-hidden">
       <div className="flex flex-col md:flex-row">
         {/* Status indicator */}
         <div className="p-4 md:p-5 flex items-center bg-white/60 backdrop-blur-sm md:w-1/3">
@@ -165,7 +174,7 @@ const RestaurantStatusInfo = ({ restaurantData }) => {
             }`}
           ></div>
           <div>
-            <h3 className="font-medium text-gray-800">
+            <h3 className="font-medium text-gray-800 text-sm md:text-base">
               Restaurant is currently{" "}
               <span
                 className={`font-bold ${
@@ -176,7 +185,7 @@ const RestaurantStatusInfo = ({ restaurantData }) => {
               </span>
             </h3>
             {todayHours && (
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-xs md:text-sm text-gray-600 mt-1">
                 <Clock size={14} className="inline mr-1" />
                 Today's hours: {todayHours.hours}
               </p>
@@ -184,22 +193,32 @@ const RestaurantStatusInfo = ({ restaurantData }) => {
           </div>
         </div>
 
-        {/* Weekly hours display - FIXED LAYOUT */}
+        {/* Weekly hours display - ADAPTIVE LAYOUT */}
         <div className="p-4 md:p-5 md:flex-1 border-t md:border-t-0 md:border-l border-amber-100">
-          <h4 className="flex items-center text-sm font-medium text-amber-800 mb-3">
-            <Calendar size={14} className="mr-1.5" />
-            Operating Hours
-          </h4>
+          <div className="flex justify-between items-center mb-3">
+            <h4 className="flex items-center text-xs md:text-sm font-medium text-amber-800">
+              <Calendar size={14} className="mr-1.5" />
+              Operating Hours
+            </h4>
+            
+            {/* Toggle button for mobile */}
+            <button 
+              className="text-xs text-amber-600 hover:text-amber-800 md:hidden"
+              onClick={() => setShowAllHours(!showAllHours)}
+            >
+              {showAllHours ? "Show Less" : "Show All"}
+            </button>
+          </div>
 
           {operatingHours.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2 text-sm">
-              {operatingHours.map((item) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-1 md:gap-y-2 text-xs md:text-sm">
+              {displayedHours.map((item) => (
                 <div
                   key={item.day}
                   className={`flex ${item.day === today ? "font-medium" : ""}`}
                 >
                   <span
-                    className={`w-22 ${
+                    className={`w-16 md:w-22 ${
                       item.day === today ? "text-amber-800" : "text-gray-700"
                     }`}
                   >
@@ -216,7 +235,7 @@ const RestaurantStatusInfo = ({ restaurantData }) => {
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 italic col-span-full">
+            <p className="text-gray-500 italic col-span-full text-xs md:text-sm">
               Operating hours not available
             </p>
           )}
@@ -234,6 +253,7 @@ const RestaurantMenu = () => {
   const [visibleCategoryGroups, setVisibleCategoryGroups] = useState(false);
   const [restaurantData, setRestaurantData] = useState(null);
   const [restaurantLoading, setRestaurantLoading] = useState(true);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const categoryRefs = useRef({});
   const menuContainerRef = useRef(null);
@@ -353,6 +373,25 @@ const RestaurantMenu = () => {
     fetchRestaurantData(id); // Fetch restaurant status and hours
   }, [id]);
 
+  // Close mobile nav when a category is selected
+  useEffect(() => {
+    if (mobileNavOpen) {
+      setMobileNavOpen(false);
+    }
+  }, [activeCategory]);
+
+  // Handle resize events to close mobile menu when switching to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768 && mobileNavOpen) {
+        setMobileNavOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [mobileNavOpen]);
+
   // Sort categories according to predefined order
   const getSortedCategories = (items) => {
     return Object.keys(items).sort((a, b) => {
@@ -376,6 +415,15 @@ const RestaurantMenu = () => {
 
   const toggleCategoryGroups = () => {
     setVisibleCategoryGroups(!visibleCategoryGroups);
+  };
+
+  // Toggle mobile navigation menu
+  const toggleMobileNav = () => {
+    setMobileNavOpen(!mobileNavOpen);
+    // Close category groups when mobile nav is opened
+    if (!mobileNavOpen) {
+      setVisibleCategoryGroups(false);
+    }
   };
 
   // Find which group a category belongs to
@@ -405,12 +453,26 @@ const RestaurantMenu = () => {
     <div className="bg-white" ref={menuContainerRef}>
       {/* Navigation Bar */}
       {sortedCategories.length > 0 && (
-        <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-amber-100 shadow-sm py-3">
+        <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-sm border-b border-amber-100 shadow-sm py-3">
           <div className="max-w-screen-xl mx-auto px-4">
-            <div className="flex items-center mb-2">
+            <div className="flex items-center justify-between">
+              {/* Mobile menu button */}
+              <button
+                onClick={toggleMobileNav}
+                className="md:hidden text-amber-700 hover:text-amber-900 p-1"
+                aria-label="Toggle menu"
+              >
+                {mobileNavOpen ? (
+                  <X size={24} />
+                ) : (
+                  <MenuIcon size={24} />
+                )}
+              </button>
+              
+              {/* Desktop category toggle */}
               <button
                 onClick={toggleCategoryGroups}
-                className="text-amber-700 hover:text-amber-900 font-medium flex items-center mr-4"
+                className="hidden md:flex text-amber-700 hover:text-amber-900 font-medium items-center mr-4"
               >
                 <span className="mr-1">Categories</span>
                 <svg
@@ -430,7 +492,8 @@ const RestaurantMenu = () => {
                 </svg>
               </button>
 
-              <div className="overflow-x-auto hide-scrollbar">
+              {/* Desktop horizontal category scroll */}
+              <div className="hidden md:block overflow-x-auto hide-scrollbar flex-1">
                 <div className="flex gap-2">
                   {sortedCategories.map((category) => (
                     <button
@@ -448,11 +511,18 @@ const RestaurantMenu = () => {
                   ))}
                 </div>
               </div>
+              
+              {/* Current category indicator for mobile */}
+              <div className="md:hidden flex-1 text-center">
+                <span className="font-medium text-amber-800 px-2 py-1 rounded-lg bg-amber-50">
+                  {capitalizeWords(activeCategory)}
+                </span>
+              </div>
             </div>
 
-            {/* Expanded Category Groups */}
+            {/* Expanded Category Groups for Desktop */}
             {visibleCategoryGroups && (
-              <div className="pt-2 pb-1 border-t border-amber-100 animate-fadeIn">
+              <div className="hidden md:block pt-2 pb-1 border-t border-amber-100 animate-fadeIn mt-2">
                 {Object.entries(availableCategoryGroups).map(
                   ([group, categories]) => (
                     <div key={group} className="mb-3 last:mb-0">
@@ -487,7 +557,57 @@ const RestaurantMenu = () => {
         </div>
       )}
 
-      <div className="max-w-screen-xl mx-auto px-6 py-10">
+      {/* Mobile Category Navigation Overlay */}
+      {mobileNavOpen && (
+        <div className="fixed inset-0 bg-amber-900/90 z-40 overflow-y-auto md:hidden animate-fadeIn">
+          <div className="max-w-lg mx-auto px-6 py-8">
+            <div className="flex justify-end mb-6">
+              <button 
+                onClick={toggleMobileNav}
+                className="text-white hover:text-amber-200 p-1"
+              >
+                <X size={28} />
+              </button>
+            </div>
+            
+            <h2 className="text-white text-lg font-serif mb-6 border-b border-amber-700 pb-2">
+              Menu Categories
+            </h2>
+            
+            <div className="space-y-6">
+              {Object.entries(availableCategoryGroups).map(
+                ([group, categories]) => (
+                  <div key={group}>
+                    <h3 className="text-xs uppercase tracking-wider text-amber-300 font-semibold mb-3">
+                      {group}
+                    </h3>
+                    <div className="grid grid-cols-2 gap-2">
+                      {categories.map((category) => (
+                        <button
+                          key={category}
+                          onClick={() => {
+                            scrollToCategory(category);
+                          }}
+                          className={`px-3 py-2 text-sm font-medium transition-all whitespace-nowrap rounded-lg text-left
+                          ${
+                            activeCategory === category
+                              ? "bg-amber-700 text-white border border-amber-500"
+                              : "bg-amber-800/60 text-amber-200 hover:bg-amber-800"
+                          }`}
+                        >
+                          {capitalizeWords(category)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="max-w-screen-xl mx-auto px-4 md:px-6 py-6 md:py-10">
         {/* Restaurant Name Header - Added Here */}
         {!restaurantLoading && restaurantData && (
           <RestaurantNameHeader restaurantData={restaurantData} />
@@ -500,12 +620,12 @@ const RestaurantMenu = () => {
 
         {/* Loading State */}
         {(loading || restaurantLoading) && (
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="w-16 h-16 relative">
+          <div className="flex flex-col items-center justify-center py-12 md:py-16">
+            <div className="w-14 h-14 md:w-16 md:h-16 relative">
               <div className="absolute inset-0 border-4 border-amber-200 border-t-amber-600 rounded-full animate-spin"></div>
               <div className="absolute inset-3 border-2 border-amber-100 border-b-amber-400 rounded-full animate-spin-slow"></div>
             </div>
-            <p className="mt-6 text-amber-800 font-medium">
+            <p className="mt-6 text-amber-800 font-medium text-sm md:text-base">
               Curating the menu...
             </p>
           </div>
@@ -513,10 +633,10 @@ const RestaurantMenu = () => {
 
         {/* Empty State */}
         {sortedCategories.length === 0 && !loading && (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center mb-6">
+          <div className="flex flex-col items-center justify-center py-16 md:py-20 text-center">
+            <div className="w-16 h-16 md:w-20 md:h-20 bg-amber-50 rounded-full flex items-center justify-center mb-5 md:mb-6">
               <svg
-                className="w-10 h-10 text-amber-500"
+                className="w-8 h-8 md:w-10 md:h-10 text-amber-500"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -530,10 +650,10 @@ const RestaurantMenu = () => {
                 ></path>
               </svg>
             </div>
-            <h3 className="text-2xl font-serif text-gray-800 mb-2">
+            <h3 className="text-xl md:text-2xl font-serif text-gray-800 mb-2">
               Menu Coming Soon
             </h3>
-            <p className="text-gray-500 max-w-md">
+            <p className="text-gray-500 max-w-md text-sm md:text-base">
               Our chefs are carefully crafting a delightful menu experience for
               you.
             </p>
@@ -541,7 +661,7 @@ const RestaurantMenu = () => {
         )}
 
         {/* Menu Categories */}
-        <div className="space-y-16">
+        <div className="space-y-12 md:space-y-16">
           {sortedCategories.map((category, categoryIndex) => {
             const categoryGroup = findCategoryGroup(category);
 
@@ -550,24 +670,24 @@ const RestaurantMenu = () => {
                 key={category}
                 ref={(el) => (categoryRefs.current[category] = el)}
                 data-category={category}
-                className="scroll-mt-28"
+                className="scroll-mt-20 md:scroll-mt-28"
               >
-                <div className="flex flex-col mb-8">
+                <div className="flex flex-col mb-6 md:mb-8">
                   {categoryGroup && (
                     <span className="text-xs uppercase tracking-wider text-amber-600 font-medium mb-1">
                       {categoryGroup}
                     </span>
                   )}
                   <div className="flex items-center">
-                    <div className="w-2 h-2 bg-amber-500 rounded-full mr-3"></div>
-                    <h2 className="text-2xl font-serif text-gray-800">
+                    <div className="w-2 h-2 bg-amber-500 rounded-full mr-2 md:mr-3"></div>
+                    <h2 className="text-xl md:text-2xl font-serif text-gray-800">
                       {capitalizeWords(category)}
                     </h2>
-                    <div className="flex-grow h-px bg-gradient-to-r from-amber-300 to-transparent ml-4"></div>
+                    <div className="flex-grow h-px bg-gradient-to-r from-amber-300 to-transparent ml-3 md:ml-4"></div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
                   {menuItems[category].map((item) => (
                     <div
                       key={item._id}
@@ -584,12 +704,12 @@ const RestaurantMenu = () => {
 
         {/* Footer */}
         {sortedCategories.length > 0 && !loading && (
-          <div className="mt-20 text-center">
+          <div className="mt-16 md:mt-20 text-center">
             <div className="inline-flex items-center">
-              <div className="h-px w-12 bg-amber-200"></div>
-              <div className="mx-4">
+              <div className="h-px w-10 md:w-12 bg-amber-200"></div>
+              <div className="mx-3 md:mx-4">
                 <svg
-                  className="w-6 h-6 text-amber-400"
+                  className="w-5 h-5 md:w-6 md:h-6 text-amber-400"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                   xmlns="http://www.w3.org/2000/svg"
@@ -597,12 +717,14 @@ const RestaurantMenu = () => {
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
                 </svg>
               </div>
-              <div className="h-px w-12 bg-amber-200"></div>
+              <div className="h-px w-10 md:w-12 bg-amber-200"></div>
             </div>
-            <p className="text-amber-800 font-serif italic mt-4">Bon Appétit</p>
+            <p className="text-amber-800 font-serif italic mt-3 md:mt-4 text-sm md:text-base">Bon Appétit</p>
           </div>
         )}
       </div>
+
+    
     </div>
   );
 };

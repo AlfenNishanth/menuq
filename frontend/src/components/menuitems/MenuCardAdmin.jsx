@@ -4,7 +4,6 @@ import {
   ChevronDown, 
   ChevronUp, 
   Clock, 
-  Star,
   Edit,
   X
 } from 'lucide-react';
@@ -16,7 +15,7 @@ function MenuCardAdmin({ item, onAddToOrder, showSuccessToast, showErrorToast })
   const [expanded, setExpanded] = useState(false);
   const [isAvailable, setIsAvailable] = useState(item.available);
   const [isEditingPrepTime, setIsEditingPrepTime] = useState(false);
-  const [prepTimeValue, setPrepTimeValue] = useState(item.prepTime ==0 ? '-' : item.prepTime);
+  const [prepTimeValue, setPrepTimeValue] = useState(item.prepTime == 0 ? '-' : item.prepTime);
   const navigate = useNavigate();
 
   const toggleExpand = () => {
@@ -98,8 +97,6 @@ function MenuCardAdmin({ item, onAddToOrder, showSuccessToast, showErrorToast })
     imageUrl,
     tags,
     prepTime,
-    rating,
-    ratingCount,
     spiceLevel
   } = item;
 
@@ -111,12 +108,12 @@ function MenuCardAdmin({ item, onAddToOrder, showSuccessToast, showErrorToast })
 
   return (
     <div 
-      className={`relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 bg-white border-0 flex flex-col max-w-4xl mx-auto ${!isAvailable ? 'opacity-60' : ''}`}
+      className={`relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 bg-white border-0 flex flex-col w-full max-w-4xl mx-auto ${!isAvailable ? 'opacity-60' : ''}`}
     >
-      <div className="flex">
-        <div className="w-42 flex-shrink-0 relative group">
+      <div className="flex flex-col md:flex-row w-full">
+        <div className="w-full md:w-64 flex-shrink-0 relative group">
           <img 
-            className="w-full h-46 object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-56 md:h-56 object-cover transition-transform duration-300 group-hover:scale-105"
             src={imageUrl}
             alt={name} 
             loading="lazy"
@@ -130,19 +127,13 @@ function MenuCardAdmin({ item, onAddToOrder, showSuccessToast, showErrorToast })
         </div>
 
         <div className="flex-grow flex flex-col">
-          <div className="p-6 pb-2">
-            <div className="flex justify-between items-start mb-4">
-              <div className="flex-grow pr-4">
-                <h2 className="text-xl font-serif tracking-wide">{capitalizeWords(name)}</h2>
-                <div className="flex items-center mt-1">
-                  <Star className="w-4 h-4 text-amber-500 mr-1" />
-                  <span className="text-sm text-gray-600">
-                    {rating} ({ratingCount} reviews)
-                  </span>
-                </div>
+          <div className="p-4 md:p-6 pb-2 w-full">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 w-full">
+              <div className="flex-grow">
+                <h2 className="text-2xl font-serif tracking-wide">{capitalizeWords(name)}</h2>
               </div>
-              <div className="text-right flex flex-col items-end">
-                <span className="text-lg font-medium text-amber-700 block">₹{price}</span>
+              <div className="text-right flex flex-col items-start sm:items-end mt-2 sm:mt-0">
+                <span className="text-xl font-medium text-amber-700 block">₹{price}</span>
                 <button 
                   onClick={handleEditItem}
                   className="mt-2 flex items-center text-blue-600 hover:text-blue-800 transition-colors"
@@ -168,13 +159,13 @@ function MenuCardAdmin({ item, onAddToOrder, showSuccessToast, showErrorToast })
             )}
 
             {/* Improved Availability Toggle Switch */}
-            <div className="mt-4 flex items-center justify-between">
-              <div className={`mt-2 text-sm font-medium align-top ${isAvailable ? 'text-green-600' : 'text-red-600'}`}>
+            <div className="mt-4 flex items-center justify-between w-full">
+              <div className={`text-base font-medium ${isAvailable ? 'text-green-600' : 'text-red-600'}`}>
                 {isAvailable ? 'Available' : 'Currently Unavailable'}
               </div>
               <button
                 onClick={handleToggleAvailability}
-                className="relative inline-flex h-6 w-11 items-center rounded-full focus:outline-none cursor-pointer"
+                className="relative inline-flex h-6 w-12 items-center rounded-full focus:outline-none cursor-pointer"
                 aria-pressed={isAvailable}
                 type="button"
               >
@@ -188,29 +179,29 @@ function MenuCardAdmin({ item, onAddToOrder, showSuccessToast, showErrorToast })
 
           <button 
             onClick={toggleExpand}
-            className="mt-2 flex items-center justify-center w-full py-2 text-amber-700 hover:text-amber-900 transition-colors duration-200 font-medium"
+            className="mt-4 flex items-center justify-center w-full py-3 text-amber-700 hover:text-amber-900 transition-colors duration-200 font-medium text-base"
           >
             {expanded ? (
-              <>Show Less <ChevronUp className="ml-1 w-4 h-4" /></>
+              <>Show Less <ChevronUp className="ml-1 w-5 h-5" /></>
             ) : (
-              <>View Details <ChevronDown className="ml-1 w-4 h-4" /></>
+              <>View Details <ChevronDown className="ml-1 w-5 h-5" /></>
             )}
           </button>
         </div>
       </div>
       
       {expanded && (
-        <div className="w-full p-6 pt-0">
+        <div className="w-full p-4 md:p-6 pt-0">
           <div className="border-t border-gray-100 pt-4 space-y-4">
             <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-2">About the Dish</h3>
-              <p className="text-gray-600">{description}</p>
+              <h3 className="text-base font-medium text-gray-700 mb-2">About the Dish</h3>
+              <p className="text-gray-600 text-sm md:text-base">{description}</p>
             </div>
 
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <Clock className="w-5 h-5 text-amber-600 mr-2" />
-                <span className="text-xs text-gray-500">Prep Time</span>
+                <span className="text-sm text-gray-500">Prep Time</span>
               </div>
               
               {isEditingPrepTime ? (
@@ -219,7 +210,7 @@ function MenuCardAdmin({ item, onAddToOrder, showSuccessToast, showErrorToast })
                     type="number" 
                     value={prepTimeValue}
                     onChange={(e) => setPrepTimeValue(e.target.value)}
-                    className="border border-gray-300 rounded px-2 py-1 text-sm w-24"
+                    className="border border-gray-300 rounded px-2 py-1 text-sm w-16 md:w-24"
                     placeholder="Minutes"
                     min="0"
                   />

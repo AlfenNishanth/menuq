@@ -69,6 +69,7 @@ const ManageMenu = () => {
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("");
   const [visibleCategoryGroups, setVisibleCategoryGroups] = useState(false);
+  const [isMobileView, setIsMobileView] = useState(false);
 
   const categoryRefs = useRef({});
   const menuContainerRef = useRef(null);
@@ -111,6 +112,22 @@ const ManageMenu = () => {
     ],
     Desserts: ["Desserts"],
   };
+
+  // Check for mobile view on mount and when window resizes
+  useEffect(() => {
+    const checkMobileView = () => {
+      setIsMobileView(window.innerWidth < 768);
+    };
+    
+    // Initial check
+    checkMobileView();
+    
+    // Add event listener for window resize
+    window.addEventListener('resize', checkMobileView);
+    
+    // Clean up
+    return () => window.removeEventListener('resize', checkMobileView);
+  }, []);
 
   const showSuccessToast = (message) => {
     toast.success(message, {
@@ -240,11 +257,11 @@ const ManageMenu = () => {
       {/* Navigation Bar */}
       {sortedCategories.length > 0 && (
         <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-amber-100 shadow-sm py-3">
-          <div className="max-w-screen-xl mx-auto px-4">
-            <div className="flex items-center mb-2">
+          <div className="max-w-screen-xl mx-auto px-2 sm:px-4">
+            <div className="flex flex-col sm:flex-row items-center mb-2">
               <button
                 onClick={toggleCategoryGroups}
-                className="text-amber-700 hover:text-amber-900 font-medium flex items-center mr-4"
+                className="text-amber-700 hover:text-amber-900 font-medium flex items-center mr-4 mb-2 sm:mb-0"
               >
                 <span className="mr-1">Categories</span>
                 <svg
@@ -264,20 +281,24 @@ const ManageMenu = () => {
                 </svg>
               </button>
 
-              <div className="overflow-x-auto hide-scrollbar">
+              <div className="w-full overflow-x-auto hide-scrollbar">
                 <div className="flex gap-2">
                   {sortedCategories.map((category) => (
                     <button
                       key={category}
                       onClick={() => scrollToCategory(category)}
-                      className={`px-4 py-1.5 text-sm font-medium transition-all duration-300 whitespace-nowrap rounded-full
+                      className={`px-3 py-1 text-xs sm:text-sm font-medium transition-all duration-300 whitespace-nowrap rounded-full
                         ${
                           activeCategory === category
                             ? "bg-amber-600 text-white shadow-md"
                             : "bg-amber-50 text-amber-900 hover:bg-amber-100"
                         }`}
                     >
-                      {capitalizeWords(category)}
+                      {isMobileView 
+                        ? category.length > 10 
+                          ? `${category.substring(0, 8)}...` 
+                          : category
+                        : capitalizeWords(category)}
                     </button>
                   ))}
                 </div>
@@ -321,7 +342,7 @@ const ManageMenu = () => {
         </div>
       )}
 
-      <div className="max-w-screen-xl mx-auto px-6 py-10">
+      <div className="max-w-screen-xl mx-auto px-3 sm:px-6 py-6 sm:py-10">
         {/* Loading State */}
         {loading && (
           <div className="flex flex-col items-center justify-center py-16">
@@ -337,10 +358,10 @@ const ManageMenu = () => {
 
         {/* Empty State */}
         {sortedCategories.length === 0 && !loading && (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center mb-6">
+          <div className="flex flex-col items-center justify-center py-16 sm:py-20 text-center">
+            <div className="w-16 sm:w-20 h-16 sm:h-20 bg-amber-50 rounded-full flex items-center justify-center mb-4 sm:mb-6">
               <svg
-                className="w-10 h-10 text-amber-500"
+                className="w-8 sm:w-10 h-8 sm:h-10 text-amber-500"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -354,7 +375,7 @@ const ManageMenu = () => {
                 ></path>
               </svg>
             </div>
-            <h3 className="text-2xl font-serif text-gray-800 mb-2">
+            <h3 className="text-xl sm:text-2xl font-serif text-gray-800 mb-2">
               Menu Coming Soon
             </h3>
             <p className="text-gray-500 max-w-md">
@@ -365,7 +386,7 @@ const ManageMenu = () => {
         )}
 
         {/* Menu Categories */}
-        <div className="space-y-16">
+        <div className="space-y-10 sm:space-y-16">
           {sortedCategories.map((category, categoryIndex) => {
             const categoryGroup = findCategoryGroup(category);
 
@@ -374,9 +395,9 @@ const ManageMenu = () => {
                 key={category}
                 ref={(el) => (categoryRefs.current[category] = el)}
                 data-category={category}
-                className="scroll-mt-28"
+                className="scroll-mt-24 sm:scroll-mt-28"
               >
-                <div className="flex flex-col mb-8">
+                <div className="flex flex-col mb-4 sm:mb-8">
                   {categoryGroup && (
                     <span className="text-xs uppercase tracking-wider text-amber-600 font-medium mb-1">
                       {categoryGroup}
@@ -384,7 +405,7 @@ const ManageMenu = () => {
                   )}
                   <div className="flex items-center">
                     <div className="w-2 h-2 bg-amber-500 rounded-full mr-3"></div>
-                    <h2 className="text-2xl font-serif text-gray-800">
+                    <h2 className="text-xl sm:text-2xl font-serif text-gray-800">
                       {category}
                     </h2>
                     <div className="flex-grow h-px bg-gradient-to-r from-amber-300 to-transparent ml-4"></div>
@@ -407,15 +428,12 @@ const ManageMenu = () => {
           })}
         </div> */}
 
-                <div className="flex flex-wrap gap-8">
+                <div className="flex flex-wrap gap-4 sm:gap-8">
                   {menuItems[category].map((item) => (
                     <div
                       key={item._id}
-                      className="flex basis-[calc(100%-2rem)] 
-                      md:basis-[calc(50%-1rem)] lg:basis-[calc(33.333%-1.5rem)] 
+                      className="flex basis-full sm:basis-[calc(50%-1rem)] lg:basis-[calc(33.333%-1.5rem)] 
                       transform transition-all duration-500 hover:-translate-y-1"
-
-                      // className="grid"
                     >
                       <MenuCardAdmin
                         item={item}
@@ -432,12 +450,12 @@ const ManageMenu = () => {
 
         {/* Footer */}
         {sortedCategories.length > 0 && !loading && (
-          <div className="mt-20 text-center">
+          <div className="mt-12 sm:mt-20 text-center">
             <div className="inline-flex items-center">
-              <div className="h-px w-12 bg-amber-200"></div>
+              <div className="h-px w-8 sm:w-12 bg-amber-200"></div>
               <div className="mx-4">
                 <svg
-                  className="w-6 h-6 text-amber-400"
+                  className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                   xmlns="http://www.w3.org/2000/svg"
@@ -445,7 +463,7 @@ const ManageMenu = () => {
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
                 </svg>
               </div>
-              <div className="h-px w-12 bg-amber-200"></div>
+              <div className="h-px w-8 sm:w-12 bg-amber-200"></div>
             </div>
             <p className="text-amber-800 font-serif italic mt-4">Bon Appétit</p>
           </div>
@@ -472,5 +490,14 @@ const ManageMenu = () => {
 // @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 // .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
 // .animate-spin-slow { animation: spin 3s linear infinite; }
+
+// Additional CSS for hiding scrollbars while allowing scrolling
+// .hide-scrollbar::-webkit-scrollbar {
+//   display: none;
+// }
+// .hide-scrollbar {
+//   -ms-overflow-style: none;
+//   scrollbar-width: none;
+// }
 
 export default ManageMenu;
