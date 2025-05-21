@@ -2,13 +2,13 @@ GET http://localhost:3100/loki/api/v1/label/level/values
 
 
 ###
-GET http://localhost:8080/api/health
+GET https://menuq.arknishinvent.com/api/health
 
 ###
 GET http://localhost:8080/api/menuq/WMiNOcc6j4aRbAkpD4unBsM7rOG3
 
 ###
-GET http://menuq.arknishinvent.com/api/menuq/
+GET http://menuq.arknishinvent.com/api/menu/RX00035
 
 ###
 GET http://menuq.arknishinvent.com/api/menuq/byId/RX00003
@@ -74,7 +74,7 @@ Content-Type: application/json
 
 {
   "operatingHours": [
-    { "day": "Monday", "hours": "9:00 AM - 5:00 PM" },
+    { "day": "Monday", "hours": "11:00 AM - 5:00 PM" },
     { "day": "Tuesday", "hours": "9:00 AM - 5:00 PM" },
     { "day": "Wednesday", "hours": "9:00 AM - 5:00 PM" },
     { "day": "Thursday", "hours": "9:00 AM - 5:00 PM" },

@@ -138,7 +138,7 @@ const DashboardHome = () => {
               MenuQ Dashboard
             </h1>
             <p className="text-amber-700 flex items-center">
-              <span className="mr-3">{userData.restaurantId} </span>
+              <span className="mr-3">{userData?.restaurantId} </span>
               <Clock size={16} className="mr-0.5 mt-0.25" />
               <span>Last updated: {getCurrentTime()}</span>
             </p>
