@@ -5,7 +5,8 @@ import {
   ChevronUp, 
   Clock, 
   Edit,
-  X
+  X,
+  Settings
 } from 'lucide-react';
 import { capitalizeWords } from '../../utils/format';
 import { updateAvailability, updatePrepTime } from '../../api/menuItem';
@@ -28,8 +29,15 @@ function MenuCardAdmin({ item, onAddToOrder, showSuccessToast, showErrorToast })
       setIsAvailable(newAvailability);
       console.log(item._id);
 
-      await updateAvailability(item._id, newAvailability)
-      showSuccessToast(`Item ${newAvailability ? 'available' : 'unavailable'} now`);
+      await updateAvailability(item._id, newAvailability);
+      
+      // Show appropriate toast message with correct styling
+      if (newAvailability) {
+        showSuccessToast(`Item is now available`);
+      } else {
+        // Use showErrorToast for unavailable to get red styling
+        showErrorToast(`Item is now unavailable`);
+      }
     } catch(error) {
       console.error("Error updating availability:", error.response?.data || error.message); 
       showErrorToast("Error updating availability. Please try again later.");
@@ -136,15 +144,14 @@ function MenuCardAdmin({ item, onAddToOrder, showSuccessToast, showErrorToast })
                 <span className="text-xl font-medium text-amber-700 block">₹{price}</span>
                 <button 
                   onClick={handleEditItem}
-                  className="mt-2 flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+                  className="mt-2 inline-flex items-center gap-1.5 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-200 shadow-sm"
                 >
-                  <Edit className="w-4 h-4 mr-1 cursor-pointer" />
-                  <span className="text-sm">Edit</span>
+                  <Edit className="w-4 h-4" />
+                  <span>Edit</span>
                 </button>
               </div>
             </div>
             
-            {/* <p className="text-gray-600 mb-4 line-clamp-2">{truncateText(description)}</p> */}
             {tags && tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {tags.map((tag, index) => (
@@ -189,6 +196,7 @@ function MenuCardAdmin({ item, onAddToOrder, showSuccessToast, showErrorToast })
           </button>
         </div>
       </div>
+      
       
       {expanded && (
         <div className="w-full p-4 md:p-6 pt-0">

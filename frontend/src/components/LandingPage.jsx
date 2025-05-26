@@ -101,35 +101,90 @@ function LandingPage() {
             <div className="absolute inset-0 bg-gradient-to-t from-amber-900/30 to-transparent"></div>
           </div> */}
           
-          {/* Floating QR Code Element */}
-          <div className="relative mx-auto md:absolute md:-right-4 lg:-right-20 md:bottom-4 lg:-bottom-28 bg-white shadow-xl rounded-xl p-3 lg:p-5 z-20 transform hover:scale-105 transition-transform duration-300 border-2 border-amber-300 max-w-max">
-            <div className="flex items-center gap-2 lg:gap-8">
-              <div className="relative">
-                <div className="absolute inset-0 bg-amber-100 rounded-md rotate-45 transform -translate-x-1 translate-y-1"></div>
-                <img src="/8-removebg.png" alt="QR code" className="w-14 h-14 md:w-16 md:h-16 lg:w-22 lg:h-22 relative z-10" />
+          {/* Floating QR Code Element - Enhanced */}
+          <div className="relative mx-auto md:absolute md:-right-4 lg:-right-20 md:bottom-4 lg:-bottom-28 bg-gradient-to-br from-white via-amber-50 to-white shadow-2xl rounded-2xl p-4 lg:p-6 z-20 transform hover:scale-110 hover:rotate-1 transition-all duration-500 border border-amber-200 max-w-max group">
+            {/* Decorative corner elements */}
+            <div className="absolute top-2 left-2 w-3 h-3 border-l-2 border-t-2 border-amber-400 opacity-50"></div>
+            <div className="absolute top-2 right-2 w-3 h-3 border-r-2 border-t-2 border-amber-400 opacity-50"></div>
+            <div className="absolute bottom-2 left-2 w-3 h-3 border-l-2 border-b-2 border-amber-400 opacity-50"></div>
+            <div className="absolute bottom-2 right-2 w-3 h-3 border-r-2 border-b-2 border-amber-400 opacity-50"></div>
+            
+            <div className="flex items-center gap-3 lg:gap-6">
+              <div className="relative flex items-center justify-center w-16 h-16 md:w-18 md:h-18 lg:w-20 lg:h-20">
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-200 to-amber-300 rounded-xl rotate-45 transform -translate-x-1 translate-y-1 group-hover:rotate-90 transition-transform duration-500"></div>
+                <div className="absolute inset-0 bg-amber-100 rounded-xl blur-sm opacity-50"></div>
+                <img src="/8-removebg.png" alt="QR code" className="w-12 h-12 md:w-14 md:h-14 lg:w-18 lg:h-18 relative z-10 rounded-lg object-contain" />
               </div>
-              <div className="text-xs lg:text-sm font-medium">
-                <span className="block text-amber-700 font-serif text-sm lg:text-base">Experience MenuQ</span>
-                <span className="text-gray-600">Scan to preview</span>
+              <div className="text-sm lg:text-base font-medium">
+                <span className="block text-amber-800 font-serif text-base lg:text-lg font-bold tracking-wide">Experience</span>
+                <span className="block text-amber-700 font-serif text-lg lg:text-xl font-bold -mt-1">MenuQ</span>
+                <span className="text-gray-600 text-xs lg:text-sm italic">Scan to preview</span>
               </div>
             </div>
           </div>
         </div>
         
-        {/* Description Card */}
-        <div className="mt-16 md:mt-20 p-5 md:p-6 lg:p-8 bg-white/80 backdrop-blur-md rounded-xl shadow-lg border border-amber-50 max-w-md mx-auto lg:mx-0 transform hover:-translate-y-2 transition-all duration-300">
-          <h2 className="text-xl lg:text-2xl font-serif font-bold text-amber-700 mb-3">MenuQ</h2>
-          <p className="text-gray-700 leading-relaxed">
-            "Where artistry meets technology. MenuQ crafts a dining narrative that honors the chef's vision while empowering guests to explore culinary landscapes at their own pace. Not merely a tool, but a canvas for gastronomic expression."
-          </p>
-          <div className="mt-6 border-t border-amber-100 pt-4 flex justify-between items-center">
-            <span className="text-amber-600 font-medium">Redefining Hospitality</span>
-            <a href="#Reach Us" className="group text-amber-700 font-medium flex items-center gap-2 hover:gap-3 transition-all duration-300">
-              Our Philosophy
-              <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
-              </svg>
-            </a>
+        {/* Premium Description Card */}
+        <div className="mt-12 md:mt-16 lg:mt-20 relative max-w-lg mx-auto lg:mx-0">
+          {/* Elegant background with subtle pattern */}
+          <div className="absolute inset-0 bg-gradient-to-br from-white via-amber-25 to-white rounded-3xl shadow-2xl border border-amber-100 transform rotate-1"></div>
+          <div className="relative bg-white/95 backdrop-blur-sm rounded-3xl p-6 md:p-8 lg:p-10 shadow-xl border border-white/50 transform hover:-translate-y-1 hover:shadow-2xl transition-all duration-500">
+            
+            {/* Decorative header */}
+            <div className="flex items-center justify-center mb-6">
+              <div className="flex items-center gap-1">
+                <div className="w-1 h-1 bg-amber-400 rounded-full"></div>
+                <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
+                <div className="w-1 h-1 bg-amber-400 rounded-full"></div>
+              </div>
+              <div className="mx-4 text-2xl lg:text-3xl font-serif font-bold bg-gradient-to-r from-amber-600 via-amber-700 to-amber-800 bg-clip-text text-transparent">
+                MenuQ
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-1 h-1 bg-amber-400 rounded-full"></div>
+                <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
+                <div className="w-1 h-1 bg-amber-400 rounded-full"></div>
+              </div>
+            </div>
+            
+            {/* Elegant quote section */}
+            <div className="relative mb-8">
+              <div className="absolute -top-2 -left-2 text-6xl text-amber-200 font-serif leading-none opacity-30 select-none">"</div>
+              <blockquote className="text-gray-700 leading-relaxed text-center italic font-light text-base lg:text-lg px-4">
+                Where artistry meets technology. MenuQ crafts a dining narrative that honors the chef's vision while empowering guests to explore culinary landscapes at their own pace.
+              </blockquote>
+              <div className="absolute -bottom-4 -right-2 text-6xl text-amber-200 font-serif leading-none opacity-30 transform rotate-180 select-none">"</div>
+            </div>
+            
+            {/* Elegant tagline */}
+            <div className="text-center mb-6">
+              <p className="text-amber-700 font-medium text-sm lg:text-base tracking-wider uppercase">
+                Not merely a tool, but a canvas for gastronomic expression
+              </p>
+            </div>
+            
+            {/* Bottom section with refined styling */}
+            <div className="border-t border-gradient-to-r from-transparent via-amber-200 to-transparent pt-6 flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center shadow-md">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                  </svg>
+                </div>
+                <span className="text-amber-700 font-semibold text-sm lg:text-base">Redefining Hospitality</span>
+              </div>
+              
+              <a 
+                href="#Reach Us" 
+                className="group relative text-amber-800 font-semibold flex items-center gap-2 hover:gap-4 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 rounded-lg px-3 py-2 hover:bg-gradient-to-r hover:from-amber-50 hover:to-amber-100 text-sm lg:text-base"
+              >
+                <span className="relative z-10">Our Philosophy</span>
+                <svg className="w-4 h-4 transition-all duration-300 group-hover:translate-x-1 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                </svg>
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-100 to-amber-200 rounded-lg opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -677,11 +732,13 @@ function LandingPage() {
           </div>
           <span className="text-amber-600 text-xl md:text-2xl transform transition-transform group-hover:rotate-45">+</span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-5 pb-4 md:pb-8 transition-all max-h-0 group-hover:max-h-96 overflow-hidden group-hover:overflow-visible">
-          <div className="hidden md:block md:col-span-1"></div>
-          <p className="text-gray-600 md:col-span-4 pr-4 md:pr-12 transition-opacity opacity-0 group-hover:opacity-100">
-            From concept to reality in 15 minutes. Our streamlined platform lets you rapidly deploy your menu, whether by importing existing content or crafting something entirely new through our designer interface.
-          </p>
+        <div className="pb-4 md:pb-8 transition-all max-h-0 group-hover:max-h-96 overflow-hidden group-hover:overflow-visible">
+          <div className="flex">
+            <div className="text-xs md:text-sm mr-3 md:mr-6 opacity-0">01</div>
+            <p className="text-gray-600 pr-4 md:pr-12 transition-opacity opacity-0 group-hover:opacity-100">
+              From concept to reality in 15 minutes. Our streamlined platform lets you rapidly deploy your menu, whether by importing existing content or crafting something entirely new through our designer interface.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -694,11 +751,13 @@ function LandingPage() {
           </div>
           <span className="text-amber-600 text-xl md:text-2xl transform transition-transform group-hover:rotate-45">+</span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-5 pb-4 md:pb-8 transition-all max-h-0 group-hover:max-h-96 overflow-hidden group-hover:overflow-visible">
-          <div className="hidden md:block md:col-span-1"></div>
-          <p className="text-gray-600 md:col-span-4 pr-4 md:pr-12 transition-opacity opacity-0 group-hover:opacity-100">
-            Your menu is your canvas. Customization extends to every aspect—color schemes that match your brand identity, logo placement, structural templates, and complete freedom in menu organization.
-          </p>
+        <div className="pb-4 md:pb-8 transition-all max-h-0 group-hover:max-h-96 overflow-hidden group-hover:overflow-visible">
+          <div className="flex">
+            <div className="text-xs md:text-sm mr-3 md:mr-6 opacity-0">02</div>
+            <p className="text-gray-600 pr-4 md:pr-12 transition-opacity opacity-0 group-hover:opacity-100">
+              Your menu is your canvas. Customization extends to every aspect—color schemes that match your brand identity, logo placement, structural templates, and complete freedom in menu organization.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -711,11 +770,13 @@ function LandingPage() {
           </div>
           <span className="text-amber-600 text-xl md:text-2xl transform transition-transform group-hover:rotate-45">+</span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-5 pb-4 md:pb-8 transition-all max-h-0 group-hover:max-h-96 overflow-hidden group-hover:overflow-visible">
-          <div className="hidden md:block md:col-span-1"></div>
-          <p className="text-gray-600 md:col-span-4 pr-4 md:pr-12 transition-opacity opacity-0 group-hover:opacity-100">
-            No barriers between customers and your offerings. A simple QR scan launches your menu instantly in their browser—no downloads, no accounts, no friction. Just pure culinary exploration.
-          </p>
+        <div className="pb-4 md:pb-8 transition-all max-h-0 group-hover:max-h-96 overflow-hidden group-hover:overflow-visible">
+          <div className="flex">
+            <div className="text-xs md:text-sm mr-3 md:mr-6 opacity-0">03</div>
+            <p className="text-gray-600 pr-4 md:pr-12 transition-opacity opacity-0 group-hover:opacity-100">
+              No barriers between customers and your offerings. A simple QR scan launches your menu instantly in their browser—no downloads, no accounts, no friction. Just pure culinary exploration.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -728,11 +789,13 @@ function LandingPage() {
           </div>
           <span className="text-amber-600 text-xl md:text-2xl transform transition-transform group-hover:rotate-45">+</span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-5 pb-4 md:pb-8 transition-all max-h-0 group-hover:max-h-96 overflow-hidden group-hover:overflow-visible">
-          <div className="hidden md:block md:col-span-1"></div>
-          <p className="text-gray-600 md:col-span-4 pr-4 md:pr-12 transition-opacity opacity-0 group-hover:opacity-100">
-            Your menu evolves in real time. Update items, prices, and availability instantly through our intuitive dashboard. Changes propagate immediately, keeping your menu perpetually current.
-          </p>
+        <div className="pb-4 md:pb-8 transition-all max-h-0 group-hover:max-h-96 overflow-hidden group-hover:overflow-visible">
+          <div className="flex">
+            <div className="text-xs md:text-sm mr-3 md:mr-6 opacity-0">04</div>
+            <p className="text-gray-600 pr-4 md:pr-12 transition-opacity opacity-0 group-hover:opacity-100">
+              Your menu evolves in real time. Update items, prices, and availability instantly through our intuitive dashboard. Changes propagate immediately, keeping your menu perpetually current.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -745,11 +808,13 @@ function LandingPage() {
           </div>
           <span className="text-amber-600 text-xl md:text-2xl transform transition-transform group-hover:rotate-45">+</span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-5 pb-4 md:pb-8 transition-all max-h-0 group-hover:max-h-96 overflow-hidden group-hover:overflow-visible">
-          <div className="hidden md:block md:col-span-1"></div>
-          <p className="text-gray-600 md:col-span-4 pr-4 md:pr-12 transition-opacity opacity-0 group-hover:opacity-100">
-            Seamless connectivity with your operational infrastructure. Our Premium and Enterprise tiers facilitate integration with leading POS systems, creating a unified technological ecosystem for your establishment.
-          </p>
+        <div className="pb-4 md:pb-8 transition-all max-h-0 group-hover:max-h-96 overflow-hidden group-hover:overflow-visible">
+          <div className="flex">
+            <div className="text-xs md:text-sm mr-3 md:mr-6 opacity-0">05</div>
+            <p className="text-gray-600 pr-4 md:pr-12 transition-opacity opacity-0 group-hover:opacity-100">
+              Seamless connectivity with your operational infrastructure. Our Premium and Enterprise tiers facilitate integration with leading POS systems, creating a unified technological ecosystem for your establishment.
+            </p>
+          </div>
         </div>
       </div>
     </div>

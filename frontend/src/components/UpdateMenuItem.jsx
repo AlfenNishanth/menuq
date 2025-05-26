@@ -318,238 +318,303 @@ export default function UpdateMenuItem() {
         >
           <div className="grid grid-cols-1 gap-4">
             {/* Name */}
-            <input
-              {...register("name", { required: "Name is required" })}
-              placeholder="Item Name"
-              className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900 ${
-                errors.name ? "border-red-500 ring-1 ring-red-500" : ""
-              }`}
-              disabled={loading}
-            />
-            {errors.name && (
-              <p className="text-red-500 text-sm -mt-3">
-                {errors.name.message}
-              </p>
-            )}
-
-            {/* Description */}
-            <textarea
-              {...register("description")}
-              placeholder="Description"
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900"
-              disabled={loading}
-              rows={3}
-            />
-
-            {/* Type Dropdown */}
-            <select
-              {...register("type")}
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900"
-              onChange={(e) => {
-                setValue("type", e.target.value);
-                if (e.target.value !== "Custom") {
-                  setValue("customType", "");
-                }
-              }}
-              disabled={loading}
-            >
-              <option value="Starter">Starter</option>
-              <option value="Main Course">Main Course</option>
-              <option value="Drinks">Drinks</option>
-              <option value="Cold Beverages">Cold Beverages</option>
-              <option value="Desserts">Desserts</option>
-              <option value="Custom">Custom</option>
-            </select>
-
-            {/* Custom Type Input (Only when "Custom" is selected) */}
-            {watch("type") === "Custom" && (
+            <div>
+              <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
+                Item Name *
+              </label>
               <input
-                {...register("customType", {
-                  required: "Custom type is required",
-                })}
-                type="text"
-                placeholder="Enter custom category"
+                id="name"
+                {...register("name", { required: "Name is required" })}
+                placeholder="Enter menu item name (e.g., Chicken Tikka)"
                 className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900 ${
-                  errors.customType ? "border-red-500 ring-1 ring-red-500" : ""
+                  errors.name ? "border-red-500 ring-1 ring-red-500" : ""
                 }`}
                 disabled={loading}
               />
-            )}
-            {errors.customType && (
-              <p className="text-red-500 text-sm -mt-3">
-                {errors.customType.message}
-              </p>
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.name.message}
+                </p>
+              )}
+            </div>
+
+            {/* Description */}
+            <div>
+              <label htmlFor="description" className="block text-sm font-semibold text-gray-700 mb-2">
+                Description (Optional)
+              </label>
+              <textarea
+                id="description"
+                {...register("description")}
+                placeholder="Describe your menu item (e.g., Spicy grilled chicken with aromatic spices)"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900"
+                disabled={loading}
+                rows={3}
+              />
+            </div>
+
+            {/* Type Dropdown */}
+            <div>
+              <label htmlFor="type" className="block text-sm font-semibold text-gray-700 mb-2">
+                Food Category *
+              </label>
+              <select
+                id="type"
+                {...register("type")}
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900"
+                onChange={(e) => {
+                  setValue("type", e.target.value);
+                  if (e.target.value !== "Custom") {
+                    setValue("customType", "");
+                  }
+                }}
+                disabled={loading}
+              >
+                <option value="Starter">Starter</option>
+                <option value="Main Course">Main Course</option>
+                <option value="Drinks">Drinks</option>
+                <option value="Cold Beverages">Cold Beverages</option>
+                <option value="Desserts">Desserts</option>
+                <option value="Custom">Custom Category</option>
+              </select>
+            </div>
+
+            {/* Custom Type Input (Only when "Custom" is selected) */}
+            {watch("type") === "Custom" && (
+              <div>
+                <label htmlFor="customType" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Custom Category Name *
+                </label>
+                <input
+                  id="customType"
+                  {...register("customType", {
+                    required: "Custom type is required",
+                  })}
+                  type="text"
+                  placeholder="Enter your custom category (e.g., Soup, Sandwich)"
+                  className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900 ${
+                    errors.customType ? "border-red-500 ring-1 ring-red-500" : ""
+                  }`}
+                  disabled={loading}
+                />
+                {errors.customType && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.customType.message}
+                  </p>
+                )}
+              </div>
             )}
 
             {/* Vegetarian Toggle */}
-            <div className="flex items-center justify-between p-3 rounded-lg bg-gray-200">
-              <span className="font-medium">
-                {watch("vegetarian") ? "Vegetarian" : "Non-vegetarian"}
-              </span>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Dietary Preference
+              </label>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-gray-200">
+                <span className="font-medium">
+                  {watch("vegetarian") ? "Vegetarian" : "Non-vegetarian"}
+                </span>
+                <Controller
+                  name="vegetarian"
+                  control={control}
+                  defaultValue={false}
+                  render={({ field: { onChange, value } }) => (
+                    <button
+                      type="button"
+                      onClick={() => onChange(!value)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        value ? "bg-amber-600" : "bg-gray-400"
+                      }`}
+                      disabled={loading}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          value ? "translate-x-6" : "translate-x-1"
+                        }`}
+                      />
+                    </button>
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Price */}
+            <div>
+              <label htmlFor="price" className="block text-sm font-semibold text-gray-700 mb-2">
+                Base Price (₹) *
+              </label>
+              <input
+                id="price"
+                type="number"
+                step="1"
+                min="0"
+                {...register("price", { required: "Price is required" })}
+                placeholder="Enter price in rupees (e.g., 150)"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900"
+                disabled={loading}
+                onChange={(e) => {
+                  setValue("price", e.target.value);
+                  // Force checking for changes whenever price is updated
+                  setTimeout(checkForChanges, 0);
+                }}
+              />
+              {errors.price && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.price.message}
+                </p>
+              )}
+            </div>
+
+            {/* Availability Toggle */}
+            <div>
+              <label htmlFor="available" className="block text-sm font-semibold text-gray-700 mb-2">
+                Availability Status
+              </label>
               <Controller
-                name="vegetarian"
+                name="available"
                 control={control}
-                defaultValue={false}
-                render={({ field: { onChange, value } }) => (
-                  <button
-                    type="button"
-                    onClick={() => onChange(!value)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      value ? "bg-amber-600" : "bg-gray-400"
-                    }`}
+                defaultValue="true"
+                render={({ field }) => (
+                  <select
+                    id="available"
+                    {...field}
+                    className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900"
                     disabled={loading}
                   >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        value ? "translate-x-6" : "translate-x-1"
-                      }`}
-                    />
-                  </button>
+                    <option value="true">Available for Orders</option>
+                    <option value="false">Currently Not Available</option>
+                  </select>
                 )}
               />
             </div>
 
-            {/* Price */}
-            <input
-              type="number"
-              step="1"
-              min="0"
-              {...register("price", { required: "Price is required" })}
-              placeholder="Base Price"
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900"
-              disabled={loading}
-              onChange={(e) => {
-                setValue("price", e.target.value);
-                // Force checking for changes whenever price is updated
-                setTimeout(checkForChanges, 0);
-              }}
-            />
-            {errors.price && (
-              <p className="text-red-500 text-sm -mt-3">
-                {errors.price.message}
-              </p>
-            )}
-
-            {/* Availability Toggle */}
-            <Controller
-              name="available"
-              control={control}
-              defaultValue="true"
-              render={({ field }) => (
-                <select
-                  {...field}
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900"
-                  disabled={loading}
-                >
-                  <option value="true">Available</option>
-                  <option value="false">Not Available</option>
-                </select>
-              )}
-            />
-
             {/* Image Upload */}
-            <div className="border-2 border-dashed rounded-lg p-4 transition border-gray-300 hover:border-amber-400 text-center">
-              <div className="space-y-2">
-                {imagePreview ? (
-                  <div className="relative">
-                    <img
-                      src={imagePreview}
-                      alt="Menu Item Preview"
-                      className="mx-auto h-28 md:h-36 object-cover rounded-lg"
-                    />
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Menu Item Photo (Optional)
+              </label>
+              <div className="border-2 border-dashed rounded-lg p-4 transition border-gray-300 hover:border-amber-400 text-center">
+                <div className="space-y-2">
+                  {imagePreview ? (
+                    <div className="relative">
+                      <img
+                        src={imagePreview}
+                        alt="Menu Item Preview"
+                        className="mx-auto h-28 md:h-36 object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 transition"
+                      >
+                        <XIcon size={12} />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="text-center py-4 text-gray-500">
+                      <Upload className="mx-auto text-3xl md:text-4xl mb-2" />
+                      <p className="text-sm font-medium">
+                        Upload Menu Item Image
+                      </p>
+                      <p className="text-xs mt-1">JPG, PNG or GIF (Max. 5MB)</p>
+                    </div>
+                  )}
+
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                    id="menu-item-image"
+                  />
+
+                  {!imagePreview && (
                     <button
                       type="button"
-                      onClick={removeImage}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 transition"
+                      onClick={() => fileInputRef.current.click()}
+                      className="mt-2 inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 text-sm font-medium rounded-md bg-amber-600 text-white hover:bg-amber-700 transition-colors"
                     >
-                      <XIcon size={12} />
+                      Browse Image
                     </button>
-                  </div>
-                ) : (
-                  <div className="text-center py-4 text-gray-500">
-                    <Upload className="mx-auto text-3xl md:text-4xl mb-2" />
-                    <p className="text-sm font-medium">
-                      Upload Menu Item Image
-                    </p>
-                    <p className="text-xs mt-1">JPG, PNG or GIF (Max. 5MB)</p>
-                  </div>
-                )}
+                  )}
 
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
-                  id="menu-item-image"
-                />
-
-                {!imagePreview && (
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current.click()}
-                    className="mt-2 inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 text-sm font-medium rounded-md bg-amber-600 text-white hover:bg-amber-700 transition-colors"
-                  >
-                    Browse Image
-                  </button>
-                )}
-
-                {imagePreview && (
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current.click()}
-                    className="mt-2 inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300 transition-colors"
-                  >
-                    Change Image
-                  </button>
-                )}
+                  {imagePreview && (
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current.click()}
+                      className="mt-2 inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300 transition-colors"
+                    >
+                      Change Image
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
 
           {/* Variants Section */}
           <div className="p-3 md:p-4 rounded-lg shadow-md transition bg-amber-50">
-            <h3 className="font-semibold mb-2 text-amber-800">Variants</h3>
-            <div className="space-y-2">
+            <div className="mb-3">
+              <h3 className="font-semibold text-amber-800 text-base md:text-lg">Size/Portion Variants</h3>
+              <p className="text-xs md:text-sm text-amber-700 mt-1">
+                Add different sizes or portions (e.g., Small, Medium, Large)
+              </p>
+            </div>
+            <div className="space-y-3">
               {variants.map((variant, index) => (
-                <div key={index} className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-2 md:mb-0">
-                  <input
-                    type="text"
-                    placeholder="Variant Name"
-                    value={variant.name}
-                    onChange={(e) => {
-                      const newVariants = [...variants];
-                      newVariants[index].name = e.target.value;
-                      setVariants(newVariants);
-                    }}
-                    className="p-2.5 md:p-3 border rounded-lg transition flex-1 bg-gray-200 border-gray-300 text-gray-900"
-                    disabled={loading}
-                  />
-                  <div className="flex space-x-2">
-                    <input
-                      type="number"
-                      step="1"
-                      min="0"
-                      placeholder="Price"
-                      value={variant.price}
-                      onChange={(e) => {
-                        const newVariants = [...variants];
-                        newVariants[index].price = parseFloat(e.target.value);
-                        setVariants(newVariants);
-                      }}
-                      className="p-2.5 md:p-3 border rounded-lg transition w-24 flex-1 md:flex-none bg-gray-200 border-gray-300 text-gray-900"
-                      disabled={loading}
-                    />
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setVariants(variants.filter((_, i) => i !== index))
-                      }
-                      className="bg-red-500 text-white px-3 rounded-lg hover:bg-red-600 transition flex items-center justify-center"
-                      disabled={loading}
-                    >
-                      <XIcon size={18} />
-                    </button>
+                <div key={index} className="bg-white p-3 rounded-lg border border-amber-200">
+                  <div className="flex flex-col space-y-2">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        Variant Name
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g., Small, Regular, Large"
+                        value={variant.name}
+                        onChange={(e) => {
+                          const newVariants = [...variants];
+                          newVariants[index].name = e.target.value;
+                          setVariants(newVariants);
+                        }}
+                        className="w-full p-2.5 border rounded-lg transition bg-gray-50 border-gray-300 text-gray-900 text-sm"
+                        disabled={loading}
+                      />
+                    </div>
+                    <div className="flex space-x-2">
+                      <div className="flex-1">
+                        <label className="block text-xs font-medium text-gray-600 mb-1">
+                          Additional Price (₹)
+                        </label>
+                        <input
+                          type="number"
+                          step="1"
+                          min="0"
+                          placeholder="0"
+                          value={variant.price}
+                          onChange={(e) => {
+                            const newVariants = [...variants];
+                            newVariants[index].price = parseFloat(e.target.value);
+                            setVariants(newVariants);
+                          }}
+                          className="w-full p-2.5 border rounded-lg transition bg-gray-50 border-gray-300 text-gray-900 text-sm"
+                          disabled={loading}
+                        />
+                      </div>
+                      <div className="flex items-end">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setVariants(variants.filter((_, i) => i !== index))
+                          }
+                          className="bg-red-500 text-white px-3 py-2.5 rounded-lg hover:bg-red-600 transition flex items-center justify-center"
+                          disabled={loading}
+                        >
+                          <XIcon size={16} />
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -561,54 +626,73 @@ export default function UpdateMenuItem() {
                 disabled={loading}
                 className="mt-2 w-full px-4 py-2 text-sm font-medium rounded-md transition-colors bg-amber-600 text-white hover:bg-amber-700"
               >
-                Add Variant
+                + Add Size/Portion Variant
               </button>
             </div>
           </div>
 
           {/* Add Ons Section */}
           <div className="p-3 md:p-4 rounded-lg shadow-md transition bg-amber-50">
-            <h3 className="font-semibold mb-2 text-amber-800">Add Ons</h3>
-            <div className="space-y-2">
+            <div className="mb-3">
+              <h3 className="font-semibold text-amber-800 text-base md:text-lg">Extra Add-Ons</h3>
+              <p className="text-xs md:text-sm text-amber-700 mt-1">
+                Optional extras customers can add (e.g., Extra Cheese, Salad)
+              </p>
+            </div>
+            <div className="space-y-3">
               {addOns.map((addOn, index) => (
-                <div key={index} className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-2 md:mb-0">
-                  <input
-                    type="text"
-                    placeholder="Add On Name"
-                    value={addOn.name}
-                    onChange={(e) => {
-                      const newAddOns = [...addOns];
-                      newAddOns[index].name = e.target.value;
-                      setAddOns(newAddOns);
-                    }}
-                    className="p-2.5 md:p-3 border rounded-lg transition flex-1 bg-gray-200 border-gray-300 text-gray-900"
-                    disabled={loading}
-                  />
-                  <div className="flex space-x-2">
-                    <input
-                      type="number"
-                      step="1"
-                      min="0"
-                      placeholder="Price"
-                      value={addOn.price}
-                      onChange={(e) => {
-                        const newAddOns = [...addOns];
-                        newAddOns[index].price = parseFloat(e.target.value);
-                        setAddOns(newAddOns);
-                      }}
-                      className="p-2.5 md:p-3 border rounded-lg transition w-24 flex-1 md:flex-none bg-gray-200 border-gray-300 text-gray-900"
-                      disabled={loading}
-                    />
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setAddOns(addOns.filter((_, i) => i !== index))
-                      }
-                      className="bg-red-500 text-white px-3 rounded-lg hover:bg-red-600 transition flex items-center justify-center"
-                      disabled={loading}
-                    >
-                      <XIcon size={18} />
-                    </button>
+                <div key={index} className="bg-white p-3 rounded-lg border border-amber-200">
+                  <div className="flex flex-col space-y-2">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        Add-On Name
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g., Extra Cheese, Extra Sauce"
+                        value={addOn.name}
+                        onChange={(e) => {
+                          const newAddOns = [...addOns];
+                          newAddOns[index].name = e.target.value;
+                          setAddOns(newAddOns);
+                        }}
+                        className="w-full p-2.5 border rounded-lg transition bg-gray-50 border-gray-300 text-gray-900 text-sm"
+                        disabled={loading}
+                      />
+                    </div>
+                    <div className="flex space-x-2">
+                      <div className="flex-1">
+                        <label className="block text-xs font-medium text-gray-600 mb-1">
+                          Extra Price (₹)
+                        </label>
+                        <input
+                          type="number"
+                          step="1"
+                          min="0"
+                          placeholder="0"
+                          value={addOn.price}
+                          onChange={(e) => {
+                            const newAddOns = [...addOns];
+                            newAddOns[index].price = parseFloat(e.target.value);
+                            setAddOns(newAddOns);
+                          }}
+                          className="w-full p-2.5 border rounded-lg transition bg-gray-50 border-gray-300 text-gray-900 text-sm"
+                          disabled={loading}
+                        />
+                      </div>
+                      <div className="flex items-end">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setAddOns(addOns.filter((_, i) => i !== index))
+                          }
+                          className="bg-red-500 text-white px-3 py-2.5 rounded-lg hover:bg-red-600 transition flex items-center justify-center"
+                          disabled={loading}
+                        >
+                          <XIcon size={16} />
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -618,15 +702,20 @@ export default function UpdateMenuItem() {
                 disabled={loading}
                 className="mt-2 w-full px-4 py-2 text-sm font-medium rounded-md transition-colors bg-amber-600 text-white hover:bg-amber-700"
               >
-                Add New
+                + Add New Extra
               </button>
             </div>
           </div>
 
           {/* Tags Section */}
           <div className="p-3 md:p-4 rounded-lg shadow-md transition bg-amber-50">
-            <h3 className="font-semibold mb-2 text-amber-800">Tags</h3>
-            <div className="mb-2 flex flex-wrap gap-2">
+            <div className="mb-3">
+              <h3 className="font-semibold text-amber-800 text-base md:text-lg">Search Tags</h3>
+              <p className="text-xs md:text-sm text-amber-700 mt-1">
+                Keywords to help customers find this item (e.g., spicy, healthy, popular)
+              </p>
+            </div>
+            <div className="mb-3 flex flex-wrap gap-2">
               {tags.map((tag, index) => (
                 <span
                   key={index}
@@ -645,54 +734,71 @@ export default function UpdateMenuItem() {
               ))}
             </div>
             <div className="flex flex-col md:flex-row gap-2">
-              <input
-                type="text"
-                placeholder="Add tag"
-                value={newTag}
-                onChange={(e) => setNewTag(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    addTag();
-                  }
-                }}
-                className="flex-1 p-2.5 md:p-3 border rounded-lg transition bg-gray-200 border-gray-300 text-gray-900"
-                disabled={loading}
-              />
-              <button
-                type="button"
-                onClick={addTag}
-                className="px-4 py-2 font-medium rounded-lg transition-colors bg-amber-600 text-white hover:bg-amber-700"
-                disabled={loading}
-              >
-                Add
-              </button>
+              <div className="flex-1">
+                <label htmlFor="newTag" className="block text-xs font-medium text-gray-600 mb-1">
+                  Add New Tag
+                </label>
+                <input
+                  id="newTag"
+                  type="text"
+                  placeholder="e.g., spicy, bestseller, healthy"
+                  value={newTag}
+                  onChange={(e) => setNewTag(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      addTag();
+                    }
+                  }}
+                  className="w-full p-2.5 border rounded-lg transition bg-gray-50 border-gray-300 text-gray-900 text-sm"
+                  disabled={loading}
+                />
+              </div>
+              <div className="flex items-end">
+                <button
+                  type="button"
+                  onClick={addTag}
+                  className="px-4 py-2.5 font-medium rounded-lg transition-colors bg-amber-600 text-white hover:bg-amber-700 text-sm"
+                  disabled={loading}
+                >
+                  Add Tag
+                </button>
+              </div>
             </div>
             {tagError && (
-              <p className="text-red-500 text-sm mt-1">{tagError}</p>
+              <p className="text-red-500 text-sm mt-2">{tagError}</p>
             )}
           </div>
 
           {/* Status message for changes */}
-          <div className="text-center text-sm">
+          <div className="text-center text-sm p-3 rounded-lg bg-gray-50">
             {hasChanges ? (
-              <p className="text-amber-600">Changes detected. Ready to update.</p>
+              <div className="flex items-center justify-center space-x-2">
+                <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
+                <p className="text-amber-600 font-medium">Changes detected. Ready to update.</p>
+              </div>
             ) : (
-              <p className="text-gray-500">No changes detected.</p>
+              <div className="flex items-center justify-center space-x-2">
+                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                <p className="text-gray-500">No changes detected.</p>
+              </div>
             )}
           </div>
 
           <button
             type="submit"
-            className={`w-full text-white p-2.5 md:p-3 rounded-lg font-semibold transition duration-300 shadow-lg flex justify-center items-center ${
+            className={`w-full text-white p-3 md:p-4 rounded-lg font-semibold transition duration-300 shadow-lg flex justify-center items-center text-base md:text-lg ${
               hasChanges 
-                ? "bg-amber-600 hover:bg-amber-700" 
+                ? "bg-amber-600 hover:bg-amber-700 hover:shadow-xl transform hover:-translate-y-0.5" 
                 : "bg-gray-400 cursor-not-allowed"
             }`}
             disabled={loading || !hasChanges}
           >
             {loading ? (
-              <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+              <div className="flex items-center space-x-2">
+                <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+                <span>Updating...</span>
+              </div>
             ) : (
               "Update Menu Item"
             )}
