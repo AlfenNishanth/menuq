@@ -318,50 +318,47 @@ export default function UpdateMenuItem() {
         >
           <div className="grid grid-cols-1 gap-4">
             {/* Name */}
-            <div>
-              <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
-                Item Name *
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">
+                Dish Name <span className="text-red-500">*</span>
               </label>
               <input
-                id="name"
                 {...register("name", { required: "Name is required" })}
-                placeholder="Enter menu item name (e.g., Chicken Tikka)"
-                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900 ${
+                placeholder="Enter the name of your dish (e.g., Chicken Biryani)"
+                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-amber-200 text-gray-900 ${
                   errors.name ? "border-red-500 ring-1 ring-red-500" : ""
                 }`}
                 disabled={loading}
               />
               {errors.name && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-red-500 text-sm">
                   {errors.name.message}
                 </p>
               )}
             </div>
 
             {/* Description */}
-            <div>
-              <label htmlFor="description" className="block text-sm font-semibold text-gray-700 mb-2">
-                Description (Optional)
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">
+                Description
               </label>
               <textarea
-                id="description"
                 {...register("description")}
-                placeholder="Describe your menu item (e.g., Spicy grilled chicken with aromatic spices)"
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900"
+                placeholder="Describe your dish, ingredients, cooking style (e.g., Aromatic basmati rice cooked with tender chicken pieces and traditional spices)"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-amber-200 text-gray-900"
                 disabled={loading}
                 rows={3}
               />
             </div>
 
             {/* Type Dropdown */}
-            <div>
-              <label htmlFor="type" className="block text-sm font-semibold text-gray-700 mb-2">
-                Food Category *
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">
+                Food Category <span className="text-red-500">*</span>
               </label>
               <select
-                id="type"
                 {...register("type")}
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-amber-200 text-gray-900"
                 onChange={(e) => {
                   setValue("type", e.target.value);
                   if (e.target.value !== "Custom") {
@@ -369,7 +366,11 @@ export default function UpdateMenuItem() {
                   }
                 }}
                 disabled={loading}
+                defaultValue="" // ✅ ensures the placeholder is shown initially
               >
+                <option value="" disabled hidden>
+                  -- Select a category --
+                </option>
                 <option value="Starter">Starter</option>
                 <option value="Main Course">Main Course</option>
                 <option value="Drinks">Drinks</option>
@@ -381,24 +382,23 @@ export default function UpdateMenuItem() {
 
             {/* Custom Type Input (Only when "Custom" is selected) */}
             {watch("type") === "Custom" && (
-              <div>
-                <label htmlFor="customType" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Custom Category Name *
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700">
+                  Custom Category Name <span className="text-red-500">*</span>
                 </label>
                 <input
-                  id="customType"
                   {...register("customType", {
                     required: "Custom type is required",
                   })}
                   type="text"
-                  placeholder="Enter your custom category (e.g., Soup, Sandwich)"
-                  className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900 ${
+                  placeholder="Enter your custom category (e.g., Snacks, Breakfast, etc.)"
+                  className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-amber-200 text-gray-900 ${
                     errors.customType ? "border-red-500 ring-1 ring-red-500" : ""
                   }`}
                   disabled={loading}
                 />
                 {errors.customType && (
-                  <p className="text-red-500 text-sm mt-1">
+                  <p className="text-red-500 text-sm">
                     {errors.customType.message}
                   </p>
                 )}
@@ -406,14 +406,19 @@ export default function UpdateMenuItem() {
             )}
 
             {/* Vegetarian Toggle */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Dietary Preference
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">
+                Food Type
               </label>
-              <div className="flex items-center justify-between p-3 rounded-lg bg-gray-200">
-                <span className="font-medium">
-                  {watch("vegetarian") ? "Vegetarian" : "Non-vegetarian"}
-                </span>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-amber-200">
+                <div>
+                  <span className="font-medium text-gray-800">
+                    {watch("vegetarian") ? "🥬 Vegetarian" : "🍖 Non-vegetarian"}
+                  </span>
+                  <p className="text-xs text-gray-600 mt-1">
+                    Toggle to specify if this dish contains meat or is vegetarian
+                  </p>
+                </div>
                 <Controller
                   name="vegetarian"
                   control={control}
@@ -439,27 +444,23 @@ export default function UpdateMenuItem() {
             </div>
 
             {/* Price */}
-            <div>
-              <label htmlFor="price" className="block text-sm font-semibold text-gray-700 mb-2">
-                Base Price (₹) *
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">
+                Base Price (₹) <span className="text-red-500">*</span>
               </label>
               <input
-                id="price"
                 type="number"
                 step="1"
                 min="0"
                 {...register("price", { required: "Price is required" })}
-                placeholder="Enter price in rupees (e.g., 150)"
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900"
+                placeholder="Enter the price in rupees (e.g., 250)"
+                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-amber-200 text-gray-900 ${
+                  errors.price ? "border-red-500 ring-1 ring-red-500" : ""
+                }`}
                 disabled={loading}
-                onChange={(e) => {
-                  setValue("price", e.target.value);
-                  // Force checking for changes whenever price is updated
-                  setTimeout(checkForChanges, 0);
-                }}
               />
               {errors.price && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-red-500 text-sm">
                   {errors.price.message}
                 </p>
               )}
@@ -468,7 +469,7 @@ export default function UpdateMenuItem() {
             {/* Availability Toggle */}
             <div>
               <label htmlFor="available" className="block text-sm font-semibold text-gray-700 mb-2">
-                Availability Status
+                Availability Status <span className="text-red-500"></span>
               </label>
               <Controller
                 name="available"
@@ -478,7 +479,9 @@ export default function UpdateMenuItem() {
                   <select
                     id="available"
                     {...field}
-                    className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900"
+                    className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-amber-200 text-gray-900 ${
+                  errors.price ? "border-red-500 ring-1 ring-red-500" : ""
+                }`}
                     disabled={loading}
                   >
                     <option value="true">Available for Orders</option>
@@ -489,18 +492,30 @@ export default function UpdateMenuItem() {
             </div>
 
             {/* Image Upload */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Menu Item Photo (Optional)
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">
+                Dish Image
               </label>
-              <div className="border-2 border-dashed rounded-lg p-4 transition border-gray-300 hover:border-amber-400 text-center">
+              <div
+                className="border-2 border-dashed rounded-lg p-4 transition border-amber-300 hover:border-amber-400 text-center"
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    const file = e.dataTransfer.files[0];
+                    setImageFile(file);
+                    setImagePreview(URL.createObjectURL(file));
+                    e.dataTransfer.clearData();
+                  }
+                }}
+              >
                 <div className="space-y-2">
                   {imagePreview ? (
                     <div className="relative">
                       <img
                         src={imagePreview}
                         alt="Menu Item Preview"
-                        className="mx-auto h-28 md:h-36 object-cover rounded-lg"
+                        className="mx-auto h-36 object-cover rounded-lg"
                       />
                       <button
                         type="button"
@@ -512,9 +527,9 @@ export default function UpdateMenuItem() {
                     </div>
                   ) : (
                     <div className="text-center py-4 text-gray-500">
-                      <Upload className="mx-auto text-3xl md:text-4xl mb-2" />
+                      <Upload className="mx-auto h-12 w-12 mb-2 text-amber-600" />
                       <p className="text-sm font-medium">
-                        Upload Menu Item Image
+                        Upload an appetizing photo of your dish
                       </p>
                       <p className="text-xs mt-1">JPG, PNG or GIF (Max. 5MB)</p>
                     </div>
@@ -533,7 +548,7 @@ export default function UpdateMenuItem() {
                     <button
                       type="button"
                       onClick={() => fileInputRef.current.click()}
-                      className="mt-2 inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 text-sm font-medium rounded-md bg-amber-600 text-white hover:bg-amber-700 transition-colors"
+                      className="mt-2 inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-amber-600 text-white hover:bg-amber-700 transition-colors"
                     >
                       Browse Image
                     </button>
@@ -543,7 +558,7 @@ export default function UpdateMenuItem() {
                     <button
                       type="button"
                       onClick={() => fileInputRef.current.click()}
-                      className="mt-2 inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300 transition-colors"
+                      className="mt-2 inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300 transition-colors"
                     >
                       Change Image
                     </button>
@@ -554,38 +569,40 @@ export default function UpdateMenuItem() {
           </div>
 
           {/* Variants Section */}
-          <div className="p-3 md:p-4 rounded-lg shadow-md transition bg-amber-50">
+          <div className="p-4 rounded-lg shadow-md transition bg-white border border-amber-50">
             <div className="mb-3">
-              <h3 className="font-semibold text-amber-800 text-base md:text-lg">Size/Portion Variants</h3>
-              <p className="text-xs md:text-sm text-amber-700 mt-1">
-                Add different sizes or portions (e.g., Small, Medium, Large)
+              <h3 className="font-serif text-xl font-semibold text-amber-700">
+                Size Variants (Optional)
+              </h3>
+              <p className="text-sm text-gray-600 mt-1">
+                Add different sizes or variants of your dish with their respective prices (e.g., Small, Medium, Large)
               </p>
             </div>
             <div className="space-y-3">
               {variants.map((variant, index) => (
-                <div key={index} className="bg-white p-3 rounded-lg border border-amber-200">
-                  <div className="flex flex-col space-y-2">
-                    <div>
+                <div key={index} className="p-3 bg-amber-50 rounded-lg">
+                  <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+                    <div className="flex-1">
                       <label className="block text-xs font-medium text-gray-600 mb-1">
                         Variant Name
                       </label>
                       <input
                         type="text"
-                        placeholder="e.g., Small, Regular, Large"
+                        placeholder="e.g., Small, Medium, Large"
                         value={variant.name}
                         onChange={(e) => {
                           const newVariants = [...variants];
                           newVariants[index].name = e.target.value;
                           setVariants(newVariants);
                         }}
-                        className="w-full p-2.5 border rounded-lg transition bg-gray-50 border-gray-300 text-gray-900 text-sm"
+                        className="w-full p-2 border rounded-lg transition bg-white border-gray-300 text-gray-900 text-sm"
                         disabled={loading}
                       />
                     </div>
-                    <div className="flex space-x-2">
-                      <div className="flex-1">
+                    <div className="flex w-full sm:w-auto">
+                      <div className="flex-1 sm:w-28">
                         <label className="block text-xs font-medium text-gray-600 mb-1">
-                          Additional Price (₹)
+                          Price (₹)
                         </label>
                         <input
                           type="number"
@@ -595,20 +612,20 @@ export default function UpdateMenuItem() {
                           value={variant.price}
                           onChange={(e) => {
                             const newVariants = [...variants];
-                            newVariants[index].price = parseFloat(e.target.value);
+                            newVariants[index].price = parseFloat(e.target.value) || 0;
                             setVariants(newVariants);
                           }}
-                          className="w-full p-2.5 border rounded-lg transition bg-gray-50 border-gray-300 text-gray-900 text-sm"
+                          className="w-full p-2 border rounded-lg transition bg-white border-gray-300 text-gray-900 text-sm"
                           disabled={loading}
                         />
                       </div>
-                      <div className="flex items-end">
+                      <div className="flex items-end ml-2">
                         <button
                           type="button"
                           onClick={() =>
                             setVariants(variants.filter((_, i) => i !== index))
                           }
-                          className="bg-red-500 text-white px-3 py-2.5 rounded-lg hover:bg-red-600 transition flex items-center justify-center"
+                          className="bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600 transition flex items-center justify-center"
                           disabled={loading}
                         >
                           <XIcon size={16} />
@@ -624,46 +641,48 @@ export default function UpdateMenuItem() {
                   setVariants([...variants, { name: "", price: 0 }])
                 }
                 disabled={loading}
-                className="mt-2 w-full px-4 py-2 text-sm font-medium rounded-md transition-colors bg-amber-600 text-white hover:bg-amber-700"
+                className="w-full px-4 py-2 text-sm font-medium rounded-md transition-colors bg-amber-600 text-white hover:bg-amber-700"
               >
-                + Add Size/Portion Variant
+                Add Size Variant
               </button>
             </div>
           </div>
 
           {/* Add Ons Section */}
-          <div className="p-3 md:p-4 rounded-lg shadow-md transition bg-amber-50">
+          <div className="p-4 rounded-lg shadow-md transition bg-white border border-amber-50">
             <div className="mb-3">
-              <h3 className="font-semibold text-amber-800 text-base md:text-lg">Extra Add-Ons</h3>
-              <p className="text-xs md:text-sm text-amber-700 mt-1">
-                Optional extras customers can add (e.g., Extra Cheese, Salad)
+              <h3 className="font-serif text-xl font-semibold text-amber-700">
+                Add-Ons (Optional)
+              </h3>
+              <p className="text-sm text-gray-600 mt-1">
+                Extra items customers can add to their order (e.g., Extra Cheese, Extra Sauce, Side Salad)
               </p>
             </div>
             <div className="space-y-3">
               {addOns.map((addOn, index) => (
-                <div key={index} className="bg-white p-3 rounded-lg border border-amber-200">
-                  <div className="flex flex-col space-y-2">
-                    <div>
+                <div key={index} className="p-3 bg-amber-50 rounded-lg">
+                  <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+                    <div className="flex-1">
                       <label className="block text-xs font-medium text-gray-600 mb-1">
                         Add-On Name
                       </label>
                       <input
                         type="text"
-                        placeholder="e.g., Extra Cheese, Extra Sauce"
+                        placeholder="e.g., Extra Cheese, Side Salad"
                         value={addOn.name}
                         onChange={(e) => {
                           const newAddOns = [...addOns];
                           newAddOns[index].name = e.target.value;
                           setAddOns(newAddOns);
                         }}
-                        className="w-full p-2.5 border rounded-lg transition bg-gray-50 border-gray-300 text-gray-900 text-sm"
+                        className="w-full p-2 border rounded-lg transition bg-white border-gray-300 text-gray-900 text-sm"
                         disabled={loading}
                       />
                     </div>
-                    <div className="flex space-x-2">
-                      <div className="flex-1">
+                    <div className="flex w-full sm:w-auto">
+                      <div className="flex-1 sm:w-28">
                         <label className="block text-xs font-medium text-gray-600 mb-1">
-                          Extra Price (₹)
+                          Price (₹)
                         </label>
                         <input
                           type="number"
@@ -673,20 +692,20 @@ export default function UpdateMenuItem() {
                           value={addOn.price}
                           onChange={(e) => {
                             const newAddOns = [...addOns];
-                            newAddOns[index].price = parseFloat(e.target.value);
+                            newAddOns[index].price = parseFloat(e.target.value) || 0;
                             setAddOns(newAddOns);
                           }}
-                          className="w-full p-2.5 border rounded-lg transition bg-gray-50 border-gray-300 text-gray-900 text-sm"
+                          className="w-full p-2 border rounded-lg transition bg-white border-gray-300 text-gray-900 text-sm"
                           disabled={loading}
                         />
                       </div>
-                      <div className="flex items-end">
+                      <div className="flex items-end ml-2">
                         <button
                           type="button"
                           onClick={() =>
                             setAddOns(addOns.filter((_, i) => i !== index))
                           }
-                          className="bg-red-500 text-white px-3 py-2.5 rounded-lg hover:bg-red-600 transition flex items-center justify-center"
+                          className="bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600 transition flex items-center justify-center"
                           disabled={loading}
                         >
                           <XIcon size={16} />
@@ -700,32 +719,34 @@ export default function UpdateMenuItem() {
                 type="button"
                 onClick={() => setAddOns([...addOns, { name: "", price: 0 }])}
                 disabled={loading}
-                className="mt-2 w-full px-4 py-2 text-sm font-medium rounded-md transition-colors bg-amber-600 text-white hover:bg-amber-700"
+                className="w-full px-4 py-2 text-sm font-medium rounded-md transition-colors bg-amber-600 text-white hover:bg-amber-700"
               >
-                + Add New Extra
+                Add New Add-On
               </button>
             </div>
           </div>
 
           {/* Tags Section */}
-          <div className="p-3 md:p-4 rounded-lg shadow-md transition bg-amber-50">
+          <div className="p-4 rounded-lg shadow-md transition bg-white border border-amber-50">
             <div className="mb-3">
-              <h3 className="font-semibold text-amber-800 text-base md:text-lg">Search Tags</h3>
-              <p className="text-xs md:text-sm text-amber-700 mt-1">
-                Keywords to help customers find this item (e.g., spicy, healthy, popular)
+              <h3 className="font-serif text-xl font-semibold text-amber-700">
+                Search Tags (Optional)
+              </h3>
+              <p className="text-sm text-gray-600 mt-1">
+                Add keywords to help customers find your dish easily (e.g., spicy, creamy, gluten-free, popular)
               </p>
             </div>
             <div className="mb-3 flex flex-wrap gap-2">
               {tags.map((tag, index) => (
                 <span
                   key={index}
-                  className="inline-flex items-center px-2.5 md:px-3 py-1 rounded-full text-xs md:text-sm font-medium bg-amber-100 text-amber-800"
+                  className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-800"
                 >
-                  {tag}
+                  #{tag}
                   <button
                     type="button"
                     onClick={() => setTags(tags.filter((_, i) => i !== index))}
-                    className="ml-1.5 -mr-1 h-4 w-4 rounded-full inline-flex items-center justify-center transition bg-amber-200 text-amber-600 hover:bg-amber-300"
+                    className="ml-2 -mr-1 h-4 w-4 rounded-full inline-flex items-center justify-center transition bg-amber-200 text-amber-600 hover:bg-amber-300"
                     disabled={loading}
                   >
                     <span className="text-xs">×</span>
@@ -733,15 +754,11 @@ export default function UpdateMenuItem() {
                 </span>
               ))}
             </div>
-            <div className="flex flex-col md:flex-row gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <div className="flex-1">
-                <label htmlFor="newTag" className="block text-xs font-medium text-gray-600 mb-1">
-                  Add New Tag
-                </label>
                 <input
-                  id="newTag"
                   type="text"
-                  placeholder="e.g., spicy, bestseller, healthy"
+                  placeholder="Enter a tag (e.g., spicy, popular, healthy)"
                   value={newTag}
                   onChange={(e) => setNewTag(e.target.value)}
                   onKeyDown={(e) => {
@@ -750,20 +767,18 @@ export default function UpdateMenuItem() {
                       addTag();
                     }
                   }}
-                  className="w-full p-2.5 border rounded-lg transition bg-gray-50 border-gray-300 text-gray-900 text-sm"
+                  className="w-full p-3 border rounded-lg transition bg-gray-50 border-amber-200 text-gray-900"
                   disabled={loading}
                 />
               </div>
-              <div className="flex items-end">
-                <button
-                  type="button"
-                  onClick={addTag}
-                  className="px-4 py-2.5 font-medium rounded-lg transition-colors bg-amber-600 text-white hover:bg-amber-700 text-sm"
-                  disabled={loading}
-                >
-                  Add Tag
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={addTag}
+                className="px-6 sm:px-4 py-3 sm:py-2 font-medium rounded-lg transition-colors bg-amber-600 text-white hover:bg-amber-700"
+                disabled={loading}
+              >
+                Add Tag
+              </button>
             </div>
             {tagError && (
               <p className="text-red-500 text-sm mt-2">{tagError}</p>

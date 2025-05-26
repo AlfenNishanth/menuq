@@ -257,13 +257,17 @@ export default function AddNewMenuItem() {
                   }
                 }}
                 disabled={loading}
+                defaultValue="" // ✅ ensures the placeholder is shown initially
               >
-                <option value="Starter">Starter (Appetizers)</option>
-                <option value="Main Course">Main Course (Primary dishes)</option>
-                <option value="Drinks">Drinks (Hot beverages like tea, coffee)</option>
-                <option value="Cold Beverages">Cold Beverages (Juices, sodas, etc.)</option>
-                <option value="Desserts">Desserts (Sweet dishes)</option>
-                <option value="Custom">Custom (Create your own category)</option>
+                <option value="" disabled hidden>
+                  -- Select a category --
+                </option>
+                <option value="Starter">Starter</option>
+                <option value="Main Course">Main Course</option>
+                <option value="Drinks">Drinks</option>
+                <option value="Cold Beverages">Cold Beverages</option>
+                <option value="Desserts">Desserts</option>
+                <option value="Custom">Custom Category</option>
               </select>
             </div>
 
@@ -442,7 +446,7 @@ export default function AddNewMenuItem() {
             </div>
             <div className="space-y-3">
               {variants.map((variant, index) => (
-                <div key={index} className="p-3 bg-gray-50 rounded-lg">
+                <div key={index} className="p-3 bg-amber-50 rounded-lg">
                   <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                     <div className="flex-1">
                       <label className="block text-xs font-medium text-gray-600 mb-1">
@@ -522,7 +526,7 @@ export default function AddNewMenuItem() {
             </div>
             <div className="space-y-3">
               {addOns.map((addOn, index) => (
-                <div key={index} className="p-3 bg-gray-50 rounded-lg">
+                <div key={index} className="p-3 bg-amber-50 rounded-lg">
                   <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                     <div className="flex-1">
                       <label className="block text-xs font-medium text-gray-600 mb-1">
