@@ -175,7 +175,7 @@ function LandingPage() {
               </div>
               
               <a 
-                href="#how-it-works" 
+                href="/aboutus" 
                 className="group relative text-amber-800 font-semibold flex items-center gap-2 hover:gap-4 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 rounded-lg px-3 py-2 hover:bg-gradient-to-r hover:from-amber-50 hover:to-amber-100 text-sm lg:text-base"
               >
                 <span className="relative z-10">Our Philosophy</span>
@@ -302,7 +302,7 @@ function LandingPage() {
     </div>
     
     <div className="mt-12 sm:mt-16 md:mt-20 text-center">
-      <a href="#Reach Us">
+      <a href="/contactus">
       <button className="px-6 sm:px-8 py-3 bg-amber-600 text-white rounded-full font-medium tracking-wide hover:bg-amber-700 transition-colors duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
       Elevate Your Dining Experience Today
       </button>
@@ -413,7 +413,7 @@ function LandingPage() {
     </div>
     
     <div className="mt-12 sm:mt-16 md:mt-20 text-center">
-      <a href="#Reach Us">
+      <a href="/contactus">
       <button className="px-6 sm:px-8 py-3 bg-amber-600 text-white rounded-full font-medium tracking-wide hover:bg-amber-700 transition-colors duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
         Transform Your Experience
       </button>
@@ -821,7 +821,7 @@ function LandingPage() {
     </div>
 
     <div className="mt-12 md:mt-20 flex justify-center">
-      <a href="#Reach Us" className="group relative">
+      <a href="/contactus" className="group relative">
         <span className="absolute -inset-0.5 bg-gradient-to-r from-amber-400 to-amber-600 rounded-full blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></span>
         <span className="relative flex items-center space-x-2 bg-white px-6 md:px-8 py-3 md:py-4 rounded-full border border-amber-600">
           <span className="text-gray-900 text-sm md:text-base font-medium">Complete Intelligence Archive</span>
@@ -1006,10 +1006,10 @@ function LandingPage() {
       <div className="text-center sm:text-left mt-6 sm:mt-0">
         <h3 className="font-serif text-lg font-bold mb-4">Product</h3>
         <ul className="space-y-2">
-          <li><a href="#how-it-works" className="text-amber-200 hover:text-white transition-colors">Features</a></li>
-          <li><a href="#Reach Us" className="text-amber-200 hover:text-white transition-colors">Pricing</a></li>
-          <li><a href="#Reach Us" className="text-amber-200 hover:text-white transition-colors">Integrations</a></li>
-          <li><a href="#Reach Us" className="text-amber-200 hover:text-white transition-colors">Request a Demo</a></li>
+          <li><a href="#features" className="text-amber-200 hover:text-white transition-colors">Features</a></li>
+          <li><a href="/contactus" className="text-amber-200 hover:text-white transition-colors">Pricing</a></li>
+          <li><a href="/contactus" className="text-amber-200 hover:text-white transition-colors">Integrations</a></li>
+          <li><a href="/contactus" className="text-amber-200 hover:text-white transition-colors">Request a Demo</a></li>
         </ul>
       </div>
       
