@@ -79,10 +79,10 @@ function Header() {
               </>
             ) : (
               <>
-                <Link to="/#features" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">Core Elements</Link>
+                <Link to="/how-it-works" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">Core Elements</Link>
                 <Link to="/aboutus" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">Who Are We</Link>
                 {/* <Link to="/#testimonials" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">Real Stories</Link> */}
-                <Link to="/#contactus" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">Reach Us</Link>
+                <Link to="/contactus" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">Reach Us</Link>
               </>
             )}
             <Link to="/login" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">Login</Link>
