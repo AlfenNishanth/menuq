@@ -71,16 +71,18 @@ function Header() {
           <div className="hidden md:flex items-center space-x-8">
             {isHomePage ? (
               <>
-                <a href="#features" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">Core Elements</a>
-                <a href="#how-it-works" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">Seamless Flow</a>
-                <a href="#Reach Us" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">Reach Us</a>
+                <a href="#how-it-works" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">Core Elements</a>
+                {/* <a href="#how-it-works" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">Seamless Flow</a> */}
+                {/* <a href="#Reach Us" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">Reach Us</a> */}
+                <Link to="/aboutus" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">Who Are We</Link>
+                <Link to="/contactus" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">Reach Us</Link>
               </>
             ) : (
               <>
                 <Link to="/#features" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">Core Elements</Link>
-                <Link to="/#how-it-works" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">Seamless Flow</Link>
+                <Link to="/aboutus" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">Who Are We</Link>
                 {/* <Link to="/#testimonials" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">Real Stories</Link> */}
-                <Link to="/#Reach Us" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">Reach Us</Link>
+                <Link to="/#contactus" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">Reach Us</Link>
               </>
             )}
             <Link to="/login" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">Login</Link>
@@ -116,15 +118,17 @@ function Header() {
           >
             {isHomePage ? (
               <>
-                <a href="#features" onClick={handleLinkClick} className="block px-4 py-3 text-gray-700 hover:bg-amber-50 active:bg-amber-100">Core Elements</a>
-                <a href="#how-it-works" onClick={handleLinkClick} className="block px-4 py-3 text-gray-700 hover:bg-amber-50 active:bg-amber-100">Seamless Flow</a>
-                <a href="#Reach Us" onClick={handleLinkClick} className="block px-4 py-3 text-gray-700 hover:bg-amber-50 active:bg-amber-100">Reach Us</a>
+                <a href="#how-it-works" onClick={handleLinkClick} className="block px-4 py-3 text-gray-700 hover:bg-amber-50 active:bg-amber-100">Core Elements</a>
+                {/* <a href="#how-it-works" onClick={handleLinkClick} className="block px-4 py-3 text-gray-700 hover:bg-amber-50 active:bg-amber-100">Who Are We</a>
+                <a href="#Reach Us" onClick={handleLinkClick} className="block px-4 py-3 text-gray-700 hover:bg-amber-50 active:bg-amber-100">Reach Us</a> */}
+                <Link to="/aboutus" onClick={handleLinkClick} className="block px-4 py-3 text-gray-700 hover:bg-amber-50 active:bg-amber-100">Who Are We</Link>
+                <Link to="/contactus" onClick={handleLinkClick} className="block px-4 py-3 text-gray-700 hover:bg-amber-50 active:bg-amber-100">Reach Us</Link>
               </>
             ) : (
               <>
-                <Link to="/#features" onClick={handleLinkClick} className="block px-4 py-3 text-gray-700 hover:bg-amber-50 active:bg-amber-100">Core Elements</Link>
-                <Link to="/#how-it-works" onClick={handleLinkClick} className="block px-4 py-3 text-gray-700 hover:bg-amber-50 active:bg-amber-100">Seamless Flow</Link>
-                <Link to="/#Reach Us" onClick={handleLinkClick} className="block px-4 py-3 text-gray-700 hover:bg-amber-50 active:bg-amber-100">Reach Us</Link>
+                <Link to="/how-it-works" onClick={handleLinkClick} className="block px-4 py-3 text-gray-700 hover:bg-amber-50 active:bg-amber-100">Core Elements</Link>
+                <Link to="/aboutus" onClick={handleLinkClick} className="block px-4 py-3 text-gray-700 hover:bg-amber-50 active:bg-amber-100">Who Are We</Link>
+                <Link to="/contactus" onClick={handleLinkClick} className="block px-4 py-3 text-gray-700 hover:bg-amber-50 active:bg-amber-100">Reach Us</Link>
               </>
             )}
             <div className="border-t border-gray-200 my-2"></div>

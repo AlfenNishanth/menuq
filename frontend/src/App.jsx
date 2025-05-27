@@ -19,6 +19,9 @@ import HeaderLayout from "./layouts/HeaderLayout";
 import PrivacyPolicy from "./components/MenuQPrivacyPolicy"
 import TermsOfService from "./components/MenuQTermsOfService"
 import CookiePolicyPage from "./components/MenuQCookiePolicyPage"
+import AboutUs from "./components/MenuQAboutUs"
+import Careers from "./components/MenuQCareers"
+import ContactUs from "./components/MenuQContactUs"
 
 function App() {
 
@@ -34,6 +37,9 @@ function App() {
           <Route path="/privacy" element={<HeaderLayout><PrivacyPolicy /></HeaderLayout>} />
           <Route path="/terms" element={<HeaderLayout><TermsOfService /></HeaderLayout>} />
           <Route path="/cookies" element={<HeaderLayout><CookiePolicyPage /></HeaderLayout>} />
+          <Route path="/aboutus" element={<HeaderLayout><AboutUs /></HeaderLayout>} />
+          <Route path="/careers" element={<HeaderLayout><Careers /></HeaderLayout>} />
+          <Route path="/contactus" element={<HeaderLayout><ContactUs /></HeaderLayout>} />
           
 
           <Route
