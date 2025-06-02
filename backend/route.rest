@@ -67,7 +67,7 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:8080/api/menu/RX00045
+GET http://localhost:8080/api/menuq/byId/RQ00001
 
 ### Update all operating hours for a restaurant
 PUT https://menuq.arknishinvent.com/api/menuq/b3r6hSN70OXMQkMAHT1h5QeybIk2/hours

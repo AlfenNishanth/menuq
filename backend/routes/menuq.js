@@ -79,7 +79,7 @@ router.post("/", async (req, res) => {
       socialMedia,
       registrationId, // Add this field for RQ ID
     } = req.body;
-    
+
     const newRestaurant = new Restaurant({
       firebaseUid,
       email,
@@ -96,36 +96,42 @@ router.post("/", async (req, res) => {
       operatingHours,
       socialMedia,
     });
-    
+
     // If registrationId (RQ ID) is provided, set it manually
-    if (registrationId && registrationId.startsWith('RQ')) {
+    if (registrationId && registrationId.startsWith("RQ")) {
       // Validate RQ format
       const rqPattern = /^RQ\d{5}$/;
       if (!rqPattern.test(registrationId)) {
-        return res.status(400).json({ 
-          message: "Invalid ID" 
+        return res.status(400).json({
+          message: "Invalid ID",
         });
       }
-      
+
       // Check if this RQ ID already exists
-      const existingRestaurant = await Restaurant.findOne({ restaurantId: registrationId });
+      const existingRestaurant = await Restaurant.findOne({
+        restaurantId: registrationId,
+      });
       if (existingRestaurant) {
-        return res.status(409).json({ 
-          message: "Restaurant with this registration ID already exists" 
+        return res.status(409).json({
+          message: "Restaurant with this registration ID already exists",
         });
       }
-      
+
       // Set the RQ ID manually (this will bypass the auto-generation)
       newRestaurant.restaurantId = registrationId;
     }
     // If no registrationId provided, the pre-save hook will generate RX ID automatically
-    
+
     const savedRestaurant = await newRestaurant.save();
     logger.info(
-      `POST /restaurant - Successfully created restaurant with ID: ${savedRestaurant.restaurantId || savedRestaurant._id}`
+      `POST /restaurant - Successfully created restaurant with ID: ${
+        savedRestaurant.restaurantId || savedRestaurant._id
+      }`
     );
     console.log(
-      `POST /restaurant - Successfully created restaurant with ID: ${savedRestaurant.restaurantId || savedRestaurant._id}`
+      `POST /restaurant - Successfully created restaurant with ID: ${
+        savedRestaurant.restaurantId || savedRestaurant._id
+      }`
     );
     res.status(201).json(savedRestaurant);
   } catch (err) {
@@ -231,7 +237,7 @@ async function getRestaurantById(req, res, next) {
 
     // Handle RQ IDs (Registration)
     if (id.startsWith("RQ")) {
-      return await handleRQId(req, res, id);
+      return await handleRQId(req, res, id, next);
     }
 
     // Handle RX IDs (existing logic)
@@ -255,16 +261,13 @@ async function getRestaurantById(req, res, next) {
 }
 
 // New function to handle RQ IDs
-async function handleRQId(req, res, id) {
+async function handleRQId(req, res, id, next) {
   try {
     const rqPattern = /^RQ\d{5}$/;
     if (!rqPattern.test(id)) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "Invalid ID",
-        });
+      return res.status(400).json({
+        message: "Invalid ID",
+      });
     }
 
     // Extract number from RQ00001 -> 1
@@ -284,10 +287,8 @@ async function handleRQId(req, res, id) {
     // Check if already registered
     const restaurant = await Restaurant.findOne({ restaurantId: id });
     if (restaurant) {
-      return res.status(409).json({
-        message: "Already registered",
-        restaurant: restaurant,
-      });
+      res.restaurant = restaurant;
+      return next();
     }
 
     // Available for registration
@@ -482,7 +483,6 @@ router.delete("/:id/hours/:day", getRestaurant, async (req, res) => {
   }
 });
 
-
 // POST /api/qr-auth/validate
 router.post("/validate-signup", async (req, res) => {
   const { qrId, password } = req.body;
@@ -492,15 +492,18 @@ router.post("/validate-signup", async (req, res) => {
   const idNum = parseInt(qrId?.slice(2));
 
   if (!qrId || !qrId.startsWith("RQ") || !counter || idNum > counter.seq) {
-    return res.status(400).json({ success: false, message: "Invalid QR code." });
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid QR code." });
   }
 
   if (password !== VALID_PASSWORD) {
-    return res.status(401).json({ success: false, message: "Incorrect password." });
+    return res
+      .status(401)
+      .json({ success: false, message: "Incorrect password." });
   }
 
   return res.status(200).json({ success: true });
 });
-
 
 module.exports = router;
