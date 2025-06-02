@@ -17,7 +17,7 @@ GET http://menuq.arknishinvent.com/api/menuq/byId/RX00003
 GET http://13.234.225.202:8080/api/health
 
 ###
-GET https://menuq.arknishinvent.com/api/health
+GET https://menuq.arknishinvent.com/api/menuq/byId/RQ00001
 
 ###
 GET https://menuq.arknishinvent.com/api/menuq/pGx6DnxdBuPIgDS6mAjK11dg0tC2
