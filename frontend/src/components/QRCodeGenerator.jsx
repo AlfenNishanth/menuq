@@ -470,13 +470,13 @@ const QRCodeGenerator = () => {
     // Add restaurant name if provided
     const finalizeDownload = () => {
       if (qrOptions.restaurantName) {
-        ctx.font = "bold 20px serif";
+        ctx.font = "bold 32px serif";
         ctx.textAlign = "center";
         ctx.fillStyle = "#1F2937"; // gray-800
         ctx.fillText(
           qrOptions.restaurantName,
           qrCanvas.width / 2,
-          originalCanvas.height + padding * 1.5
+          originalCanvas.height + padding * 2
         );
       }
 
@@ -814,27 +814,6 @@ const QRCodeGenerator = () => {
 
               {/* Shape Options */}
               {renderShapeButtons(qrOptions.shapeType)}
-            </div>
-
-            {/* Colors */}
-            <div className="border-t border-gray-200 pt-6 mb-6">
-              <h3 className="text-lg font-medium text-gray-800 mb-4">Colors</h3>
-
-              {/* QR Color */}
-              {renderColorPicker(
-                "QR Code Color",
-                qrOptions.fgColor,
-                "fgColor",
-                (color) => setQrOptions({ ...qrOptions, fgColor: color })
-              )}
-
-              {/* Background Color */}
-              {renderColorPicker(
-                "Background Color",
-                qrOptions.bgColor,
-                "bgColor",
-                (color) => setQrOptions({ ...qrOptions, bgColor: color })
-              )}
 
               {/* Border Options */}
               <div className="mb-4">
@@ -868,6 +847,27 @@ const QRCodeGenerator = () => {
                   "borderColor",
                   (color) => setQrOptions({ ...qrOptions, borderColor: color })
                 )}
+            </div>
+
+            {/* Colors */}
+            <div className="border-t border-gray-200 pt-6 mb-6">
+              <h3 className="text-lg font-medium text-gray-800 mb-4">Colors</h3>
+
+              {/* QR Color */}
+              {renderColorPicker(
+                "QR Code Color",
+                qrOptions.fgColor,
+                "fgColor",
+                (color) => setQrOptions({ ...qrOptions, fgColor: color })
+              )}
+
+              {/* Background Color */}
+              {renderColorPicker(
+                "Background Color",
+                qrOptions.bgColor,
+                "bgColor",
+                (color) => setQrOptions({ ...qrOptions, bgColor: color })
+              )}  
             </div>
 
             {/* Size & Error Correction */}

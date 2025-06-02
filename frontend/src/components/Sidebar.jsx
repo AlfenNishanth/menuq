@@ -391,115 +391,55 @@ const Sidebar = ({ onLogoutClick }) => {
             </button>
           </div>
           
-          {/* Menu Items - Always expanded on mobile */}
-          <ul className="flex-1 px-3 py-4 flex flex-col gap-2">
-            <li className="mb-2">
-              <NavLink
+          {/* Menu Items - Using SidebarItem components for consistency */}
+          <SidebarContext.Provider value={{ expanded: true }}>
+            <ul className="flex-1 px-3 py-4 flex flex-col gap-2">
+              <SidebarItem
+                icon={<LayoutDashboard size={18} />}
+                text="Dashboard"
                 to="/dashboard/"
-                className={({isActive}) => `relative flex items-center py-2.5 px-3 rounded-lg transition-all duration-200 ${
-                  isActive
-                    ? "bg-gradient-to-tr from-amber-100 to-amber-50 text-amber-800"
-                    : "hover:bg-amber-50 text-gray-700"
-                }`}
-              >
-                <div className="text-amber-600 flex items-center justify-center w-5">
-                  <LayoutDashboard size={18} />
-                </div>
-                <span className="ml-3 font-medium">Dashboard</span>
-                <span className="ml-2 text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">
-                  New
-                </span>
-              </NavLink>
-            </li>
-            <li className="mb-2">
-              <NavLink
+                badge="New"
+              />
+              <SidebarItem
+                icon={<MenuSquare size={18} />}
+                text="Manage Menu"
                 to="/dashboard/manage-menu/"
-                className={({isActive}) => `relative flex items-center py-2.5 px-3 rounded-lg transition-all duration-200 ${
-                  isActive
-                    ? "bg-gradient-to-tr from-amber-100 to-amber-50 text-amber-800"
-                    : "hover:bg-amber-50 text-gray-700"
-                }`}
-              >
-                <div className="text-amber-600 flex items-center justify-center w-5">
-                  <MenuSquare size={18} />
-                </div>
-                <span className="ml-3 font-medium">Manage Menu</span>
-              </NavLink>
-            </li>
-            <li className="mb-2">
-              <NavLink
+              />
+              <SidebarItem
+                icon={<PlusCircle size={18} />}
+                text="Add Menu Item"
                 to="/dashboard/add-new-menu-item"
-                className={({isActive}) => `relative flex items-center py-2.5 px-3 rounded-lg transition-all duration-200 ${
-                  isActive
-                    ? "bg-gradient-to-tr from-amber-100 to-amber-50 text-amber-800"
-                    : "hover:bg-amber-50 text-gray-700"
-                }`}
-              >
-                <div className="text-amber-600 flex items-center justify-center w-5">
-                  <PlusCircle size={18} />
-                </div>
-                <span className="ml-3 font-medium">Add Menu Item</span>
-              </NavLink>
-            </li>
-            <li className="mb-2">
-              <NavLink
+              />
+              <SidebarItem
+                icon={<UserCog size={18} />}
+                text="Edit Profile"
                 to="/dashboard/update-profile"
-                className={({isActive}) => `relative flex items-center py-2.5 px-3 rounded-lg transition-all duration-200 ${
-                  isActive
-                    ? "bg-gradient-to-tr from-amber-100 to-amber-50 text-amber-800"
-                    : "hover:bg-amber-50 text-gray-700"
-                }`}
-              >
-                <div className="text-amber-600 flex items-center justify-center w-5">
-                  <UserCog size={18} />
-                </div>
-                <span className="ml-3 font-medium">Edit Profile</span>
-              </NavLink>
-            </li>
-            {/* <li className="mb-2">
-              <NavLink
+              />
+              {/* <SidebarItem
+                icon={<Settings size={18} />}
+                text="Settings"
                 to="/dashboard/settings"
-                className={({isActive}) => `relative flex items-center py-2.5 px-3 rounded-lg transition-all duration-200 ${
-                  isActive
-                    ? "bg-gradient-to-tr from-amber-100 to-amber-50 text-amber-800"
-                    : "hover:bg-amber-50 text-gray-700"
-                }`}
-              >
-                <div className="text-amber-600 flex items-center justify-center w-5">
-                  <Settings size={18} />
-                </div>
-                <span className="ml-3 font-medium">Settings</span>
-              </NavLink>
-            </li> */}
-            <li className="mb-2">
-              <NavLink
+              /> */}
+              <SidebarItem
+                icon={<QrCode size={18} />}
+                text="QR Code"
                 to="/dashboard/qr-generator"
-                className={({isActive}) => `relative flex items-center py-2.5 px-3 rounded-lg transition-all duration-200 ${
-                  isActive
-                    ? "bg-gradient-to-tr from-amber-100 to-amber-50 text-amber-800"
-                    : "hover:bg-amber-50 text-gray-700"
-                }`}
+              />
+            </ul>
+            
+            {/* Logout button - Always showing text on mobile */}
+            <div className="mt-auto px-3 pb-4">
+              <div
+                onClick={handleLogoutClick}
+                className="flex items-center py-2.5 px-3 cursor-pointer rounded-md transition-colors hover:bg-red-50 text-red-500"
               >
-                <div className="text-amber-600 flex items-center justify-center w-5">
-                  <QrCode size={18} />
+                <div className="flex items-center justify-center w-5">
+                  <LogOut size={18} />
                 </div>
-                <span className="ml-3 font-medium">QR Code</span>
-              </NavLink>
-            </li>
-          </ul>
-          
-          {/* Logout button - Always showing text on mobile */}
-          <div className="mt-auto px-3 pb-4">
-            <div
-              onClick={handleLogoutClick}
-              className="flex items-center py-2.5 px-3 cursor-pointer rounded-md transition-colors hover:bg-red-50 text-red-500"
-            >
-              <div className="flex items-center justify-center w-5">
-                <LogOut size={18} />
+                <span className="ml-3">Logout</span>
               </div>
-              <span className="ml-3">Logout</span>
             </div>
-          </div>
+          </SidebarContext.Provider>
 
           {/* User Profile Section - Always expanded on mobile */}
           <div className="border-t p-3 flex items-center border-gray-200">
