@@ -16,6 +16,7 @@ import UpdateMenuItem from "./components/UpdateMenuItem";
 import Dashboard_plain from "./components/Dashboard_plain";
 import QRCodeGenerator from "./components/QRCodeGenerator";
 import HeaderLayout from "./layouts/HeaderLayout";
+import SignupWithQr from "./components/SignUpWithId";
 
 function App() {
 
@@ -27,7 +28,8 @@ function App() {
           <Route path="/" element={<HeaderLayout><LandingPage /></HeaderLayout>} />
           <Route path="/login" element={ <HeaderLayout><Login /></HeaderLayout>} />
           <Route path="/signup" element={<HeaderLayout><Signup /></HeaderLayout>} />
-
+          <Route path="/signup/:id" element={<HeaderLayout><Signup /></HeaderLayout>} />
+          
           <Route
             path="/dashboard/*"
             element={

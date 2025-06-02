@@ -89,6 +89,9 @@ app.use("/api/menuq", resRouter);
 const menuRouter = require("./routes/menu");
 app.use("/api/menu", menuRouter);
 
+const initRouter = require("./routes/counter_init");
+app.use("/api/", initRouter);
+
 //test
 app.get("/api/health", async (req, res) => {
   res.send("Menuq is up");

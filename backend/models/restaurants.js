@@ -64,13 +64,13 @@ const restaurantSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
-// **Auto-generate restaurantId before saving**
+
 restaurantSchema.pre("save", async function (next) {
     if (!this.restaurantId) {
       try {
         const counter = await Counter.findByIdAndUpdate(
-          { _id: "restaurantId" }, // Unique identifier for restaurant counter
-          { $inc: { seq: 1 } }, // Increment sequence number
+          { _id: "restaurantId" },
+          { $inc: { seq: 1 } }, 
           { new: true, upsert: true }
         );
   

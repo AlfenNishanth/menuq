@@ -78,6 +78,7 @@ export async function getRestaurantMenu(id) {
   try {
     const response = await axios.get(`${config.MENU}/${id}`);
     // console.log(`${config.MENUQ}/${id}`);
+    // console.log(response.data)
     return response.data;
   } catch (error) {
     throw error;

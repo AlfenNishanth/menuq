@@ -23,6 +23,7 @@ function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState();
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
+  const [isSigningUp, setIsSigningUp] = useState(false);
 
   // Enhanced signUp function that handles both Firebase auth and database registration
   async function signUp(email, password, restaurantData) {
@@ -105,8 +106,6 @@ function AuthProvider({ children }) {
     return sendPasswordResetEmail(auth, email);
   }
 
-  // Flag to track if we're in the signup process
-  const [isSigningUp, setIsSigningUp] = useState(false);
   
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {

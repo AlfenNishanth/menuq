@@ -55,12 +55,13 @@ POST http://localhost:8080/api/menuq
 Content-Type: application/json
 
 {
-  "firebaseUid": "user_123",
-  "email": "health@example.com",
+  "firebaseUid": "user_12345",
+  "email": "health12@example.com",
   "phone": "9876543210",
   "restaurantName": "Tasty Bites",
   "restaurantAddress": "123 Main Street, City",
-  "noOfSeats": 0
+  "noOfSeats": 0,
+  "registrationId" : "RQ00001"
 //  "restaurantCategory": "Cafe",
 //  "cuisineType": ["Italian", "Indian"],
 }
@@ -107,3 +108,23 @@ Content-Type: application/json
   "resOpen": false
 }
 
+###
+POST http://localhost:8080/api/counter/init
+Content-Type: application/json
+
+{
+  "counterId": "qrCounter",
+  "seq": 50
+}
+
+###
+GET http://localhost:8080/api/counter/2
+
+###
+GET http://localhost:8080/api/menuq/
+
+###
+GET http://localhost:8080/api/menu/RX00001
+
+###
+GET https://menuq.arknishinvent.com/api/menu/RX00002

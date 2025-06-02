@@ -4,6 +4,8 @@ import MenuCard from "./MenuCard";
 import { getRestaurantMenu } from "../../api/menuItem";
 import { fetchRestaurantByID } from "../../api/restaurant";
 import { capitalizeWords } from "../../utils/format";
+import { useNavigate } from "react-router-dom";
+
 import {
   Clock,
   Calendar,
@@ -16,10 +18,6 @@ import {
 } from "lucide-react";
 import axios from "axios";
 
-// Config for API endpoints
-const config = {
-  MENUQ: window.REACT_APP_MENUQ_API || "/api/restaurants",
-};
 
 // Comprehensive list of menu categories in logical serving order
 const categoryOrder = [
@@ -255,6 +253,8 @@ const RestaurantMenu = () => {
   const [restaurantLoading, setRestaurantLoading] = useState(true);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
+  const navigate = useNavigate();
+
   const categoryRefs = useRef({});
   const menuContainerRef = useRef(null);
 
@@ -303,7 +303,10 @@ const RestaurantMenu = () => {
       setRestaurantLoading(true);
       console.log("ID: " + id);
       const data = await fetchRestaurantByID(id);
-      setRestaurantData(data);
+      if(data.redirect == '1') {
+        navigate(`/signup/${id}`);
+      }
+      else setRestaurantData(data);
     } catch (error) {
       console.error("Error fetching restaurant data:", error);
     } finally {
@@ -316,6 +319,7 @@ const RestaurantMenu = () => {
       setLoading(true);
       const items = await getRestaurantMenu(id);
 
+      
       // Group items by category
       const groupedItems = {};
       items.forEach((item) => {

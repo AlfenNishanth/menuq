@@ -1,15 +1,20 @@
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config(); 
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
 }
 const express = require("express");
 const router = express.Router();
 const Restaurant = require("../models/restaurants");
 const MenuItem = require("../models/menuItem");
-const logger = require('../logger');
+const logger = require("../logger");
+const Counter = require("../models/counter");
 
 const multer = require("multer");
 const { v4 } = require("uuid");
-const { S3Client, PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
+const {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} = require("@aws-sdk/client-s3");
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
@@ -25,7 +30,7 @@ const s3Client = new S3Client({
 //Get all
 router.get("/", async (req, res) => {
   try {
-    logger.info('GET /restaurant - Fetching all restaurants');
+    logger.info("GET /restaurant - Fetching all restaurants");
     const restaurants = await Restaurant.find();
     res.json(restaurants);
   } catch (err) {
@@ -36,20 +41,27 @@ router.get("/", async (req, res) => {
 
 //Get one
 router.get("/:id", getRestaurant, (req, res) => {
-  logger.info(`GET /restaurant/${req.params.id} - Fetching restaurant by firebase UID`);
+  logger.info(
+    `GET /restaurant/${req.params.id} - Fetching restaurant by firebase UID`
+  );
   res.json(res.restaurant);
 });
 
 //Get by restaurantId
 router.get("/byId/:id", getRestaurantById, (req, res) => {
-  logger.info(`GET /restaurant/byId/${req.params.id} - Fetching restaurant by restaurant ID`);
+  logger.info(
+    `GET /restaurant/byId/${req.params.id} - Fetching restaurant by restaurant ID`
+  );
   res.json(res.restaurant);
 });
 
 //Create one
+//Create one
 router.post("/", async (req, res) => {
   try {
-    logger.info(`POST /restaurant - Creating new restaurant for: ${req.body.restaurantName}`);
+    logger.info(
+      `POST /restaurant - Creating new restaurant for: ${req.body.restaurantName}`
+    );
     const {
       firebaseUid,
       email,
@@ -65,6 +77,7 @@ router.post("/", async (req, res) => {
       cuisineType,
       operatingHours,
       socialMedia,
+      registrationId, // Add this field for RQ ID
     } = req.body;
     
     const newRestaurant = new Restaurant({
@@ -83,18 +96,46 @@ router.post("/", async (req, res) => {
       operatingHours,
       socialMedia,
     });
-
+    
+    // If registrationId (RQ ID) is provided, set it manually
+    if (registrationId && registrationId.startsWith('RQ')) {
+      // Validate RQ format
+      const rqPattern = /^RQ\d{5}$/;
+      if (!rqPattern.test(registrationId)) {
+        return res.status(400).json({ 
+          message: "Invalid ID" 
+        });
+      }
+      
+      // Check if this RQ ID already exists
+      const existingRestaurant = await Restaurant.findOne({ restaurantId: registrationId });
+      if (existingRestaurant) {
+        return res.status(409).json({ 
+          message: "Restaurant with this registration ID already exists" 
+        });
+      }
+      
+      // Set the RQ ID manually (this will bypass the auto-generation)
+      newRestaurant.restaurantId = registrationId;
+    }
+    // If no registrationId provided, the pre-save hook will generate RX ID automatically
+    
     const savedRestaurant = await newRestaurant.save();
-    logger.info(`POST /restaurant - Successfully created restaurant with ID: ${savedRestaurant._id}`);
-    console.log(`POST /restaurant - Successfully created restaurant with ID: ${savedRestaurant._id}`);
+    logger.info(
+      `POST /restaurant - Successfully created restaurant with ID: ${savedRestaurant.restaurantId || savedRestaurant._id}`
+    );
+    console.log(
+      `POST /restaurant - Successfully created restaurant with ID: ${savedRestaurant.restaurantId || savedRestaurant._id}`
+    );
     res.status(201).json(savedRestaurant);
   } catch (err) {
     console.log(`POST /restaurant - Error creating restaurant: ${err.message}`);
-    logger.error(`POST /restaurant - Error creating restaurant: ${err.message}`);
+    logger.error(
+      `POST /restaurant - Error creating restaurant: ${err.message}`
+    );
     res.status(400).json({ message: err.message });
   }
 });
-
 // Update one
 router.patch("/:id", async (req, res) => {
   try {
@@ -116,7 +157,9 @@ router.patch("/:id", async (req, res) => {
       return res.status(404).json({ message: "Restaurant not found" });
     }
 
-    logger.info(`PATCH /restaurant/${firebaseUid} - Successfully updated restaurant`);
+    logger.info(
+      `PATCH /restaurant/${firebaseUid} - Successfully updated restaurant`
+    );
     res.status(200).json(updatedRestaurant);
   } catch (err) {
     logger.error(`PATCH /restaurant/${req.params.id} - Error: ${err.message}`);
@@ -125,43 +168,50 @@ router.patch("/:id", async (req, res) => {
 });
 
 //Delete one
-router.delete("/:id", (req, res) => {
-
-});
+router.delete("/:id", (req, res) => {});
 
 //Toggle status
 router.patch("/:id/status", getRestaurant, async (req, res) => {
   try {
     const { resOpen } = req.body;
-    
+
     if (resOpen === undefined) {
       return res.status(400).json({ message: "resOpen status is required" });
     }
 
-    logger.info(`PATCH /restaurant/${req.params.id}/status - Updating restaurant open status to: ${resOpen}`);
-    
+    logger.info(
+      `PATCH /restaurant/${req.params.id}/status - Updating restaurant open status to: ${resOpen}`
+    );
+
     res.restaurant.resOpen = resOpen;
     res.restaurant.updatedAt = Date.now();
-    
+
     const updatedRestaurant = await res.restaurant.save();
-    
-    logger.info(`PATCH /restaurant/${req.params.id}/status - Successfully updated restaurant status`);
+
+    logger.info(
+      `PATCH /restaurant/${req.params.id}/status - Successfully updated restaurant status`
+    );
     res.status(200).json(updatedRestaurant);
   } catch (err) {
-    logger.error(`PATCH /restaurant/${req.params.id}/status - Error: ${err.message}`);
+    logger.error(
+      `PATCH /restaurant/${req.params.id}/status - Error: ${err.message}`
+    );
     res.status(400).json({ message: err.message });
   }
 });
 
-
 async function getRestaurant(req, res, next) {
   let restaurant;
   try {
-    logger.info(`Middleware getRestaurant - Finding restaurant with firebase UID: ${req.params.id}`);
+    logger.info(
+      `Middleware getRestaurant - Finding restaurant with firebase UID: ${req.params.id}`
+    );
     restaurant = await Restaurant.findOne({ firebaseUid: req.params.id });
 
     if (restaurant == null) {
-      logger.info(`Middleware getRestaurant - Restaurant not found for ID: ${req.params.id}`);
+      logger.info(
+        `Middleware getRestaurant - Restaurant not found for ID: ${req.params.id}`
+      );
       return res.status(404).json({ message: "Cannot find restaurant" });
     }
   } catch (err) {
@@ -174,23 +224,83 @@ async function getRestaurant(req, res, next) {
 
 async function getRestaurantById(req, res, next) {
   try {
-    logger.info(`Middleware getRestaurantById - Finding restaurant with ID: ${req.params.id}`);
+    const id = req.params.id;
+    logger.info(
+      `Middleware getRestaurantById - Finding restaurant with ID: ${id}`
+    );
+
+    // Handle RQ IDs (Registration)
+    if (id.startsWith("RQ")) {
+      return await handleRQId(req, res, id);
+    }
+
+    // Handle RX IDs (existing logic)
     const restaurant = await Restaurant.findOne({
-      restaurantId: req.params.id,
+      restaurantId: id,
     });
-    
+
     if (restaurant == null) {
-      logger.info(`Middleware getRestaurantById - Restaurant not found for ID: ${req.params.id}`);
+      logger.info(
+        `Middleware getRestaurantById - Restaurant not found for ID: ${id}`
+      );
       return res.status(404).json({ message: "Cannot find restaurant" });
     }
-    res.json(restaurant);
+
+    res.restaurant = restaurant;
+    next();
   } catch (err) {
     logger.error(`Middleware getRestaurantById - Error: ${err.message}`);
     return res.status(500).json({ message: err.message });
   }
-  next();
 }
 
+// New function to handle RQ IDs
+async function handleRQId(req, res, id) {
+  try {
+    const rqPattern = /^RQ\d{5}$/;
+    if (!rqPattern.test(id)) {
+      return res
+        .status(400)
+        .json({
+          message:
+            "Invalid ID",
+        });
+    }
+
+    // Extract number from RQ00001 -> 1
+    const numericPart = id.replace("RQ", "").replace(/^0+/, "") || "0";
+    const idNumber = parseInt(numericPart, 10);
+
+    if (isNaN(idNumber)) {
+      return res.status(400).json({ message: "Invalid RQ ID format" });
+    }
+
+    // Check counter
+    const counter = await Counter.findById("qrCounter");
+    if (!counter || idNumber > counter.seq) {
+      return res.status(404).json({ message: "Registration ID not valid" });
+    }
+
+    // Check if already registered
+    const restaurant = await Restaurant.findOne({ restaurantId: id });
+    if (restaurant) {
+      return res.status(409).json({
+        message: "Already registered",
+        restaurant: restaurant,
+      });
+    }
+
+    // Available for registration
+    return res.json({
+      message: "Available for registration",
+      registrationId: id,
+      redirect: "1",
+    });
+  } catch (err) {
+    logger.error(`Error handling RQ ID ${id}: ${err.message}`);
+    return res.status(500).json({ message: err.message });
+  }
+}
 
 //--------------------------------------------------//
 
@@ -200,35 +310,57 @@ async function getRestaurantById(req, res, next) {
 router.put("/:id/hours", getRestaurant, async (req, res) => {
   try {
     const { operatingHours } = req.body;
-    
+
     if (!operatingHours || !Array.isArray(operatingHours)) {
-      return res.status(400).json({ message: "Valid operating hours array is required" });
+      return res
+        .status(400)
+        .json({ message: "Valid operating hours array is required" });
     }
-    
+
     // Validate each day entry
     for (const entry of operatingHours) {
       if (!entry.day || !entry.hours) {
-        return res.status(400).json({ message: "Each operating hour entry must have day and hours" });
+        return res.status(400).json({
+          message: "Each operating hour entry must have day and hours",
+        });
       }
-      
+
       // Validate day is one of the allowed values
-      const allowedDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+      const allowedDays = [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+      ];
       if (!allowedDays.includes(entry.day)) {
-        return res.status(400).json({ message: `Invalid day: ${entry.day}. Must be one of: ${allowedDays.join(", ")}` });
+        return res.status(400).json({
+          message: `Invalid day: ${
+            entry.day
+          }. Must be one of: ${allowedDays.join(", ")}`,
+        });
       }
     }
-    
-    logger.info(`PUT /restaurant/${req.params.id}/hours - Updating all operating hours`);
-    
+
+    logger.info(
+      `PUT /restaurant/${req.params.id}/hours - Updating all operating hours`
+    );
+
     res.restaurant.operatingHours = operatingHours;
     res.restaurant.updatedAt = Date.now();
-    
+
     const updatedRestaurant = await res.restaurant.save();
-    
-    logger.info(`PUT /restaurant/${req.params.id}/hours - Successfully updated operating hours`);
+
+    logger.info(
+      `PUT /restaurant/${req.params.id}/hours - Successfully updated operating hours`
+    );
     res.status(200).json(updatedRestaurant);
   } catch (err) {
-    logger.error(`PUT /restaurant/${req.params.id}/hours - Error: ${err.message}`);
+    logger.error(
+      `PUT /restaurant/${req.params.id}/hours - Error: ${err.message}`
+    );
     res.status(400).json({ message: err.message });
   }
 });
@@ -237,24 +369,38 @@ router.put("/:id/hours", getRestaurant, async (req, res) => {
 router.patch("/:id/hours", getRestaurant, async (req, res) => {
   try {
     const { day, hours } = req.body;
-    
+
     if (!day || !hours) {
       return res.status(400).json({ message: "Day and hours are required" });
     }
-    
+
     // Validate day is one of the allowed values
-    const allowedDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    const allowedDays = [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+    ];
     if (!allowedDays.includes(day)) {
-      return res.status(400).json({ message: `Invalid day: ${day}. Must be one of: ${allowedDays.join(", ")}` });
+      return res.status(400).json({
+        message: `Invalid day: ${day}. Must be one of: ${allowedDays.join(
+          ", "
+        )}`,
+      });
     }
-    
-    logger.info(`PATCH /restaurant/${req.params.id}/hours - Updating operating hours for ${day}`);
-    
+
+    logger.info(
+      `PATCH /restaurant/${req.params.id}/hours - Updating operating hours for ${day}`
+    );
+
     // Find the index of the day if it exists
     const dayIndex = res.restaurant.operatingHours.findIndex(
-      entry => entry.day === day
+      (entry) => entry.day === day
     );
-    
+
     if (dayIndex >= 0) {
       // Update existing day
       res.restaurant.operatingHours[dayIndex].hours = hours;
@@ -262,14 +408,18 @@ router.patch("/:id/hours", getRestaurant, async (req, res) => {
       // Add new day
       res.restaurant.operatingHours.push({ day, hours });
     }
-    
+
     res.restaurant.updatedAt = Date.now();
     const updatedRestaurant = await res.restaurant.save();
-    
-    logger.info(`PATCH /restaurant/${req.params.id}/hours - Successfully updated operating hours for ${day}`);
+
+    logger.info(
+      `PATCH /restaurant/${req.params.id}/hours - Successfully updated operating hours for ${day}`
+    );
     res.status(200).json(updatedRestaurant);
   } catch (err) {
-    logger.error(`PATCH /restaurant/${req.params.id}/hours - Error: ${err.message}`);
+    logger.error(
+      `PATCH /restaurant/${req.params.id}/hours - Error: ${err.message}`
+    );
     res.status(400).json({ message: err.message });
   }
 });
@@ -278,40 +428,79 @@ router.patch("/:id/hours", getRestaurant, async (req, res) => {
 router.delete("/:id/hours/:day", getRestaurant, async (req, res) => {
   try {
     const { day } = req.params;
-    
+
     // Validate day is one of the allowed values
-    const allowedDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    const allowedDays = [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+    ];
     if (!allowedDays.includes(day)) {
-      return res.status(400).json({ message: `Invalid day: ${day}. Must be one of: ${allowedDays.join(", ")}` });
+      return res.status(400).json({
+        message: `Invalid day: ${day}. Must be one of: ${allowedDays.join(
+          ", "
+        )}`,
+      });
     }
-    
-    logger.info(`DELETE /restaurant/${req.params.id}/hours/${day} - Removing operating hours for ${day}`);
-    
+
+    logger.info(
+      `DELETE /restaurant/${req.params.id}/hours/${day} - Removing operating hours for ${day}`
+    );
+
     // Find the index of the day if it exists
     const dayIndex = res.restaurant.operatingHours.findIndex(
-      entry => entry.day === day
+      (entry) => entry.day === day
     );
-    
+
     if (dayIndex >= 0) {
       // Remove the day
       res.restaurant.operatingHours.splice(dayIndex, 1);
       res.restaurant.updatedAt = Date.now();
-      
+
       const updatedRestaurant = await res.restaurant.save();
-      
-      logger.info(`DELETE /restaurant/${req.params.id}/hours/${day} - Successfully removed operating hours for ${day}`);
+
+      logger.info(
+        `DELETE /restaurant/${req.params.id}/hours/${day} - Successfully removed operating hours for ${day}`
+      );
       res.status(200).json(updatedRestaurant);
     } else {
       // Day not found
-      logger.info(`DELETE /restaurant/${req.params.id}/hours/${day} - Day not found in operating hours`);
+      logger.info(
+        `DELETE /restaurant/${req.params.id}/hours/${day} - Day not found in operating hours`
+      );
       res.status(404).json({ message: `No operating hours found for ${day}` });
     }
   } catch (err) {
-    logger.error(`DELETE /restaurant/${req.params.id}/hours/${day} - Error: ${err.message}`);
+    logger.error(
+      `DELETE /restaurant/${req.params.id}/hours/${day} - Error: ${err.message}`
+    );
     res.status(400).json({ message: err.message });
   }
 });
 
+
+// POST /api/qr-auth/validate
+router.post("/validate-signup", async (req, res) => {
+  const { qrId, password } = req.body;
+  const VALID_PASSWORD = process.env.QR_SIGNUP_PASSWORD || "sales123";
+
+  const counter = await Counter.findById("qrCounter");
+  const idNum = parseInt(qrId?.slice(2));
+
+  if (!qrId || !qrId.startsWith("RQ") || !counter || idNum > counter.seq) {
+    return res.status(400).json({ success: false, message: "Invalid QR code." });
+  }
+
+  if (password !== VALID_PASSWORD) {
+    return res.status(401).json({ success: false, message: "Incorrect password." });
+  }
+
+  return res.status(200).json({ success: true });
+});
 
 
 module.exports = router;

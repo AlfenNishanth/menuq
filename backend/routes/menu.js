@@ -4,7 +4,11 @@ if (process.env.NODE_ENV !== 'production') {
 
 const express = require("express");
 const router = express.Router();
+
+const Restaurant = require("../models/restaurants");
 const MenuItem = require("../models/menuItem");
+const Counter = require('../models/counter'); 
+
 const logger = require('../logger');
 
 const multer = require("multer");
@@ -21,6 +25,93 @@ const s3Client = new S3Client({
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
+
+
+
+
+// router.get("/:id", validateId, getMenuItems);
+
+// async function validateId(req, res, next) {
+//   try {
+//     const id = req.params.id;
+//     logger.info(`Middleware validateId - Validating ID: ${id}`);
+    
+//     // Handle RQ IDs (Registration)
+//     if (id.startsWith('RQ')) {
+//       return await handleRQValidation(req, res, id);
+//     }
+    
+//     // RX IDs or others - continue to menu fetch
+//     next();
+//   } catch (err) {
+//     logger.error(`Middleware validateId - Error: ${err.message}`);
+//     return res.status(500).json({ message: err.message });
+//   }
+// }
+
+// // Handle RQ validation
+// async function handleRQValidation(req, res, id) {
+//   try {
+//     // Extract number from RQ00001 -> 1
+//     const numericPart = id.replace('RQ', '').replace(/^0+/, '') || '0';
+//     const idNumber = parseInt(numericPart, 10);
+    
+//     if (isNaN(idNumber)) {
+//       return res.status(400).json({ message: "Invalid RQ ID format" });
+//     }
+    
+//     // Check counter
+//     const counter = await Counter.findById('qrCounter');
+//     if (!counter || idNumber > counter.seq) {
+//       return res.status(404).json({ message: "Registration ID not valid" });
+//     }
+    
+//     // Check if already registered
+//     const restaurant = await Restaurant.findOne({ restaurantId: id });
+//     if (restaurant) {
+//       // Restaurant exists, check for menu items
+//       const items = await MenuItem.find({ restaurantID: id });
+//       if (!items.length) {
+//         return res.status(404).json({ message: "No items found for this restaurant" });
+//       }
+//       return res.json(items);
+//     }
+    
+//     // Available for registration
+//     return res.json({ 
+//       message: "Available for registration",
+//       registrationId: id,
+//       redirect: "signup"
+//     });
+    
+//   } catch (err) {
+//     logger.error(`Error handling RQ validation ${id}: ${err.message}`);
+//     return res.status(500).json({ message: err.message });
+//   }
+// }
+
+// Your existing menu fetch logic (unchanged)
+// async function getMenuItems(req, res) {
+//   try {
+//     logger.info(`GET /menu/${req.params.id} - Fetching menu items for restaurant`);
+//     const id = req.params.id;
+//     const items = await MenuItem.find({ restaurantID: id });
+    
+//     if (!items.length) {
+//       logger.info(`GET /menu/${id} - No items found for restaurant`);
+//       return res.status(404).json({ message: "No items found for this restaurant" });
+//     }
+    
+//     res.json(items);
+//   } catch (error) {
+//     logger.error(`GET /menu/${req.params.id} - Error: ${error.message}`);
+//     console.error("Error while fetching menu for restaurant: ", error);
+//     res.status(500).json({ message: error.message });
+//   }
+// }
+
+
+
 
 
 router.get("/:id", async (req, res) => {
@@ -42,6 +133,9 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+
+
 
 
 router.get("/item/:id", async (req, res) => {

@@ -1,14 +1,24 @@
 import { useRef, useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { FaEye, FaEyeSlash, FaGoogle, FaApple } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { updateProfile } from "firebase/auth";
-import { registerRestaurant } from "../api/restaurant";
+import { registerRestaurant, validateQrSignup } from "../api/restaurant";
 import LocationSelector from "./LocationSelector";
 
 const Signup = () => {
+  // Get QR ID from URL params if present
+  const { id: urlId } = useParams();
+  
+  // Restaurant data states
+  const [ResLoc, setResLoc] = useState({ type: "Point", coordinates: [0, 0] });
+  const [ResCategory, setResCategory] = useState("");
+  const [CuisineType, setCuisineType] = useState([]);
+  const [OperatingHours, setOperatingHours] = useState([]);
+  const [SocialMedia, setSocialMedia] = useState({});
+
   // Form references
   const emailRef = useRef();
   const passwordRef = useRef();
@@ -18,34 +28,79 @@ const Signup = () => {
   const NoSeatsRef = useRef();
   const phoneRef = useRef();
 
-  // Restaurant data states
-  const [ResLoc, setResLoc] = useState({ type: "Point", coordinates: [0, 0] });
-  const [ResCategory, setResCategory] = useState("");
-  const [CuisineType, setCuisineType] = useState([]);
-  const [OperatingHours, setOperatingHours] = useState([]);
-  const [SocialMedia, setSocialMedia] = useState({});
-
   // UI states
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
+  // QR signup states
+  const [qrId, setQrId] = useState(null);
+  const [qrAuthenticated, setQrAuthenticated] = useState(false);
+  const [initializing, setInitializing] = useState(true);
 
   const { signUp, socialLogin, currentUser, userData, isSigningUp } = useAuth();
   const navigate = useNavigate();
 
-  // Focus email input on component mount
+  // Handle QR signup validation on component mount
   useEffect(() => {
-    emailRef.current?.focus();
-  }, []);
+    const initializeComponent = async () => {
+      // Check if user is already signed in
+      if (currentUser && !isSigningUp && userData) {
+        alert("You are already signed in. Please logout first to signup with a new user.");
+        navigate("/dashboard");
+        return;
+      }
 
-  // Redirect if user is already signed in
+      // Check if this is a QR-based signup
+      if (urlId?.startsWith("RQ")) {
+        try {
+          const password = prompt("Enter password to proceed with QR-based signup:");
+          
+          if (!password) {
+            alert("Signup cancelled: no password provided.");
+            navigate("/");
+            return;
+          }
+
+          const result = await validateQrSignup(urlId, password);
+
+          if (result.success) {
+            setQrId(urlId);
+            setQrAuthenticated(true);
+            // toast.success("QR authentication successful!");
+          } else {
+            alert(result.message || "Invalid QR or password.");
+            navigate("/");
+            return;
+          }
+        } catch (error) {
+          console.error("QR validation error:", error);
+          alert("Failed to validate QR code. Please try again.");
+          navigate("/");
+          return;
+        }
+      } else if (urlId && !urlId.startsWith("RQ")) {
+        // Invalid ID format
+        navigate("/");
+        return;
+      } else {
+        // Regular signup (no QR)
+        setQrAuthenticated(true);
+      }
+
+      setInitializing(false);
+    };
+
+    initializeComponent();
+  }, []); // Only run once on mount
+
+  // Focus email input after initialization
   useEffect(() => {
-    if (currentUser && !isSigningUp && userData) {
-      toast.info("You are already signed in. Please logout first to signup with a new user.");
-      navigate("/dashboard/");
+    if (!initializing && qrAuthenticated) {
+      emailRef.current?.focus();
     }
-  }, [currentUser, isSigningUp, userData, navigate]);
+  }, [initializing, qrAuthenticated]);
 
   // Handle location selection from the location picker
   const handleLocationSelect = (locationData) => {
@@ -100,10 +155,10 @@ const Signup = () => {
         restaurantCategory: ResCategory,
         cuisineType: CuisineType,
         operatingHours: OperatingHours,
-        socialMedia: SocialMedia
+        socialMedia: SocialMedia,
+        ...(qrId && { registrationId: qrId })
       };
-      
-      // Call the enhanced signUp function from AuthContext
+
       const result = await signUp(
         emailRef.current.value,
         passwordRef.current.value,
@@ -121,76 +176,6 @@ const Signup = () => {
       console.error(err);
     }
     
-    setLoading(false);
-  }
-
-  // Fallback signup method (kept from your comments) - can be used if needed
-  async function handleLegacySignup(e) {
-    e.preventDefault();
-    setLoading(true);
-
-    if (passwordRef.current.value !== confirmPasswordRef.current.value) {
-      setLoading(false);
-      toast.error("Passwords do not match");
-      return setError("Passwords do not match");
-    }
-
-    if (passwordRef.current.value.length < 6) {
-      setLoading(false);
-      toast.error("Password must be at least 6 characters long");
-      return setError("Password must be at least 6 characters long");
-    }
-    
-    if (ResLoc.coordinates[0] === 0 && ResLoc.coordinates[1] === 0) {
-      setLoading(false);
-      toast.error("Please select a restaurant location");
-      return setError("Please select a restaurant location");
-    }
-
-    try {
-      setError("");
-      const userCredential = await signUp(
-        emailRef.current.value,
-        passwordRef.current.value
-      );
-
-      const user = userCredential.user;
-      if (user) {
-        await updateProfile(user, { displayName: ResNameRef.current.value });
-        
-        // Prepare restaurant data
-        const data = {
-          firebaseUid: user.uid,
-          email: emailRef.current.value,
-          phone: phoneRef.current.value,
-          restaurantName: ResNameRef.current.value,
-          restaurantAddress: ResAdrsRef.current.value,
-          restaurantLocation: ResLoc,
-          noOfSeats: NoSeatsRef.current.value,
-          restaurantCategory: ResCategory,
-          cuisineType: CuisineType,
-          operatingHours: OperatingHours,
-          socialMedia: SocialMedia
-        };
-        
-        try {
-          await registerRestaurant(data);
-          toast.success("Account created successfully!");
-          navigate("/dashboard");
-        } catch (error) {
-          console.error("Error registering restaurant in database:", error);
-          setError(`Failed to create an account: ${error}`);
-          console.log("deleting firebase user " + user.uid + " " + user.displayName);
-          await user.delete();
-        }
-      }
-    } catch (err) {
-      const errorMessage = err.message.replace("Firebase: ", "");
-      setError(`Failed to create an account: ${errorMessage}`);
-      toast.error(`Signup failed: ${errorMessage}`);
-      console.error(err);
-    }
-
     setLoading(false);
   }
 
@@ -217,6 +202,32 @@ const Signup = () => {
     }
   };
 
+  // Show loading state during initialization
+  if (initializing) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-amber-50 to-white">
+        <div className="text-center">
+          <div className="animate-spin h-8 w-8 border-4 border-amber-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-gray-600">Initializing signup...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if QR authentication failed
+  if (!qrAuthenticated) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-amber-50 to-white">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">Signup authentication failed</p>
+          <Link to="/" className="text-amber-600 underline hover:text-amber-700">
+            Go back to home
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex items-center justify-center min-h-screen transition-colors duration-500 bg-gradient-to-b from-amber-50 to-white px-4 py-8 sm:px-6">
       {/* Decorative Elements */}
@@ -227,7 +238,10 @@ const Signup = () => {
       </div>
 
       <div className="p-4 sm:p-8 rounded-2xl shadow-xl w-full max-w-md transform transition-transform duration-300 backdrop-blur-lg bg-white/90 border border-amber-100">
-        <h2 className="text-2xl sm:text-3xl font-extrabold mb-4 sm:mb-6 text-center text-gray-900">Create Your MenuQ Account</h2>
+        <h2 className="text-2xl sm:text-3xl font-extrabold mb-4 sm:mb-6 text-center text-gray-900">
+          {qrId ? `Sign Up for ${qrId}` : 'Create Your MenuQ Account'}
+        </h2>
+        
         {error && <div className="text-red-500 text-center mb-4 animate-shake">{error}</div>}
         
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -238,7 +252,6 @@ const Signup = () => {
               placeholder="Email Address" 
               className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-200 border-gray-300 text-gray-900" 
               required 
-              autoFocus 
               aria-label="Email Address"
             />
             
@@ -364,27 +377,6 @@ const Signup = () => {
             )}
           </button>
         </form>
-
-        {/* Social login buttons - commented out for future implementation */}
-        {/* <div className="mt-6 text-center">
-          <p className="text-sm text-gray-500 mb-2">Or sign up with</p>
-          <div className="flex justify-center space-x-3">
-            <button 
-              className="p-3 bg-red-600 text-white rounded-full hover:bg-red-700" 
-              onClick={() => handleSocialSignup('google')}
-              aria-label="Sign up with Google"
-            >
-              <FaGoogle />
-            </button>
-            <button 
-              className="p-3 bg-black text-white rounded-full hover:bg-gray-800" 
-              onClick={() => handleSocialSignup('apple')}
-              aria-label="Sign up with Apple"
-            >
-              <FaApple />
-            </button>
-          </div>
-        </div> */}
 
         <div className="flex justify-center mt-4 text-gray-500 text-sm sm:text-base">
           Already have an account?

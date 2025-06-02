@@ -22,7 +22,7 @@ export async function fetchRestaurantByID(ResId) {
   console.log("calling fetRestaurantByID API");
   try {
     const response = await axios.get(`${config.MENUQ}/byId/${ResId}`);
-    // console.log(response.data);
+    console.log(response.data);
     return response.data;
   } catch (error) {
     throw error;
@@ -132,5 +132,23 @@ export async function deleteDayOperatingHours(firebaseUID, day) {
   } catch (error) {
     console.error(`Error deleting operating hours for ${day}:`, error);
     throw error;
+  }
+}
+
+
+
+export async function validateQrSignup(qrId, password) {
+  try {
+    const res = await axios.post(`${config.MENUQ}/validate-signup`, {
+      qrId,
+      password,
+    });
+    console.log("validating signup password");
+    console.log(res)
+    return res.data; // { success: true } or { success: false, message: '...' }
+  } catch (err) {
+    // Optional: handle specific error cases here too
+    console.error("QR validation API error:", err);
+    return { success: false, message: "Server error" };
   }
 }
