@@ -34,7 +34,16 @@ function App() {
           <Route path="/" element={<HeaderLayout><LandingPage /></HeaderLayout>} />
           <Route path="/login" element={ <HeaderLayout><Login /></HeaderLayout>} />
           <Route path="/signup" element={<HeaderLayout><Signup /></HeaderLayout>} />
-
+          {/* ✅ Legal policy routes */}
+          <Route path="/privacy" element={<HeaderLayout><PrivacyPolicy /></HeaderLayout>} />
+          <Route path="/terms" element={<HeaderLayout><TermsOfService /></HeaderLayout>} />
+          <Route path="/cookies" element={<HeaderLayout><CookiePolicyPage /></HeaderLayout>} />
+          <Route path="/aboutus" element={<HeaderLayout><AboutUs /></HeaderLayout>} />
+          <Route path="/careers" element={<HeaderLayout><Careers /></HeaderLayout>} />
+          <Route path="/contactus" element={<HeaderLayout><ContactUs /></HeaderLayout>} />
+          
+          <Route path="/signup/:id" element={<HeaderLayout><Signup /></HeaderLayout>} />
+          
           <Route
             path="/dashboard/*"
             element={
