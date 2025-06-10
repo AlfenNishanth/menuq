@@ -42,6 +42,9 @@ export default function AddNewMenuItem() {
   const fileInputRef = useRef();
   const { currentUser, userData, updateUserData } = useAuth();
 
+  // Ref for scrolling to top
+  const topOfFormRef = useRef(null);
+
   // Load custom categories from memory when component mounts
   useEffect(() => {
     if (userData?.restaurantId) {
@@ -110,6 +113,23 @@ export default function AddNewMenuItem() {
     }
   };
 
+  // Function to scroll to top smoothly
+  const scrollToTop = () => {
+    if (topOfFormRef.current) {
+      topOfFormRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+        inline: "nearest"
+      });
+    } else {
+      // Fallback: scroll to top of window
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+    }
+  };
+
   const addTag = () => {
     const trimmedTag = newTag.trim().toLowerCase();
 
@@ -167,6 +187,11 @@ export default function AddNewMenuItem() {
 
     // Close the modal
     setShowPredefinedModal(false);
+
+    // Scroll to top to show the filled form
+    setTimeout(() => {
+      scrollToTop();
+    }, 100);
   };
 
   const onSubmit = async (data) => {
@@ -220,6 +245,11 @@ export default function AddNewMenuItem() {
       setImageFile(null);
       setImagePreview(null);
       setShowCustomInput(false);
+      
+      // Scroll to top after successful submission
+      setTimeout(() => {
+        scrollToTop();
+      }, 100);
     } catch (error) {
       console.error("Error adding menu item:", error);
       toast.error(`Error adding menu item: ${error.message}`);
@@ -238,6 +268,9 @@ export default function AddNewMenuItem() {
       </div>
 
       <div className="p-4 sm:p-8 rounded-2xl shadow-xl w-full max-w-lg bg-white relative z-10">
+        {/* Top reference point for scrolling */}
+        <div ref={topOfFormRef} className="absolute -top-20"></div>
+        
         <h2 className="text-3xl sm:text-4xl font-serif font-bold mb-4 sm:mb-6 text-center text-amber-700">
           Add New Menu Item
         </h2>
