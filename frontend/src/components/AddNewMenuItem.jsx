@@ -31,11 +31,25 @@ export default function AddNewMenuItem() {
   const [showPredefinedModal, setShowPredefinedModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredDishes, setFilteredDishes] = useState([]);
+  
+  // New state for custom categories
+  const [customCategories, setCustomCategories] = useState([]);
+  const [showCustomInput, setShowCustomInput] = useState(false);
 
   const vegetarianValue = watch("vegetarian");
+  const selectedType = watch("type");
 
   const fileInputRef = useRef();
   const { currentUser, userData, updateUserData } = useAuth();
+
+  // Load custom categories from memory when component mounts
+  useEffect(() => {
+    if (userData?.restaurantId) {
+      const storageKey = `customCategories_${userData.restaurantId}`;
+      const storedCategories = JSON.parse(localStorage.getItem(storageKey) || "[]");
+      setCustomCategories(storedCategories);
+    }
+  }, [userData]);
 
   // Set filtered dishes on mount and when search term changes
   useEffect(() => {
@@ -60,6 +74,41 @@ export default function AddNewMenuItem() {
       setFilteredDishes(filtered);
     }
   }, [searchTerm]);
+
+  // Function to save custom category
+  const saveCustomCategory = (categoryName) => {
+    if (!userData?.restaurantId) return;
+    
+    const normalizedCategory = categoryName.toLowerCase().trim();
+    if (!normalizedCategory) return;
+    
+    const storageKey = `customCategories_${userData.restaurantId}`;
+    const existingCategories = JSON.parse(localStorage.getItem(storageKey) || "[]");
+    
+    // Check if category already exists (case-insensitive)
+    const categoryExists = existingCategories.some(
+      cat => cat.toLowerCase() === normalizedCategory
+    );
+    
+    if (!categoryExists) {
+      const updatedCategories = [...existingCategories, categoryName.trim()];
+      localStorage.setItem(storageKey, JSON.stringify(updatedCategories));
+      setCustomCategories(updatedCategories);
+    }
+  };
+
+  // Handle type selection change
+  const handleTypeChange = (selectedValue) => {
+    setValue("type", selectedValue);
+    
+    if (selectedValue === "Custom") {
+      setShowCustomInput(true);
+      setValue("customType", "");
+    } else {
+      setShowCustomInput(false);
+      setValue("customType", "");
+    }
+  };
 
   const addTag = () => {
     const trimmedTag = newTag.trim().toLowerCase();
@@ -131,14 +180,19 @@ export default function AddNewMenuItem() {
       await updateUserData();
     }
     const restaurantID = userData.restaurantId;
-    const finalType =
-      data.type === "Custom" ? data.customType.toLowerCase() : data.type;
+    let finalType = data.type;
+    
+    if (data.type === "Custom" && data.customType) {
+      finalType = data.customType.trim();
+      // Save the custom category for future use
+      saveCustomCategory(finalType);
+    }
 
     const formData = new FormData();
     formData.append("restaurantID", restaurantID);
     formData.append("name", data.name.toLowerCase());
     formData.append("description", data.description.toLowerCase());
-    formData.append("type", finalType);
+    formData.append("type", finalType.toLowerCase());
     formData.append("price", parseFloat(data.price));
     formData.append("available", "true");
     formData.append("vegetarian", data.vegetarian);
@@ -165,6 +219,7 @@ export default function AddNewMenuItem() {
       setTags([]);
       setImageFile(null);
       setImagePreview(null);
+      setShowCustomInput(false);
     } catch (error) {
       console.error("Error adding menu item:", error);
       toast.error(`Error adding menu item: ${error.message}`);
@@ -250,12 +305,7 @@ export default function AddNewMenuItem() {
               <select
                 {...register("type")}
                 className="w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-amber-200 text-gray-900"
-                onChange={(e) => {
-                  setValue("type", e.target.value);
-                  if (e.target.value !== "Custom") {
-                    setValue("customType", "");
-                  }
-                }}
+                onChange={(e) => handleTypeChange(e.target.value)}
                 disabled={loading}
                 defaultValue="" // ✅ ensures the placeholder is shown initially
               >
@@ -267,22 +317,34 @@ export default function AddNewMenuItem() {
                 <option value="Drinks">Drinks</option>
                 <option value="Cold Beverages">Cold Beverages</option>
                 <option value="Desserts">Desserts</option>
-                <option value="Custom">Custom Category</option>
+                
+                {/* Display saved custom categories */}
+                {customCategories.length > 0 && (
+                  <optgroup label="Your Custom Categories">
+                    {customCategories.map((category, index) => (
+                      <option key={index} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
+                
+                <option value="Custom">+ Create New Category</option>
               </select>
             </div>
 
             {/* Custom Type Input (Only when "Custom" is selected) */}
-            {watch("type") === "Custom" && (
+            {showCustomInput && selectedType === "Custom" && (
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-gray-700">
-                  Custom Category Name <span className="text-red-500">*</span>
+                  New Category Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   {...register("customType", {
-                    required: "Custom type is required",
+                    required: "Custom category name is required",
                   })}
                   type="text"
-                  placeholder="Enter your custom category (e.g., Snacks, Breakfast, etc.)"
+                  placeholder="Enter your new category (e.g., Snacks, Breakfast, etc.)"
                   className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-4 focus:ring-amber-500 transition bg-gray-50 border-amber-200 text-gray-900 ${
                     errors.customType ? "border-red-500 ring-1 ring-red-500" : ""
                   }`}
@@ -293,6 +355,9 @@ export default function AddNewMenuItem() {
                     {errors.customType.message}
                   </p>
                 )}
+                <p className="text-xs text-amber-600">
+                  💡 This category will be saved and available for future menu items
+                </p>
               </div>
             )}
 
