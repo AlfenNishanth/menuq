@@ -1,5 +1,5 @@
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config(); 
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
 }
 
 const express = require("express");
@@ -7,13 +7,17 @@ const router = express.Router();
 
 const Restaurant = require("../models/restaurants");
 const MenuItem = require("../models/menuItem");
-const Counter = require('../models/counter'); 
+const Counter = require("../models/counter");
 
-const logger = require('../logger');
+const logger = require("../logger");
 
 const multer = require("multer");
 const { v4 } = require("uuid");
-const { S3Client, PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
+const {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} = require("@aws-sdk/client-s3");
 
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
@@ -26,21 +30,18 @@ const s3Client = new S3Client({
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-
-
-
 // router.get("/:id", validateId, getMenuItems);
 
 // async function validateId(req, res, next) {
 //   try {
 //     const id = req.params.id;
 //     logger.info(`Middleware validateId - Validating ID: ${id}`);
-    
+
 //     // Handle RQ IDs (Registration)
 //     if (id.startsWith('RQ')) {
 //       return await handleRQValidation(req, res, id);
 //     }
-    
+
 //     // RX IDs or others - continue to menu fetch
 //     next();
 //   } catch (err) {
@@ -55,17 +56,17 @@ const upload = multer({ storage });
 //     // Extract number from RQ00001 -> 1
 //     const numericPart = id.replace('RQ', '').replace(/^0+/, '') || '0';
 //     const idNumber = parseInt(numericPart, 10);
-    
+
 //     if (isNaN(idNumber)) {
 //       return res.status(400).json({ message: "Invalid RQ ID format" });
 //     }
-    
+
 //     // Check counter
 //     const counter = await Counter.findById('qrCounter');
 //     if (!counter || idNumber > counter.seq) {
 //       return res.status(404).json({ message: "Registration ID not valid" });
 //     }
-    
+
 //     // Check if already registered
 //     const restaurant = await Restaurant.findOne({ restaurantId: id });
 //     if (restaurant) {
@@ -76,14 +77,14 @@ const upload = multer({ storage });
 //       }
 //       return res.json(items);
 //     }
-    
+
 //     // Available for registration
-//     return res.json({ 
+//     return res.json({
 //       message: "Available for registration",
 //       registrationId: id,
 //       redirect: "signup"
 //     });
-    
+
 //   } catch (err) {
 //     logger.error(`Error handling RQ validation ${id}: ${err.message}`);
 //     return res.status(500).json({ message: err.message });
@@ -96,12 +97,12 @@ const upload = multer({ storage });
 //     logger.info(`GET /menu/${req.params.id} - Fetching menu items for restaurant`);
 //     const id = req.params.id;
 //     const items = await MenuItem.find({ restaurantID: id });
-    
+
 //     if (!items.length) {
 //       logger.info(`GET /menu/${id} - No items found for restaurant`);
 //       return res.status(404).json({ message: "No items found for this restaurant" });
 //     }
-    
+
 //     res.json(items);
 //   } catch (error) {
 //     logger.error(`GET /menu/${req.params.id} - Error: ${error.message}`);
@@ -110,13 +111,11 @@ const upload = multer({ storage });
 //   }
 // }
 
-
-
-
-
 router.get("/:id", async (req, res) => {
   try {
-    logger.info(`GET /menu/${req.params.id} - Fetching menu items for restaurant`);
+    logger.info(
+      `GET /menu/${req.params.id} - Fetching menu items for restaurant`
+    );
     const id = req.params.id;
     const items = await MenuItem.find({ restaurantID: id });
 
@@ -134,10 +133,6 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-
-
-
-
 router.get("/item/:id", async (req, res) => {
   try {
     logger.info(`GET /menu/item/${req.params.id} - Fetching single menu item`);
@@ -154,11 +149,13 @@ router.get("/item/:id", async (req, res) => {
     console.error("Error while fetching menu item: ", error);
     res.status(500).json({ message: error.message });
   }
-})
+});
 
 router.post("/", upload.single("image"), async (req, res) => {
   try {
-    logger.info(`POST /menu - Creating new menu item for restaurant ${req.body.restaurantID}`);
+    logger.info(
+      `POST /menu - Creating new menu item for restaurant ${req.body.restaurantID}`
+    );
 
     const {
       restaurantID,
@@ -170,7 +167,7 @@ router.post("/", upload.single("image"), async (req, res) => {
       addOns,
       available,
       tags,
-      vegetarian
+      vegetarian,
     } = req.body;
 
     let imageUrl = "";
@@ -189,16 +186,18 @@ router.post("/", upload.single("image"), async (req, res) => {
       description,
       type,
       price,
-      variants:parsedVariants,
-      addOns:parsedAddOns,
+      variants: parsedVariants,
+      addOns: parsedAddOns,
       imageUrl,
       available,
-      tags:parsedTags,
-      vegetarian
+      tags: parsedTags,
+      vegetarian,
     });
     console.log("trying to save to mongo");
     const savedMenuItem = await newMenuItem.save();
-    logger.info(`POST /menu - Successfully created menu item with ID: ${savedMenuItem._id}`);
+    logger.info(
+      `POST /menu - Successfully created menu item with ID: ${savedMenuItem._id}`
+    );
     res.status(201).json(savedMenuItem); // Respond with the saved menu item
   } catch (err) {
     logger.error(`POST /menu - Error creating menu item: ${err.message}`);
@@ -235,7 +234,9 @@ router.patch("/:id", upload.single("image"), async (req, res) => {
     }
 
     // Update the menu item
-    const updatedMenuItem = await MenuItem.findByIdAndUpdate(id, updateData, { new: true });
+    const updatedMenuItem = await MenuItem.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
     logger.info(`PATCH /menu/${id} - Successfully updated menu item`);
 
     res.json(updatedMenuItem);
@@ -249,7 +250,9 @@ router.patch("/:id", upload.single("image"), async (req, res) => {
 // Availability route
 router.patch("/availability/:id", async (req, res) => {
   try {
-    logger.info(`PATCH /menu/availability/${req.params.id} - Updating availability`);
+    logger.info(
+      `PATCH /menu/availability/${req.params.id} - Updating availability`
+    );
 
     const { id } = req.params;
     const { available } = req.body;
@@ -267,11 +270,15 @@ router.patch("/availability/:id", async (req, res) => {
     if (!updatedMenuItem) {
       return res.status(404).json({ message: "Menu item not found" });
     }
-    logger.info(`PATCH /menu/availability/${id} - Successfully updated availability to: ${available}`);
+    logger.info(
+      `PATCH /menu/availability/${id} - Successfully updated availability to: ${available}`
+    );
 
     return res.status(200).json(updatedMenuItem);
   } catch (error) {
-    logger.error(`PATCH /menu/availability/${req.params.id} - Error: ${error.message}`);
+    logger.error(
+      `PATCH /menu/availability/${req.params.id} - Error: ${error.message}`
+    );
     console.error("Error updating availability:", error);
     return res.status(500).json({ message: "Server error" });
   }
@@ -298,39 +305,82 @@ router.patch("/prepTime/:id", async (req, res) => {
       logger.error(`PATCH /menu/prepTime/${req.params.id} - Error - not found`);
       return res.status(404).json({ message: "Menu item not found" });
     }
-    logger.info(`PATCH /menu/prepTime/${id} - Successfully updated prep time to: ${prepTime}`);
+    logger.info(
+      `PATCH /menu/prepTime/${id} - Successfully updated prep time to: ${prepTime}`
+    );
     return res.status(200).json(updatedMenuItem);
   } catch (error) {
-    logger.error(`PATCH /menu/prepTime/${req.params.id} - Error: ${error.message}`);
+    logger.error(
+      `PATCH /menu/prepTime/${req.params.id} - Error: ${error.message}`
+    );
     console.error("Error updating prepTime:", error);
     return res.status(500).json({ message: "Server error" });
   }
-})
+});
 
+// Delete menu item
+router.delete("/:id", async (req, res) => {
+  try {
+    logger.info(`DELETE /menu/${req.params.id} - Deleting menu item`);
+    const { id } = req.params;
+
+    // Find the menu item first to get the image URL
+    const menuItem = await MenuItem.findById(id);
+    if (!menuItem) {
+      logger.info(`DELETE /menu/${id} - Menu item not found`);
+      return res.status(404).json({ message: "Menu item not found" });
+    }
+
+    // Delete image from S3 if it exists
+    if (menuItem.imageUrl) {
+      console.log("Deleting associated image from S3...");
+      try {
+        await deleteFileFromS3(menuItem.imageUrl);
+      } catch (imageError) {
+        logger.error(
+          `DELETE /menu/${id} - Error deleting image: ${imageError.message}`
+        );
+        // Continue with deletion even if image deletion fails
+        console.log(
+          "Image deletion failed, but continuing with menu item deletion"
+        );
+      }
+    }
+
+    // Delete the menu item from database
+    await MenuItem.findByIdAndDelete(id);
+
+    logger.info(`DELETE /menu/${id} - Successfully deleted menu item`);
+    res.status(200).json({ message: "Menu item deleted successfully" });
+  } catch (error) {
+    logger.error(`DELETE /menu/${req.params.id} - Error: ${error.message}`);
+    console.error("Error deleting menu item:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 //upload file
 async function uploadFileToS3(file) {
   logger.info(`Uploading file: ${file.originalname} to S3`);
   console.log("trying to upload file");
 
-  try{
-  const fileName = `${file.originalname}_${v4()}`;
-  const params = {
-    Bucket: process.env.AWS_BUCKET_NAME,
-    Key: fileName,
-    Body: file.buffer,
-    ContentType: file.mimetype,
-    // ACL: "public-read",
-  };
+  try {
+    const fileName = `${file.originalname}_${v4()}`;
+    const params = {
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: fileName,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+      // ACL: "public-read",
+    };
 
-  const command = new PutObjectCommand(params);
-  await s3Client.send(command);
-  
-  logger.info(`Successfully uploaded file: ${fileName} to S3`);
+    const command = new PutObjectCommand(params);
+    await s3Client.send(command);
 
-  // Manually construct the URL (this assumes your bucket’s public URL format)
-  return `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+    logger.info(`Successfully uploaded file: ${fileName} to S3`);
 
+    // Manually construct the URL (this assumes your bucket’s public URL format)
+    return `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
   } catch (error) {
     logger.error(`Error uploading file to S3: ${error.message}`);
     console.error("Error uploading file to S3:", error);
