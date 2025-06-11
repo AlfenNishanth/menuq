@@ -1,3 +1,5 @@
+// RestaurantMenu.js
+
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import MenuCard from "./MenuCard";
@@ -20,57 +22,58 @@ import axios from "axios";
 
 
 // Comprehensive list of menu categories in logical serving order
+// --- IMPORTANT: CONVERT ALL TO LOWERCASE TO MATCH BACKEND STORAGE ---
 const categoryOrder = [
   // Meal-specific menus
-  "Breakfast",
-  "Brunch",
-  "Lunch Specials",
+  "breakfast",
+  "brunch",
+  "lunch specials",
 
   // Starters and light options
-  "Appetizers",
-  "Starter",
-  "Soups",
-  "Salads",
+  "appetizers",
+  "starter",
+  "soups",
+  "salads",
 
   // Main dishes
-  "Chef's Specials",
-  "Signature Dishes",
-  "Main Course",
-  "Pasta",
-  "Pizza",
-  "Noodles",
-  "Rice Dishes",
-  "Curry",
-  "Sushi",
-  "Tapas",
-  "Sharing Platters",
+  "chef's specials",
+  "signature dishes",
+  "main course",
+  "pasta",
+  "pizza",
+  "noodles",
+  "rice dishes",
+  "curry",
+  "sushi",
+  "tapas",
+  "sharing platters",
 
   // Supporting items
-  "Sides",
-  "Accompaniments",
+  "sides",
+  "accompaniments",
 
   // Special dietary options
-  "Vegetarian",
-  "Vegan",
-  "Gluten-Free",
-  "Kids Menu",
+  "vegetarian",
+  "vegan",
+  "gluten-free",
+  "kids menu",
 
   // Beverages
-  "Beverages",
-  "Hot Beverages",
-  "Drinks",
-  "Cold Beverages",
-  "Mocktails",
-  "Cocktails",
-  "Wine List",
-  "Beer",
-  "Spirits",
+  "beverages",
+  "hot beverages",
+  "drinks",
+  "cold beverages",
+  "mocktails",
+  "cocktails",
+  "wine list",
+  "beer",
+  "spirits",
 
   // Sweet endings
-  "Desserts",
+  "desserts",
 ];
 
-// Restaurant Name Display Component
+// Restaurant Name Display Component (No changes needed here)
 const RestaurantNameHeader = ({ restaurantData }) => {
   if (!restaurantData || !restaurantData.restaurantName) {
     return null;
@@ -80,9 +83,7 @@ const RestaurantNameHeader = ({ restaurantData }) => {
 
   return (
     <div className="mb-8">
-      {/* <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-amber-800 to-amber-600 shadow-lg"> */}
       <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#b35a00] to-amber-500 shadow-lg">
-        {/* Decorative patterns */}
         <div className="absolute top-0 left-0 w-full h-full opacity-10">
           <div className="absolute -right-20 -top-20 w-64 h-64 bg-white rounded-full"></div>
           <div className="absolute left-1/4 -bottom-24 w-40 h-40 bg-white rounded-full"></div>
@@ -121,16 +122,14 @@ const RestaurantNameHeader = ({ restaurantData }) => {
   );
 };
 
-// Component to display restaurant status and hours
+// Component to display restaurant status and hours (No changes needed here)
 const RestaurantStatusInfo = ({ restaurantData }) => {
-  // If no data is available yet
   if (!restaurantData) {
     return null;
   }
 
   const { resOpen, operatingHours = [] } = restaurantData;
 
-  // Get current day of week
   const days = [
     "Sunday",
     "Monday",
@@ -142,29 +141,22 @@ const RestaurantStatusInfo = ({ restaurantData }) => {
   ];
   const today = days[new Date().getDay()];
 
-  // Find today's hours
   const todayHours = operatingHours.find((item) => item.day === today);
 
-  // Check if currently within operating hours (simplified check)
   const isWithinHours = () => {
     if (!todayHours) return false;
-
-    // This is a simplified check. For a complete check, you would need to parse
-    // the time strings and compare with current time
     return resOpen;
   };
 
   const [showAllHours, setShowAllHours] = useState(false);
 
-  // Show limited hours on mobile by default
-  const displayedHours = showAllHours 
-    ? operatingHours 
+  const displayedHours = showAllHours
+    ? operatingHours
     : operatingHours.filter(item => item.day === today);
 
   return (
     <div className="bg-gradient-to-r from-amber-50 to-white border-l-4 border-amber-400 rounded-r-lg shadow-sm mb-6 md:mb-8 overflow-hidden">
       <div className="flex flex-col md:flex-row">
-        {/* Status indicator */}
         <div className="p-4 md:p-5 flex items-center bg-white/60 backdrop-blur-sm md:w-1/3">
           <div
             className={`w-3 h-3 rounded-full mr-3 ${
@@ -191,16 +183,14 @@ const RestaurantStatusInfo = ({ restaurantData }) => {
           </div>
         </div>
 
-        {/* Weekly hours display - ADAPTIVE LAYOUT */}
         <div className="p-4 md:p-5 md:flex-1 border-t md:border-t-0 md:border-l border-amber-100">
           <div className="flex justify-between items-center mb-3">
             <h4 className="flex items-center text-xs md:text-sm font-medium text-amber-800">
               <Calendar size={14} className="mr-1.5" />
               Operating Hours
             </h4>
-            
-            {/* Toggle button for mobile */}
-            <button 
+
+            <button
               className="text-xs text-amber-600 hover:text-amber-800 md:hidden"
               onClick={() => setShowAllHours(!showAllHours)}
             >
@@ -216,7 +206,7 @@ const RestaurantStatusInfo = ({ restaurantData }) => {
                   className={`flex ${item.day === today ? "font-medium" : ""}`}
                 >
                   <span
-                    className={`w-16 md:w-22 ${
+                    className={`w-18 md:w-22 ${
                       item.day === today ? "text-amber-800" : "text-gray-700"
                     }`}
                   >
@@ -243,6 +233,7 @@ const RestaurantStatusInfo = ({ restaurantData }) => {
   );
 };
 
+
 const RestaurantMenu = () => {
   const { id } = useParams();
   const [menuItems, setMenuItems] = useState({});
@@ -252,58 +243,59 @@ const RestaurantMenu = () => {
   const [restaurantData, setRestaurantData] = useState(null);
   const [restaurantLoading, setRestaurantLoading] = useState(true);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [customCategories, setCustomCategories] = useState([]); // State for custom categories from local storage
 
   const navigate = useNavigate();
 
   const categoryRefs = useRef({});
   const menuContainerRef = useRef(null);
 
-  // Group categories by type for better navigation
+  // --- IMPORTANT: CONVERT ALL TO LOWERCASE TO MATCH BACKEND STORAGE ---
   const categoryGroups = {
-    "Meal Options": ["Breakfast", "Brunch", "Lunch Specials"],
-    Starters: ["Appetizers", "Starter", "Soups", "Salads"],
-    Mains: [
-      "Chef's Specials",
-      "Signature Dishes",
-      "Main Course",
-      "Pasta",
-      "Pizza",
-      "Noodles",
-      "Rice Dishes",
-      "Curry",
-      "Sushi",
-      "Tapas",
-      "Sharing Platters",
+    "meal options": ["breakfast", "brunch", "lunch specials"],
+    starters: ["appetizers", "starter", "soups", "salads"],
+    mains: [
+      "chef's specials",
+      "signature dishes",
+      "main course",
+      "pasta",
+      "pizza",
+      "noodles",
+      "rice dishes",
+      "curry",
+      "sushi",
+      "tapas",
+      "sharing platters",
     ],
-    Extras: [
-      "Sides",
-      "Accompaniments",
-      "Vegetarian",
-      "Vegan",
-      "Gluten-Free",
-      "Kids Menu",
+    extras: [
+      "sides",
+      "accompaniments",
+      "vegetarian",
+      "vegan",
+      "gluten-free",
+      "kids menu",
     ],
-    Drinks: [
-      "Beverages",
-      "Hot Beverages",
-      "Drinks",
-      "Cold Beverages",
-      "Mocktails",
-      "Cocktails",
-      "Wine List",
-      "Beer",
-      "Spirits",
+    drinks: [
+      "beverages",
+      "hot beverages",
+      "drinks",
+      "cold beverages",
+      "mocktails",
+      "cocktails",
+      "wine list",
+      "beer",
+      "spirits",
     ],
-    Desserts: ["Desserts"],
+    desserts: ["desserts"],
   };
+
 
   // Fetch restaurant data including status and hours
   const fetchRestaurantData = async (id) => {
     try {
       setRestaurantLoading(true);
-      console.log("ID: " + id);
       const data = await fetchRestaurantByID(id);
-      if(data.redirect == '1') {
+      if (data.redirect == '1') { // Use '==' for loose comparison if data.redirect can be string or number
         navigate(`/signup/${id}`);
       }
       else setRestaurantData(data);
@@ -319,17 +311,36 @@ const RestaurantMenu = () => {
       setLoading(true);
       const items = await getRestaurantMenu(id);
 
-      
-      // Group items by category
+      // Group items by category (which will be lowercase)
       const groupedItems = {};
       items.forEach((item) => {
-        if (!groupedItems[item.type]) {
-          groupedItems[item.type] = [];
+        // Ensure category is lowercase from the start for consistency
+        const type = item.type ? item.type.toLowerCase() : 'uncategorized'; // Fallback for safety
+        if (!groupedItems[type]) {
+          groupedItems[type] = [];
         }
-        groupedItems[item.type].push(item);
+        groupedItems[type].push(item);
       });
 
       setMenuItems(groupedItems);
+
+      // Dynamically add categories present in menuItems but not in categoryOrder
+      // This is crucial for custom categories to be recognized
+      const newCustomCategories = [];
+      Object.keys(groupedItems).forEach(itemCategory => {
+        if (!categoryOrder.includes(itemCategory) && !customCategories.includes(itemCategory)) {
+          newCustomCategories.push(itemCategory);
+        }
+      });
+      if (newCustomCategories.length > 0) {
+        setCustomCategories(prev => [...prev, ...newCustomCategories]);
+        // Also save to local storage if needed for cross-session consistency on this component
+        // (though AddNewMenuItem already handles this for its own use)
+        // If you want Menu component to remember custom categories even if menu items are removed,
+        // you'd need to fetch and store them here as well.
+        // For now, we'll rely on categories being present in menuItems for display.
+      }
+
 
       // Set the first category as active
       const categories = getSortedCategories(groupedItems);
@@ -343,7 +354,8 @@ const RestaurantMenu = () => {
     }
   };
 
-  // Custom hook for intersection observer to detect when categories are in view
+
+  // Intersection Observer
   useEffect(() => {
     const observerOptions = {
       root: null,
@@ -364,25 +376,25 @@ const RestaurantMenu = () => {
       observerOptions
     );
 
-    // Observe all category sections
-    Object.entries(categoryRefs.current).forEach(([category, ref]) => {
+    // Observe all category sections dynamically as they are rendered
+    const currentCategoryRefs = categoryRefs.current;
+    Object.values(currentCategoryRefs).forEach((ref) => {
       if (ref) observer.observe(ref);
     });
 
-    return () => observer.disconnect();
-  }, [categoryRefs.current]);
+    return () => {
+      Object.values(currentCategoryRefs).forEach((ref) => {
+        if (ref) observer.unobserve(ref);
+      });
+      observer.disconnect();
+    };
+  }, [menuItems]); // Re-run observer setup when menuItems change (i.e., on initial fetch)
 
+  // Initial data fetch
   useEffect(() => {
     fetchMenuItems();
-    fetchRestaurantData(id); // Fetch restaurant status and hours
+    fetchRestaurantData(id);
   }, [id]);
-
-  // Close mobile nav when a category is selected
-  useEffect(() => {
-    if (mobileNavOpen) {
-      setMobileNavOpen(false);
-    }
-  }, [activeCategory]);
 
   // Handle resize events to close mobile menu when switching to desktop
   useEffect(() => {
@@ -390,68 +402,91 @@ const RestaurantMenu = () => {
       if (window.innerWidth >= 768 && mobileNavOpen) {
         setMobileNavOpen(false);
       }
+      if (window.innerWidth < 768 && visibleCategoryGroups) {
+          setVisibleCategoryGroups(false);
+      }
     };
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [mobileNavOpen]);
+  }, [mobileNavOpen, visibleCategoryGroups]);
 
-  // Sort categories according to predefined order
-  const getSortedCategories = (items) => {
-    return Object.keys(items).sort((a, b) => {
-      const indexA = categoryOrder.indexOf(a);
-      const indexB = categoryOrder.indexOf(b);
+  // Sort categories according to predefined order and include custom categories
+  const getSortedCategories = useCallback((items) => {
+    const allCategoriesInMenu = Object.keys(items);
+    const sorted = [...categoryOrder, ...customCategories].filter(category =>
+      allCategoriesInMenu.includes(category)
+    );
 
-      if (indexA !== -1 && indexB !== -1) return indexA - indexB;
-      if (indexA !== -1) return -1;
-      if (indexB !== -1) return 1;
-      return a.localeCompare(b);
+    // Add any categories from menuItems that are neither in categoryOrder nor customCategories (fallback)
+    allCategoriesInMenu.forEach(category => {
+      if (!sorted.includes(category)) {
+        sorted.push(category);
+      }
     });
-  };
+
+    return sorted;
+  }, [menuItems, customCategories]); // Recalculate when menuItems or customCategories change
 
   const scrollToCategory = (category) => {
-    setActiveCategory(category);
-    categoryRefs.current[category]?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+    if (categoryRefs.current[category]) {
+      setActiveCategory(category);
+      categoryRefs.current[category].scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
   };
 
   const toggleCategoryGroups = () => {
     setVisibleCategoryGroups(!visibleCategoryGroups);
+    setMobileNavOpen(false);
   };
 
-  // Toggle mobile navigation menu
   const toggleMobileNav = () => {
     setMobileNavOpen(!mobileNavOpen);
-    // Close category groups when mobile nav is opened
-    if (!mobileNavOpen) {
-      setVisibleCategoryGroups(false);
-    }
+    setVisibleCategoryGroups(false);
   };
 
   // Find which group a category belongs to
   const findCategoryGroup = (category) => {
     for (const [group, categories] of Object.entries(categoryGroups)) {
-      if (categories.includes(category)) {
-        return group;
+      // Ensure comparison is consistent (both lowercase)
+      if (categories.includes(category.toLowerCase())) {
+        return capitalizeWords(group); // Capitalize group name for display
       }
     }
-    return null;
+    // If not in predefined groups, it's a custom category.
+    // We can display its name capitalized, or add it to a generic "Custom" group if desired.
+    return "Other Categories"; // Or just return null if no group is needed
   };
 
   const sortedCategories = getSortedCategories(menuItems);
 
   // Get only the categories that actually have menu items
   const availableCategoryGroups = {};
+  // Iterate through the predefined category groups (lowercase)
   Object.entries(categoryGroups).forEach(([group, categories]) => {
-    const availableCategories = categories.filter((cat) =>
-      sortedCategories.includes(cat)
+    const availableCategoriesInGroup = categories.filter((cat) =>
+      sortedCategories.includes(cat) // Check against lowercase sortedCategories
     );
-    if (availableCategories.length > 0) {
-      availableCategoryGroups[group] = availableCategories;
+    if (availableCategoriesInGroup.length > 0) {
+      availableCategoryGroups[group] = availableCategoriesInGroup;
     }
   });
+
+  // Add custom categories to a new group if they exist and are not already in a predefined group
+  const customCategoriesToDisplay = sortedCategories.filter(cat =>
+    !Object.values(categoryGroups).flat().includes(cat)
+  );
+
+  if (customCategoriesToDisplay.length > 0) {
+    availableCategoryGroups["other categories"] = [
+      ...(availableCategoryGroups["other categories"] || []),
+      ...customCategoriesToDisplay,
+    ].sort((a, b) => a.localeCompare(b)); // Sort custom categories alphabetically
+  }
+
 
   return (
     <div className="bg-white" ref={menuContainerRef}>
@@ -472,7 +507,7 @@ const RestaurantMenu = () => {
                   <MenuIcon size={24} />
                 )}
               </button>
-              
+
               {/* Desktop category toggle */}
               <button
                 onClick={toggleCategoryGroups}
@@ -515,7 +550,7 @@ const RestaurantMenu = () => {
                   ))}
                 </div>
               </div>
-              
+
               {/* Current category indicator for mobile */}
               <div className="md:hidden flex-1 text-center">
                 <span className="font-medium text-amber-800 px-2 py-1 rounded-lg bg-amber-50">
@@ -527,11 +562,12 @@ const RestaurantMenu = () => {
             {/* Expanded Category Groups for Desktop */}
             {visibleCategoryGroups && (
               <div className="hidden md:block pt-2 pb-1 border-t border-amber-100 animate-fadeIn mt-2">
+                {/* Ensure availableCategoryGroups keys are consistent (lowercase) for iteration */}
                 {Object.entries(availableCategoryGroups).map(
                   ([group, categories]) => (
                     <div key={group} className="mb-3 last:mb-0">
                       <h3 className="text-xs uppercase tracking-wider text-amber-800 font-semibold mb-1.5">
-                        {group}
+                        {capitalizeWords(group)} {/* Capitalize group name for display */}
                       </h3>
                       <div className="flex flex-wrap gap-1.5">
                         {categories.map((category) => (
@@ -539,7 +575,7 @@ const RestaurantMenu = () => {
                             key={category}
                             onClick={() => {
                               scrollToCategory(category);
-                              setVisibleCategoryGroups(false);
+                              setVisibleCategoryGroups(false); // Close after selection
                             }}
                             className={`px-3 py-1 text-xs transition-all whitespace-nowrap rounded
                             ${
@@ -548,7 +584,7 @@ const RestaurantMenu = () => {
                                 : "bg-amber-50 text-amber-800 hover:bg-amber-100"
                             }`}
                           >
-                            {category}
+                            {capitalizeWords(category)}
                           </button>
                         ))}
                       </div>
@@ -566,24 +602,24 @@ const RestaurantMenu = () => {
         <div className="fixed inset-0 bg-amber-900/90 z-40 overflow-y-auto md:hidden animate-fadeIn">
           <div className="max-w-lg mx-auto px-6 py-8">
             <div className="flex justify-end mb-6">
-              <button 
+              <button
                 onClick={toggleMobileNav}
                 className="text-white hover:text-amber-200 p-1"
               >
                 <X size={28} />
               </button>
             </div>
-            
+
             <h2 className="text-white text-lg font-serif mb-6 border-b border-amber-700 pb-2">
               Menu Categories
             </h2>
-            
+
             <div className="space-y-6">
               {Object.entries(availableCategoryGroups).map(
                 ([group, categories]) => (
                   <div key={group}>
                     <h3 className="text-xs uppercase tracking-wider text-amber-300 font-semibold mb-3">
-                      {group}
+                      {capitalizeWords(group)} {/* Capitalize group name for display */}
                     </h3>
                     <div className="grid grid-cols-2 gap-2">
                       {categories.map((category) => (
@@ -591,13 +627,14 @@ const RestaurantMenu = () => {
                           key={category}
                           onClick={() => {
                             scrollToCategory(category);
+                            setMobileNavOpen(false); // Explicitly close mobile nav on category click
                           }}
                           className={`px-3 py-2 text-sm font-medium transition-all whitespace-nowrap rounded-lg text-left
-                          ${
-                            activeCategory === category
-                              ? "bg-amber-700 text-white border border-amber-500"
-                              : "bg-amber-800/60 text-amber-200 hover:bg-amber-800"
-                          }`}
+                            ${
+                              activeCategory === category
+                                ? "bg-amber-700 text-white border border-amber-500"
+                                : "bg-amber-800/60 text-amber-200 hover:bg-amber-800"
+                            }`}
                         >
                           {capitalizeWords(category)}
                         </button>
@@ -692,7 +729,7 @@ const RestaurantMenu = () => {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
-                  {menuItems[category].map((item) => (
+                  {menuItems[category]?.map((item) => ( // Use optional chaining for safety
                     <div
                       key={item._id}
                       className="transform transition-all duration-500 hover:-translate-y-1"
@@ -727,15 +764,8 @@ const RestaurantMenu = () => {
           </div>
         )}
       </div>
-
-    
     </div>
   );
 };
-
-// Add this to your CSS or tailwind.config.js for the animations
-// @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-// .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
-// .animate-spin-slow { animation: spin 3s linear infinite; }
 
 export default RestaurantMenu;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   ChevronDown, 
@@ -13,13 +13,14 @@ import {
 import { capitalizeWords } from '../../utils/format';
 import { updateAvailability, updatePrepTime, deleteMenuItem } from '../../api/menuItem';
 
-function MenuCardAdmin({ item, onAddToOrder, showSuccessToast, showErrorToast, onItemDeleted }) {
+function MenuCardAdmin({ item, onAddToOrder, showSuccessToast, showErrorToast, onItemDeleted, onRefresh }) {
   const [expanded, setExpanded] = useState(false);
   const [isAvailable, setIsAvailable] = useState(item.available);
   const [isEditingPrepTime, setIsEditingPrepTime] = useState(false);
   const [prepTimeValue, setPrepTimeValue] = useState(item.prepTime == 0 ? '-' : item.prepTime);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isHidden, setIsHidden] = useState(false); // For smooth removal animation
   const navigate = useNavigate();
 
   const toggleExpand = () => {
@@ -105,10 +106,16 @@ function MenuCardAdmin({ item, onAddToOrder, showSuccessToast, showErrorToast, o
       
       showSuccessToast(`"${capitalizeWords(item.name)}" has been deleted successfully`);
       
-      // Call parent callback to remove item from the list
-      if (onItemDeleted) {
-        onItemDeleted(item._id);
-      }
+      // Add smooth removal animation
+      setIsHidden(true);
+      
+      // Wait for animation to complete before calling parent callback
+      setTimeout(() => {
+        // Call parent callback to remove item from the list
+        if (onItemDeleted) {
+          onItemDeleted(item._id);
+        }
+      }, 300); // Match this with the transition duration
       
       setShowDeleteConfirm(false);
     } catch (error) {
@@ -151,7 +158,7 @@ function MenuCardAdmin({ item, onAddToOrder, showSuccessToast, showErrorToast, o
   return (
     <>
       <div 
-        className={`relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 bg-white border-0 flex flex-col w-full max-w-4xl mx-auto ${!isAvailable ? 'opacity-60' : ''}`}
+        className={`relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300 bg-white border-0 flex flex-col w-full max-w-4xl mx-auto ${!isAvailable ? 'opacity-60' : ''} ${isHidden ? 'opacity-0 transform scale-95 translate-y-4' : 'opacity-100 transform scale-100 translate-y-0'}`}
       >
         <div className="flex flex-col md:flex-row w-full">
           <div className="w-full md:w-64 flex-shrink-0 relative group">
