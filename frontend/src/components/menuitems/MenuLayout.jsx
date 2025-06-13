@@ -1,5 +1,3 @@
-// RestaurantMenu.js
-
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import MenuCard from "./MenuCard";
@@ -11,76 +9,32 @@ import { useNavigate } from "react-router-dom";
 import {
   Clock,
   Calendar,
-  AlertCircle,
   MapPin,
   Award,
-  Phone,
   Menu as MenuIcon,
   X,
+  Search,
+  ChevronDown,
+  ArrowUpCircle
 } from "lucide-react";
-import axios from "axios";
 
-
-// Comprehensive list of menu categories in logical serving order
-// --- IMPORTANT: CONVERT ALL TO LOWERCASE TO MATCH BACKEND STORAGE ---
+// The 'categoryOrder' array is fine as is
 const categoryOrder = [
-  // Meal-specific menus
-  "breakfast",
-  "brunch",
-  "lunch specials",
-
-  // Starters and light options
-  "appetizers",
-  "starter",
-  "soups",
-  "salads",
-
-  // Main dishes
-  "chef's specials",
-  "signature dishes",
-  "main course",
-  "pasta",
-  "pizza",
-  "noodles",
-  "rice dishes",
-  "curry",
-  "sushi",
-  "tapas",
-  "sharing platters",
-
-  // Supporting items
-  "sides",
-  "accompaniments",
-
-  // Special dietary options
-  "vegetarian",
-  "vegan",
-  "gluten-free",
-  "kids menu",
-
-  // Beverages
-  "beverages",
-  "hot beverages",
-  "drinks",
-  "cold beverages",
-  "mocktails",
-  "cocktails",
-  "wine list",
-  "beer",
-  "spirits",
-
-  // Sweet endings
+  "breakfast", "brunch", "lunch specials",
+  "appetizers", "starter", "soups", "salads",
+  "chef's specials", "signature dishes", "main course", "pasta", "pizza", "noodles",
+  "rice dishes", "curry", "sushi", "tapas", "sharing platters",
+  "sides", "accompaniments", "vegetarian", "vegan", "gluten-free", "kids menu",
+  "beverages", "hot beverages", "drinks", "cold beverages", "mocktails",
+  "cocktails", "wine list", "beer", "spirits",
   "desserts",
 ];
 
-// Restaurant Name Display Component (No changes needed here)
 const RestaurantNameHeader = ({ restaurantData }) => {
   if (!restaurantData || !restaurantData.restaurantName) {
     return null;
   }
-
   const { restaurantName, restaurantCategory, restaurantAddress } = restaurantData;
-
   return (
     <div className="mb-8">
       <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#b35a00] to-amber-500 shadow-lg">
@@ -88,7 +42,6 @@ const RestaurantNameHeader = ({ restaurantData }) => {
           <div className="absolute -right-20 -top-20 w-64 h-64 bg-white rounded-full"></div>
           <div className="absolute left-1/4 -bottom-24 w-40 h-40 bg-white rounded-full"></div>
         </div>
-
         <div className="relative p-6 md:p-8 lg:p-10">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between">
             <div className="mb-4 md:mb-0">
@@ -98,19 +51,16 @@ const RestaurantNameHeader = ({ restaurantData }) => {
                   {restaurantCategory || "Restaurant"}
                 </span>
               </div>
-
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-white leading-tight">
                 {restaurantName}
               </h1>
-
               {restaurantAddress && (
                 <div className="flex items-center mt-2 md:mt-3 text-amber-100">
-                  <MapPin size={14} className="mr-1.5 md:mr-2" />
+                  <MapPin size={14} className="inline mr-1.5 md:mr-2" />
                   <span className="text-xs md:text-sm lg:text-base">{restaurantAddress}</span>
                 </div>
               )}
             </div>
-
             <div className="flex items-center bg-white/10 backdrop-filter backdrop-blur-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-white/20">
               <Award className="text-amber-300 mr-1.5 md:mr-2" size={16} />
               <span className="text-white text-xs md:text-sm font-medium">Authentic Cuisine</span>
@@ -122,37 +72,16 @@ const RestaurantNameHeader = ({ restaurantData }) => {
   );
 };
 
-// Component to display restaurant status and hours (No changes needed here)
 const RestaurantStatusInfo = ({ restaurantData }) => {
   if (!restaurantData) {
     return null;
   }
-
   const { resOpen, operatingHours = [] } = restaurantData;
-
-  const days = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
+  const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const today = days[new Date().getDay()];
-
   const todayHours = operatingHours.find((item) => item.day === today);
-
-  const isWithinHours = () => {
-    if (!todayHours) return false;
-    return resOpen;
-  };
-
   const [showAllHours, setShowAllHours] = useState(false);
-
-  const displayedHours = showAllHours
-    ? operatingHours
-    : operatingHours.filter(item => item.day === today);
+  const displayedHours = showAllHours ? operatingHours : operatingHours.filter((item) => item.day === today);
 
   return (
     <div className="bg-gradient-to-r from-amber-50 to-white border-l-4 border-amber-400 rounded-r-lg shadow-sm mb-6 md:mb-8 overflow-hidden">
@@ -182,14 +111,12 @@ const RestaurantStatusInfo = ({ restaurantData }) => {
             )}
           </div>
         </div>
-
         <div className="p-4 md:p-5 md:flex-1 border-t md:border-t-0 md:border-l border-amber-100">
           <div className="flex justify-between items-center mb-3">
             <h4 className="flex items-center text-xs md:text-sm font-medium text-amber-800">
               <Calendar size={14} className="mr-1.5" />
               Operating Hours
             </h4>
-
             <button
               className="text-xs text-amber-600 hover:text-amber-800 md:hidden"
               onClick={() => setShowAllHours(!showAllHours)}
@@ -197,7 +124,6 @@ const RestaurantStatusInfo = ({ restaurantData }) => {
               {showAllHours ? "Show Less" : "Show All"}
             </button>
           </div>
-
           {operatingHours.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-1 md:gap-y-2 text-xs md:text-sm">
               {displayedHours.map((item) => (
@@ -233,74 +159,56 @@ const RestaurantStatusInfo = ({ restaurantData }) => {
   );
 };
 
-
 const RestaurantMenu = () => {
   const { id } = useParams();
   const [menuItems, setMenuItems] = useState({});
+  const [allFlatMenuItems, setAllFlatMenuItems] = useState([]); // Stores all items in a flat array for search
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("");
   const [visibleCategoryGroups, setVisibleCategoryGroups] = useState(false);
   const [restaurantData, setRestaurantData] = useState(null);
   const [restaurantLoading, setRestaurantLoading] = useState(true);
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [customCategories, setCustomCategories] = useState([]); // State for custom categories from local storage
+  const [customCategories, setCustomCategories] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showBackToTop, setShowBackToTop] = useState(false);
 
   const navigate = useNavigate();
-
   const categoryRefs = useRef({});
   const menuContainerRef = useRef(null);
+  const horizontalNavRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
-  // --- IMPORTANT: CONVERT ALL TO LOWERCASE TO MATCH BACKEND STORAGE ---
+
   const categoryGroups = {
     "meal options": ["breakfast", "brunch", "lunch specials"],
     starters: ["appetizers", "starter", "soups", "salads"],
     mains: [
-      "chef's specials",
-      "signature dishes",
-      "main course",
-      "pasta",
-      "pizza",
-      "noodles",
-      "rice dishes",
-      "curry",
-      "sushi",
-      "tapas",
-      "sharing platters",
+      "chef's specials", "signature dishes", "main course", "pasta", "pizza", "noodles",
+      "rice dishes", "curry", "sushi", "tapas", "sharing platters",
     ],
     extras: [
-      "sides",
-      "accompaniments",
-      "vegetarian",
-      "vegan",
-      "gluten-free",
-      "kids menu",
+      "sides", "accompaniments", "vegetarian", "vegan", "gluten-free", "kids menu",
     ],
     drinks: [
-      "beverages",
-      "hot beverages",
-      "drinks",
-      "cold beverages",
-      "mocktails",
-      "cocktails",
-      "wine list",
-      "beer",
-      "spirits",
+      "beverages", "hot beverages", "drinks", "cold beverages", "mocktails",
+      "cocktails", "wine list", "beer", "spirits",
     ],
     desserts: ["desserts"],
   };
 
-
-  // Fetch restaurant data including status and hours
   const fetchRestaurantData = async (id) => {
     try {
       setRestaurantLoading(true);
       const data = await fetchRestaurantByID(id);
-      if (data.redirect == '1') { // Use '==' for loose comparison if data.redirect can be string or number
+      if (data && data.redirect === "1") {
         navigate(`/signup/${id}`);
+      } else {
+        setRestaurantData(data);
       }
-      else setRestaurantData(data);
     } catch (error) {
       console.error("Error fetching restaurant data:", error);
+      setRestaurantData(null);
     } finally {
       setRestaurantLoading(false);
     }
@@ -311,61 +219,66 @@ const RestaurantMenu = () => {
       setLoading(true);
       const items = await getRestaurantMenu(id);
 
-      // Group items by category (which will be lowercase)
       const groupedItems = {};
-      items.forEach((item) => {
-        // Ensure category is lowercase from the start for consistency
-        const type = item.type ? item.type.toLowerCase() : 'uncategorized'; // Fallback for safety
-        if (!groupedItems[type]) {
-          groupedItems[type] = [];
-        }
-        groupedItems[type].push(item);
-      });
+      const flatItems = []; // New array to store all items flattened
 
+      if (Array.isArray(items)) {
+        items.forEach((item) => {
+          const type = item.type ? String(item.type).toLowerCase() : "uncategorized";
+          if (!groupedItems[type]) {
+            groupedItems[type] = [];
+          }
+          groupedItems[type].push(item);
+          flatItems.push(item); // Add to flat list
+        });
+      }
       setMenuItems(groupedItems);
+      setAllFlatMenuItems(flatItems); // Store the flattened list
 
-      // Dynamically add categories present in menuItems but not in categoryOrder
-      // This is crucial for custom categories to be recognized
       const newCustomCategories = [];
-      Object.keys(groupedItems).forEach(itemCategory => {
-        if (!categoryOrder.includes(itemCategory) && !customCategories.includes(itemCategory)) {
+      Object.keys(groupedItems).forEach((itemCategory) => {
+        if (
+          !categoryOrder.includes(itemCategory) &&
+          !customCategories.includes(itemCategory)
+        ) {
           newCustomCategories.push(itemCategory);
         }
       });
       if (newCustomCategories.length > 0) {
-        setCustomCategories(prev => [...prev, ...newCustomCategories]);
-        // Also save to local storage if needed for cross-session consistency on this component
-        // (though AddNewMenuItem already handles this for its own use)
-        // If you want Menu component to remember custom categories even if menu items are removed,
-        // you'd need to fetch and store them here as well.
-        // For now, we'll rely on categories being present in menuItems for display.
+        setCustomCategories((prev) => [...prev, ...newCustomCategories]);
       }
 
-
-      // Set the first category as active
+      // Set active category only if there are items and no search term
       const categories = getSortedCategories(groupedItems);
-      if (categories.length > 0) {
+      if (categories.length > 0 && !searchTerm) {
         setActiveCategory(categories[0]);
       }
     } catch (error) {
       console.error("Error fetching menu:", error);
+      setMenuItems({});
+      setAllFlatMenuItems([]);
     } finally {
       setLoading(false);
     }
   };
 
-
-  // Intersection Observer
+  // Intersection Observer for active category highlighting
   useEffect(() => {
+    // Disable observer if search is active or no menu items
+    if (searchTerm || Object.keys(menuItems).length === 0) {
+      return;
+    }
+
     const observerOptions = {
       root: null,
-      rootMargin: "-100px 0px -80% 0px",
+      rootMargin: "-100px 0px -80% 0px", // Adjust these values based on your header height
       threshold: 0,
     };
 
     const observerCallback = (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
+          // Only update active category if no search term is active
           setActiveCategory(entry.target.dataset.category);
         }
       });
@@ -376,7 +289,6 @@ const RestaurantMenu = () => {
       observerOptions
     );
 
-    // Observe all category sections dynamically as they are rendered
     const currentCategoryRefs = categoryRefs.current;
     Object.values(currentCategoryRefs).forEach((ref) => {
       if (ref) observer.observe(ref);
@@ -388,7 +300,7 @@ const RestaurantMenu = () => {
       });
       observer.disconnect();
     };
-  }, [menuItems]); // Re-run observer setup when menuItems change (i.e., on initial fetch)
+  }, [menuItems, searchTerm]); // Depend on menuItems and searchTerm
 
   // Initial data fetch
   useEffect(() => {
@@ -396,37 +308,87 @@ const RestaurantMenu = () => {
     fetchRestaurantData(id);
   }, [id]);
 
-  // Handle resize events to close mobile menu when switching to desktop
+  // Handle resize events to close desktop category groups if resized to mobile
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768 && mobileNavOpen) {
-        setMobileNavOpen(false);
-      }
       if (window.innerWidth < 768 && visibleCategoryGroups) {
-          setVisibleCategoryGroups(false);
+        setVisibleCategoryGroups(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [visibleCategoryGroups]);
+
+  // Effect to manage "Back to Top" button visibility
+  useEffect(() => {
+    const handleScroll = () => {
+      if (menuContainerRef.current) {
+        const scrollTop = menuContainerRef.current.scrollTop;
+        setShowBackToTop(scrollTop > 300);
       }
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [mobileNavOpen, visibleCategoryGroups]);
+    const currentContainer = menuContainerRef.current;
+    if (currentContainer) {
+      currentContainer.addEventListener("scroll", handleScroll);
+    }
+
+    return () => {
+      if (currentContainer) {
+        currentContainer.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, []);
+
+  const scrollToTop = () => {
+    if (menuContainerRef.current) {
+      menuContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  // Update horizontal scroll shadows based on scroll position
+  const updateScrollShadows = useCallback(() => {
+    if (horizontalNavRef.current) {
+      const { scrollWidth, clientWidth, scrollLeft } = horizontalNavRef.current;
+      setCanScrollLeft(scrollLeft > 0);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth);
+    }
+  }, []);
+
+  // Set up resize and scroll listeners for horizontal nav for shadows
+  useEffect(() => {
+    const currentNavRef = horizontalNavRef.current;
+    if (currentNavRef) {
+      currentNavRef.addEventListener('scroll', updateScrollShadows);
+      window.addEventListener('resize', updateScrollShadows);
+      updateScrollShadows(); // Initial check
+    }
+    return () => {
+      if (currentNavRef) {
+        currentNavRef.removeEventListener('scroll', updateScrollShadows);
+      }
+      window.removeEventListener('resize', updateScrollShadows);
+    };
+  }, [updateScrollShadows]);
 
   // Sort categories according to predefined order and include custom categories
-  const getSortedCategories = useCallback((items) => {
-    const allCategoriesInMenu = Object.keys(items);
-    const sorted = [...categoryOrder, ...customCategories].filter(category =>
-      allCategoriesInMenu.includes(category)
-    );
+  const getSortedCategories = useCallback(
+    (items) => {
+      const allCategoriesInMenu = Object.keys(items);
+      const sorted = [...categoryOrder, ...customCategories].filter((category) =>
+        allCategoriesInMenu.includes(category)
+      );
 
-    // Add any categories from menuItems that are neither in categoryOrder nor customCategories (fallback)
-    allCategoriesInMenu.forEach(category => {
-      if (!sorted.includes(category)) {
-        sorted.push(category);
-      }
-    });
-
-    return sorted;
-  }, [menuItems, customCategories]); // Recalculate when menuItems or customCategories change
+      // Add any categories not in the predefined order or custom list
+      allCategoriesInMenu.forEach((category) => {
+        if (!sorted.includes(category)) {
+          sorted.push(category);
+        }
+      });
+      return sorted;
+    },
+    [customCategories, categoryOrder]
+  );
 
   const scrollToCategory = (category) => {
     if (categoryRefs.current[category]) {
@@ -440,108 +402,138 @@ const RestaurantMenu = () => {
 
   const toggleCategoryGroups = () => {
     setVisibleCategoryGroups(!visibleCategoryGroups);
-    setMobileNavOpen(false);
   };
 
-  const toggleMobileNav = () => {
-    setMobileNavOpen(!mobileNavOpen);
-    setVisibleCategoryGroups(false);
-  };
-
-  // Find which group a category belongs to
   const findCategoryGroup = (category) => {
     for (const [group, categories] of Object.entries(categoryGroups)) {
-      // Ensure comparison is consistent (both lowercase)
       if (categories.includes(category.toLowerCase())) {
-        return capitalizeWords(group); // Capitalize group name for display
+        return capitalizeWords(group);
       }
     }
-    // If not in predefined groups, it's a custom category.
-    // We can display its name capitalized, or add it to a generic "Custom" group if desired.
-    return "Other Categories"; // Or just return null if no group is needed
+    return "Other Categories";
   };
 
-  const sortedCategories = getSortedCategories(menuItems);
+  // --- Search Functionality ---
+  const handleSearchChange = (event) => {
+    const newSearchTerm = event.target.value;
+    setSearchTerm(newSearchTerm);
+    setActiveCategory(""); // Clear active category when searching
+    if (menuContainerRef.current) {
+        menuContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top on search
+    }
+  };
 
-  // Get only the categories that actually have menu items
+  const clearSearch = () => {
+    setSearchTerm("");
+    // Re-activate first category if menu items exist
+    const categories = getSortedCategories(menuItems);
+    if (categories.length > 0) {
+      setActiveCategory(categories[0]);
+    }
+  };
+
+  // New logic for filtering items based on search
+  const getFilteredAndGroupedItems = useCallback(() => {
+    if (!searchTerm) {
+      return menuItems; // If no search term, return original grouped items
+    }
+
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+    const filteredFlatItems = allFlatMenuItems.filter(item => {
+      const itemName = String(item.itemName || "").toLowerCase();
+      const itemDescription = String(item.itemDescription || "").toLowerCase();
+      const itemType = String(item.type || "").toLowerCase(); // Also search in category/type
+
+      return (
+        itemName.includes(lowerCaseSearchTerm) ||
+        itemDescription.includes(lowerCaseSearchTerm) ||
+        itemType.includes(lowerCaseSearchTerm)
+      );
+    });
+
+    // Regroup filtered items by their original categories
+    const newGroupedItems = {};
+    filteredFlatItems.forEach(item => {
+      const type = item.type ? String(item.type).toLowerCase() : "uncategorized";
+      if (!newGroupedItems[type]) {
+        newGroupedItems[type] = [];
+      }
+      newGroupedItems[type].push(item);
+    });
+
+    // Sort items within each category by itemName for consistency in search results
+    for (const category in newGroupedItems) {
+      newGroupedItems[category].sort((a, b) =>
+        String(a.itemName).localeCompare(String(b.itemName))
+      );
+    }
+
+    return newGroupedItems;
+  }, [searchTerm, allFlatMenuItems, menuItems]);
+
+  const itemsToDisplay = getFilteredAndGroupedItems();
+  const categoriesToDisplay = getSortedCategories(itemsToDisplay);
+
+  // Determine available category groups based on itemsToDisplay
   const availableCategoryGroups = {};
-  // Iterate through the predefined category groups (lowercase)
   Object.entries(categoryGroups).forEach(([group, categories]) => {
     const availableCategoriesInGroup = categories.filter((cat) =>
-      sortedCategories.includes(cat) // Check against lowercase sortedCategories
+      categoriesToDisplay.includes(cat)
     );
     if (availableCategoriesInGroup.length > 0) {
       availableCategoryGroups[group] = availableCategoriesInGroup;
     }
   });
 
-  // Add custom categories to a new group if they exist and are not already in a predefined group
-  const customCategoriesToDisplay = sortedCategories.filter(cat =>
-    !Object.values(categoryGroups).flat().includes(cat)
+  const customCategoriesToDisplay = categoriesToDisplay.filter(
+    (cat) => !Object.values(categoryGroups).flat().includes(cat)
   );
 
+  // Add custom categories to 'other categories' group if they exist
   if (customCategoriesToDisplay.length > 0) {
     availableCategoryGroups["other categories"] = [
       ...(availableCategoryGroups["other categories"] || []),
       ...customCategoriesToDisplay,
-    ].sort((a, b) => a.localeCompare(b)); // Sort custom categories alphabetically
+    ].sort((a, b) => a.localeCompare(b));
   }
 
 
   return (
-    <div className="bg-white" ref={menuContainerRef}>
-      {/* Navigation Bar */}
-      {sortedCategories.length > 0 && (
+    <div className="bg-white overflow-y-auto h-screen" ref={menuContainerRef}>
+      {/* Navigation Bar (Sticky at the top) */}
+      {categoriesToDisplay.length > 0 && (
         <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-sm border-b border-amber-100 shadow-sm py-3">
           <div className="max-w-screen-xl mx-auto px-4">
-            <div className="flex items-center justify-between">
-              {/* Mobile menu button */}
-              <button
-                onClick={toggleMobileNav}
-                className="md:hidden text-amber-700 hover:text-amber-900 p-1"
-                aria-label="Toggle menu"
-              >
-                {mobileNavOpen ? (
-                  <X size={24} />
-                ) : (
-                  <MenuIcon size={24} />
-                )}
-              </button>
-
-              {/* Desktop category toggle */}
+            <div className="flex items-center justify-between gap-4">
               <button
                 onClick={toggleCategoryGroups}
-                className="hidden md:flex text-amber-700 hover:text-amber-900 font-medium items-center mr-4"
+                className="hidden md:flex text-amber-700 hover:text-amber-900 font-medium items-center flex-shrink-0"
               >
                 <span className="mr-1">Categories</span>
-                <svg
+                <ChevronDown
                   className={`w-4 h-4 transition-transform ${
                     visibleCategoryGroups ? "rotate-180" : ""
                   }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
+                />
               </button>
 
-              {/* Desktop horizontal category scroll */}
-              <div className="hidden md:block overflow-x-auto hide-scrollbar flex-1">
+              <div
+                ref={horizontalNavRef}
+                className={`overflow-x-auto hide-scrollbar flex-1 relative
+                  ${canScrollLeft ? 'shadow-left-gradient' : ''}
+                  ${canScrollRight ? 'shadow-right-gradient' : ''}`}
+                onScroll={updateScrollShadows}
+              >
                 <div className="flex gap-2">
-                  {sortedCategories.map((category) => (
+                  {/* Only show categories that have items in the current view (filtered or full) */}
+                  {categoriesToDisplay.map((category) => (
                     <button
                       key={category}
                       onClick={() => scrollToCategory(category)}
                       className={`px-4 py-1.5 text-sm font-medium transition-all duration-300 whitespace-nowrap rounded-full
                         ${
-                          activeCategory === category
-                            ? "bg-amber-600 text-white shadow-md"
+                          activeCategory === category && !searchTerm
+                            ? "bg-amber-600 text-white shadow-md ring-2 ring-amber-300 ring-offset-1"
                             : "bg-amber-50 text-amber-900 hover:bg-amber-100"
                         }`}
                     >
@@ -550,24 +542,16 @@ const RestaurantMenu = () => {
                   ))}
                 </div>
               </div>
-
-              {/* Current category indicator for mobile */}
-              <div className="md:hidden flex-1 text-center">
-                <span className="font-medium text-amber-800 px-2 py-1 rounded-lg bg-amber-50">
-                  {capitalizeWords(activeCategory)}
-                </span>
-              </div>
             </div>
 
             {/* Expanded Category Groups for Desktop */}
             {visibleCategoryGroups && (
               <div className="hidden md:block pt-2 pb-1 border-t border-amber-100 animate-fadeIn mt-2">
-                {/* Ensure availableCategoryGroups keys are consistent (lowercase) for iteration */}
                 {Object.entries(availableCategoryGroups).map(
                   ([group, categories]) => (
                     <div key={group} className="mb-3 last:mb-0">
                       <h3 className="text-xs uppercase tracking-wider text-amber-800 font-semibold mb-1.5">
-                        {capitalizeWords(group)} {/* Capitalize group name for display */}
+                        {capitalizeWords(group)}
                       </h3>
                       <div className="flex flex-wrap gap-1.5">
                         {categories.map((category) => (
@@ -575,14 +559,14 @@ const RestaurantMenu = () => {
                             key={category}
                             onClick={() => {
                               scrollToCategory(category);
-                              setVisibleCategoryGroups(false); // Close after selection
+                              setVisibleCategoryGroups(false);
                             }}
                             className={`px-3 py-1 text-xs transition-all whitespace-nowrap rounded
-                            ${
-                              activeCategory === category
-                                ? "bg-amber-500 text-white"
-                                : "bg-amber-50 text-amber-800 hover:bg-amber-100"
-                            }`}
+                              ${
+                                activeCategory === category && !searchTerm
+                                  ? "bg-amber-500 text-white"
+                                  : "bg-amber-50 text-amber-800 hover:bg-amber-100"
+                              }`}
                           >
                             {capitalizeWords(category)}
                           </button>
@@ -597,59 +581,9 @@ const RestaurantMenu = () => {
         </div>
       )}
 
-      {/* Mobile Category Navigation Overlay */}
-      {mobileNavOpen && (
-        <div className="fixed inset-0 bg-amber-900/90 z-40 overflow-y-auto md:hidden animate-fadeIn">
-          <div className="max-w-lg mx-auto px-6 py-8">
-            <div className="flex justify-end mb-6">
-              <button
-                onClick={toggleMobileNav}
-                className="text-white hover:text-amber-200 p-1"
-              >
-                <X size={28} />
-              </button>
-            </div>
-
-            <h2 className="text-white text-lg font-serif mb-6 border-b border-amber-700 pb-2">
-              Menu Categories
-            </h2>
-
-            <div className="space-y-6">
-              {Object.entries(availableCategoryGroups).map(
-                ([group, categories]) => (
-                  <div key={group}>
-                    <h3 className="text-xs uppercase tracking-wider text-amber-300 font-semibold mb-3">
-                      {capitalizeWords(group)} {/* Capitalize group name for display */}
-                    </h3>
-                    <div className="grid grid-cols-2 gap-2">
-                      {categories.map((category) => (
-                        <button
-                          key={category}
-                          onClick={() => {
-                            scrollToCategory(category);
-                            setMobileNavOpen(false); // Explicitly close mobile nav on category click
-                          }}
-                          className={`px-3 py-2 text-sm font-medium transition-all whitespace-nowrap rounded-lg text-left
-                            ${
-                              activeCategory === category
-                                ? "bg-amber-700 text-white border border-amber-500"
-                                : "bg-amber-800/60 text-amber-200 hover:bg-amber-800"
-                            }`}
-                        >
-                          {capitalizeWords(category)}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
+      {/* Main Content Area */}
       <div className="max-w-screen-xl mx-auto px-4 md:px-6 py-6 md:py-10">
-        {/* Restaurant Name Header - Added Here */}
+        {/* Restaurant Name Header */}
         {!restaurantLoading && restaurantData && (
           <RestaurantNameHeader restaurantData={restaurantData} />
         )}
@@ -657,6 +591,31 @@ const RestaurantMenu = () => {
         {/* Restaurant Status Banner */}
         {!restaurantLoading && restaurantData && (
           <RestaurantStatusInfo restaurantData={restaurantData} />
+        )}
+
+        {/* Search Bar */}
+        {(!loading && !restaurantLoading && allFlatMenuItems.length > 0) && (
+          <div className="sticky top-[calc(60px)] z-20 bg-white pt-4 pb-2 -mt-4 mb-4 rounded-b-lg">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search for dishes..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+                className="w-full pl-10 pr-10 py-2.5 rounded-full border border-amber-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 text-sm text-gray-700 placeholder-gray-400 outline-none transition-all duration-200 shadow-sm"
+              />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+              {searchTerm && (
+                <button
+                  onClick={clearSearch}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  aria-label="Clear search"
+                >
+                  <X size={18} />
+                </button>
+              )}
+            </div>
+          </div>
         )}
 
         {/* Loading State */}
@@ -672,8 +631,8 @@ const RestaurantMenu = () => {
           </div>
         )}
 
-        {/* Empty State */}
-        {sortedCategories.length === 0 && !loading && (
+        {/* Empty State for no menu items (when not loading and no search active) */}
+        {allFlatMenuItems.length === 0 && !loading && !restaurantLoading && !searchTerm && (
           <div className="flex flex-col items-center justify-center py-16 md:py-20 text-center">
             <div className="w-16 h-16 md:w-20 md:h-20 bg-amber-50 rounded-full flex items-center justify-center mb-5 md:mb-6">
               <svg
@@ -701,50 +660,102 @@ const RestaurantMenu = () => {
           </div>
         )}
 
-        {/* Menu Categories */}
-        <div className="space-y-12 md:space-y-16">
-          {sortedCategories.map((category, categoryIndex) => {
-            const categoryGroup = findCategoryGroup(category);
-
-            return (
-              <div
-                key={category}
-                ref={(el) => (categoryRefs.current[category] = el)}
-                data-category={category}
-                className="scroll-mt-20 md:scroll-mt-28"
+        {/* Empty State for no search results (when search is active) */}
+        {searchTerm && Object.keys(itemsToDisplay).length === 0 && !loading && !restaurantLoading && (
+          <div className="flex flex-col items-center justify-center py-16 md:py-20 text-center">
+            <div className="w-16 h-16 md:w-20 md:h-20 bg-amber-50 rounded-full flex items-center justify-center mb-5 md:mb-6">
+              <svg
+                className="w-8 h-8 md:w-10 md:h-10 text-amber-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <div className="flex flex-col mb-6 md:mb-8">
-                  {categoryGroup && (
-                    <span className="text-xs uppercase tracking-wider text-amber-600 font-medium mb-1">
-                      {categoryGroup}
-                    </span>
-                  )}
-                  <div className="flex items-center">
-                    <div className="w-2 h-2 bg-amber-500 rounded-full mr-2 md:mr-3"></div>
-                    <h2 className="text-xl md:text-2xl font-serif text-gray-800">
-                      {capitalizeWords(category)}
-                    </h2>
-                    <div className="flex-grow h-px bg-gradient-to-r from-amber-300 to-transparent ml-3 md:ml-4"></div>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2A9 9 0 111 10a9 9 0 0118 0z"
+                ></path>
+              </svg>
+            </div>
+            <h3 className="text-xl md:text-2xl font-serif text-gray-800 mb-2">
+              No Results Found
+            </h3>
+            <p className="text-gray-500 max-w-md text-sm md:text-base">
+              We couldn't find any dishes matching "<span className="font-semibold text-amber-700">{searchTerm}</span>". Please try a different search term.
+            </p>
+            <button
+              onClick={clearSearch}
+              className="mt-6 px-6 py-2 bg-amber-600 text-white rounded-full hover:bg-amber-700 transition-colors shadow"
+            >
+              Clear Search
+            </button>
+          </div>
+        )}
+
+        {/* Menu Categories Display (Either full menu or filtered search results) */}
+        {Object.keys(itemsToDisplay).length > 0 && !loading && !restaurantLoading && (
+          <div className="space-y-12 md:space-y-16">
+            {categoriesToDisplay.map((category) => {
+              const categoryGroup = findCategoryGroup(category);
+              const items = itemsToDisplay[category];
+
+              if (!items || items.length === 0) return null;
+
+              return (
+                <div
+                  key={category}
+                  // Only attach ref and data-category if not searching, to avoid observer interference
+                  ref={!searchTerm ? (el) => (categoryRefs.current[category] = el) : null}
+                  data-category={!searchTerm ? category : undefined}
+                  className="scroll-mt-20 md:scroll-mt-28"
+                >
+                  <div className="flex flex-col mb-6 md:mb-8">
+                    {/* Only show group if not searching or if it's a dedicated search result group */}
+                    {categoryGroup && !searchTerm && (
+                      <span className="text-xs uppercase tracking-wider text-amber-600 font-medium mb-1">
+                        {categoryGroup}
+                      </span>
+                    )}
+                    <div className="flex items-center">
+                      <div className="w-2 h-2 bg-amber-500 rounded-full mr-2 md:mr-3"></div>
+                      <h2 className="text-xl md:text-2xl font-serif text-gray-800">
+                        {capitalizeWords(category)}
+                      </h2>
+                      <div className="flex-grow h-px bg-gradient-to-r from-amber-300 to-transparent ml-3 md:ml-4"></div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
+                    {items.map((item) => (
+                      <div
+                        key={item._id}
+                        className="transform transition-all duration-500 hover:-translate-y-1"
+                      >
+                        <MenuCard item={item} />
+                      </div>
+                    ))}
                   </div>
                 </div>
+              );
+            })}
+          </div>
+        )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
-                  {menuItems[category]?.map((item) => ( // Use optional chaining for safety
-                    <div
-                      key={item._id}
-                      className="transform transition-all duration-500 hover:-translate-y-1"
-                    >
-                      <MenuCard item={item} />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        {/* Back to Top Button */}
+        {showBackToTop && (
+          <button
+            onClick={scrollToTop}
+            className="fixed bottom-6 right-6 bg-amber-600 text-white p-3 rounded-full shadow-lg hover:bg-amber-700 transition-all duration-300 z-50 flex items-center justify-center animate-fade-in-up"
+            aria-label="Scroll to top"
+          >
+            <ArrowUpCircle size={24} />
+          </button>
+        )}
 
         {/* Footer */}
-        {sortedCategories.length > 0 && !loading && (
+        {Object.keys(itemsToDisplay).length > 0 && !loading && !restaurantLoading && (
           <div className="mt-16 md:mt-20 text-center">
             <div className="inline-flex items-center">
               <div className="h-px w-10 md:w-12 bg-amber-200"></div>
