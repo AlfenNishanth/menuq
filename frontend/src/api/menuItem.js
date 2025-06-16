@@ -84,3 +84,17 @@ export async function getRestaurantMenu(id) {
     throw error;
   }
 }
+
+export async function deleteMenuItem(menuItemId) {
+  console.log("Calling deleteMenuItem API");
+  try {
+    const response = await axios.delete(`${config.MENU}/${menuItemId}`);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error deleting menu item:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+}

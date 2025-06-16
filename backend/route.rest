@@ -8,7 +8,7 @@ GET https://menuq.arknishinvent.com/api/health
 GET http://localhost:8080/api/menuq/WMiNOcc6j4aRbAkpD4unBsM7rOG3
 
 ###
-GET http://menuq.arknishinvent.com/api/menu/RX00035
+GET http://menuq.arknishinvent.com/api/menuq
 
 ###
 GET http://menuq.arknishinvent.com/api/menuq/byId/RX00003
@@ -17,7 +17,7 @@ GET http://menuq.arknishinvent.com/api/menuq/byId/RX00003
 GET http://13.234.225.202:8080/api/health
 
 ###
-GET http://menuq.arknishinvent.com/api/test
+GET https://menuq.arknishinvent.com/api/menuq/byId/RQ00001
 
 ###
 GET https://menuq.arknishinvent.com/api/menuq/pGx6DnxdBuPIgDS6mAjK11dg0tC2
@@ -67,7 +67,7 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:8080/api/menu/RX00045
+GET http://localhost:8080/api/menuq/byId/RQ00001
 
 ### Update all operating hours for a restaurant
 PUT https://menuq.arknishinvent.com/api/menuq/b3r6hSN70OXMQkMAHT1h5QeybIk2/hours
@@ -109,7 +109,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:8080/api/counter/init
+POST https://menuq.arknishinvent.com/api/counter/init
 Content-Type: application/json
 
 {
