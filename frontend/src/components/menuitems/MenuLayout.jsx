@@ -599,7 +599,7 @@ const RestaurantMenu = () => {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Search for dishes..."
+                placeholder="Search for Categories..."
                 value={searchTerm}
                 onChange={handleSearchChange}
                 className="w-full pl-10 pr-10 py-2.5 rounded-full border border-amber-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 text-sm text-gray-700 placeholder-gray-400 outline-none transition-all duration-200 shadow-sm"
